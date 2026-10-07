@@ -17,6 +17,7 @@
   const scopes=new Set(),applicationRoots=new Set(); let sequence=0,applicationEpoch=0;
   const memberKinds=['event','character','task','project','knowledge','poll','journal','trade'];
   const publicKinds=['gallery','place','chronicle','trade','event','character'];
+  const publicEmpty={gallery:'Dorfaufnahmen',place:'Orte',chronicle:'Chronikeinträge',trade:'Handels- und Diplomatieeinträge',event:'RP-Termine',character:'Charaktervorstellungen'};
   const visibilityNames={draft:'Entwurf',clan:'Clanintern',review:'Zur Freigabe',public:'Öffentlich',archived:'Archiviert'};
   const route=path=>new URL(path,Raben.config.siteUrl).href;
   const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Berlin'}).format(new Date());
@@ -231,7 +232,7 @@
       const result=await q.range(ctx.offset,ctx.offset+11);if(result.error)throw result.error;if(epoch!==ctx.epoch||ctx.disposed)return;
       ctx.records=reset?result.data:ctx.records.concat(result.data);ctx.list.replaceChildren();
       ctx.urls.forEach(url=>URL.revokeObjectURL(url));ctx.urls.clear();
-      if(!ctx.records.length)ctx.list.append(note(ctx.public?'Hier erscheinen die ersten freigegebenen '+definitions[ctx.kind]?.label.toLowerCase()+'.':ctx.kind==='review'?'Es warten keine Einträge auf Freigabe.':'Noch keine passenden Einträge.','hub-empty'));
+      if(!ctx.records.length)ctx.list.append(note(ctx.public?'Hier erscheinen die ersten freigegebenen '+publicEmpty[ctx.kind]+'.':ctx.kind==='review'?'Es warten keine Einträge auf Freigabe.':'Noch keine passenden Einträge.','hub-empty'));
       ctx.records.forEach(row=>ctx.list.append(renderCard(ctx,row)));ctx.more.hidden=ctx.records.length>=Number(result.count||0);
       if(ctx.kind==='place')await drawMap(ctx,ctx.records);
       inform(ctx,'');
@@ -280,7 +281,7 @@
     const panel=el('div','hub-panel');ctx.panel=panel;panel.id='hub-panel-'+uid;panel.setAttribute('role','tabpanel');panel.tabIndex=0;
     ctx.heading=el('h2','');ctx.create=button('Neu erstellen',()=>openEditor(ctx,ctx.kind),'button small-button');ctx.refresh=button('Aktualisieren',()=>{const f=ctx.kind==='applications'?(ctx.offset=0,applications(ctx)):ctx.kind==='dashboard'?dashboard(ctx):loadList(ctx,true);f.catch(error=>inform(ctx,failure(error),true));});
     const bar=el('div','hub-toolbar'),titles=el('div','hub-title-row');titles.append(ctx.heading,ctx.create,ctx.refresh);bar.append(titles);
-    const sf=field('Suchen','search');ctx.search=sf.input;ctx.searchWrap=sf.wrap;ctx.search.placeholder='Titel, Text oder Schlagwörter';const searchForm=el('form','hub-search');searchForm.append(sf.wrap,button('Suchen',null));searchForm.lastChild.type='submit';searchForm.addEventListener('submit',event=>{event.preventDefault();loadList(ctx,true);});bar.append(searchForm);
+    const sf=field('Suchen','search');ctx.search=sf.input;ctx.searchWrap=sf.wrap;ctx.search.placeholder='Titel, Text oder Schlagwörter';const searchForm=el('form','hub-search');ctx.searchWrap=searchForm;searchForm.append(sf.wrap,button('Suchen',null));searchForm.lastChild.type='submit';searchForm.addEventListener('submit',event=>{event.preventDefault();loadList(ctx,true);});bar.append(searchForm);
     const af=field('Archivierte Einträge anzeigen','checkbox',false);ctx.archive=af.input;ctx.archiveWrap=af.wrap;ctx.archive.addEventListener('change',()=>loadList(ctx,true));
     const pf=field('Vergangene Termine anzeigen','checkbox',false);ctx.past=pf.input;ctx.pastWrap=pf.wrap;ctx.past.addEventListener('change',()=>loadList(ctx,true));bar.append(af.wrap,pf.wrap);
     ctx.editor=el('div','hub-editor-host');ctx.list=el('div','hub-list');ctx.more=button('Weitere laden',()=>{ctx.offset=ctx.kind==='applications'?(ctx.applications||[]).length:ctx.records.length;const f=ctx.kind==='applications'?applications(ctx):loadList(ctx,false);f.catch(error=>inform(ctx,failure(error),true));});ctx.more.hidden=true;
