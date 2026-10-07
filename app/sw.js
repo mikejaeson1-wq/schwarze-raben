@@ -1,13 +1,13 @@
 "use strict";
 const CACHE_PREFIX = "schwarze-raben-admin-shell-";
-const CACHE_NAME = CACHE_PREFIX + "v2";
+const CACHE_NAME = CACHE_PREFIX + "v3";
 const APP = new URL("./", self.location.href);
 // Only public, version-controlled UI files. No API, auth callback or user data.
 const ASSETS = [
-  "offline.html", "app.css", "install.js", "mobile.js", "manifest.webmanifest", "qr.png",
+  "offline.html", "app.css?v=d91204f14160", "install.js?v=408e384acc86", "mobile.js?v=5be272988abf", "manifest.webmanifest", "qr.png",
   "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png",
-  "../style.css", "../portal.css", "../config.js", "../default-content.js", "../app.js",
-  "../admin.js", "../community.js", "../community.css", "../effects.js", "../favicon.svg", "../vendor/supabase-2.117.2.js"
+  "../style.css?v=ac5de8590758", "../portal.css?v=ebc9f1a69173", "../config.js?v=910867e31876", "../default-content.js?v=2bf778afac5e", "../app.js?v=3d3d13153bc3",
+  "../admin.js?v=11b0bfa4baef", "../community.js?v=95bf8c4f398f", "../community.css?v=2a7809b024fb", "../effects.js?v=e6386250d97b", "../favicon.svg", "../vendor/supabase-2.117.2.js?v=b51e7b9e308e"
 ].map(path => new URL(path, APP).href);
 const STATIC_URLS = new Set(ASSETS);
 self.addEventListener("install", event => {
@@ -25,7 +25,8 @@ self.addEventListener("fetch", event => {
     event.respondWith(fetch(request).catch(() => caches.match(new URL("offline.html", APP).href)));
     return;
   }
-  if (url.search || !STATIC_URLS.has(url.href)) return;
+  // Only exact public asset URLs, including their known content versions.
+  if (!STATIC_URLS.has(url.href)) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
     try {

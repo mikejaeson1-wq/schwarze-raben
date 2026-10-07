@@ -136,7 +136,7 @@ Die App verwendet den bereits erlaubten Discord-Callback **clan.html** mit PKCE.
 
 Der Service Worker hat den Bereich **app/** als Geltungsbereich. Er legt ausschließlich öffentliche Programm- und Gestaltungsdateien ab. Supabase-API-Antworten, Mitgliederlisten, interne Beiträge, authentifizierte Requests und Navigationsadressen mit Anmeldecodes werden nicht gecacht. Ohne Internet erscheint beim Öffnen ein Verbindungshinweis; Änderungen werden nicht offline gespeichert oder später automatisch versendet. Beim Installieren möglichst zuerst das App-Symbol anlegen und danach innerhalb der App anmelden, damit die Sitzung im richtigen Browser-Kontext liegt.
 
-Die App wird wie die Website über GitHub Pages aktualisiert. Änderungen an gecachten Dateien werden bei bestehender Verbindung neu geladen. Bei späteren Änderungen am Service Worker die Cache-Version in **app/sw.js** erhöhen.
+Die App wird wie die Website über GitHub Pages aktualisiert. Stylesheets und Scripte werden mit einem Dateihash als Versionshinweis geladen. Dadurch erhalten auch bereits benutzte Browser die aktuellen Dateien beim erneuten Öffnen. Die Cache-Liste des Service Workers erlaubt ausschließlich die exakt hinterlegten öffentlichen Dateiversionen; andere Query-Adressen werden nicht gespeichert. Bei späteren Codeänderungen die betroffenen Dateihashes in HTML und Cache-Liste erneuern und die Cache-Version in **app/sw.js** erhöhen.
 
 Offizielle Hinweise zur Installation:
 
