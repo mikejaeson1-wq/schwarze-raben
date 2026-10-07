@@ -1,6 +1,8 @@
 (() => {
   "use strict";
   const config = window.RABEN_CONFIG || {};
+  const adminReturnKey = "schwarze-raben-admin-return";
+  const adminReturnLifetime = 15 * 60 * 1000;
   let client = null;
   const configured = () => /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(config.supabaseUrl || "") && !!config.supabasePublishableKey;
   const getClient = () => {
@@ -30,11 +32,30 @@
     const rows = await check(sb.rpc("raben_request_membership"));
     return Array.isArray(rows) ? rows[0] : rows;
   };
-  const signIn = async () => {
-    const redirect = new URL("clan.html", config.siteUrl);
+  const signIn = async (destination = "clan") => {
+    // Both interfaces reuse the already configured Discord/PKCE callback.
+    const destinations = {clan: "clan.html", "admin-app": "clan.html"};
+    if (!Object.hasOwn(destinations, destination)) throw new Error("Unbekanntes Anmeldeziel.");
+    const redirect = new URL(destinations[destination], config.siteUrl);
     if (redirect.origin !== window.location.origin || window.location.protocol !== "https:") throw new Error("Die Discord-Anmeldung ist auf der veröffentlichten Website verfügbar.");
-    const {error} = await getClient().auth.signInWithOAuth({provider: "discord", options: {redirectTo: redirect.href}});
-    if (error) throw error;
+    if (destination === "admin-app") window.sessionStorage.setItem(adminReturnKey, String(Date.now() + adminReturnLifetime));
+    else window.sessionStorage.removeItem(adminReturnKey);
+    try {
+      const {error} = await getClient().auth.signInWithOAuth({provider: "discord", options: {redirectTo: redirect.href}});
+      if (error) throw error;
+    } catch (error) { window.sessionStorage.removeItem(adminReturnKey); throw error; }
+  };
+  const finishAdminSignIn = () => {
+    // A short-lived, tab-local intent flag. It conveys no credentials or rights.
+    let expires;
+    try { expires = Number(window.sessionStorage.getItem(adminReturnKey)); window.sessionStorage.removeItem(adminReturnKey); }
+    catch (_) { return false; }
+    const now = Date.now();
+    if (!Number.isFinite(expires) || expires <= now || expires > now + adminReturnLifetime) return false;
+    const target = new URL("app/", config.siteUrl);
+    if (target.origin !== window.location.origin) return false;
+    window.location.replace(target.href);
+    return true;
   };
   const signOut = async () => {
     window.dispatchEvent(new Event("raben-lock"));
@@ -62,5 +83,5 @@
     if (error?.message?.includes("noch eingerichtet") || error?.message?.includes("veröffentlichten Website")) return error.message;
     return "Das hat gerade nicht funktioniert. Deine Eingaben bleiben erhalten. Bitte versuche es erneut.";
   };
-  window.Raben = {config, configured, client: getClient, el, status, check, member, signIn, signOut, imageUrl, applyImages, errorMessage};
+  window.Raben = {config, configured, client: getClient, el, status, check, member, signIn, finishAdminSignIn, signOut, imageUrl, applyImages, errorMessage};
 })();

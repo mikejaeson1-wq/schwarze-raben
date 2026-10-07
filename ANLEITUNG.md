@@ -7,6 +7,7 @@ Die öffentliche Website wird über GitHub Pages bereitgestellt. Supabase speich
 - **index.html:** öffentliche Clanvorstellung mit Dorf, Infoboard und ergänzbaren Informationen.
 - **clan.html:** eigene Oberfläche für den geschlossenen Clanbereich.
 - **admin.html:** Verwaltung für freigegebene Admins.
+- **app/:** installierbare mobile Admin-App mit Discord-Anmeldung, eigenem App-Symbol und QR-Code zur Installationsanleitung.
 - **Bilder:** Startseiten-Hintergrund und Dorfbild austauschen; JPG, PNG, WebP bis 8 MB.
 - **Effekte:** Schneefall, Glutpartikel oder keine Animation; Stärke und Geschwindigkeit einstellen.
 - **Inhalte:** Clanangaben, Dorfname, Geschichte, Charaktervorstellungen, öffentliche Aushänge, RP-Hinweise und zusätzliche Infos bearbeiten.
@@ -113,11 +114,40 @@ Die Datei **.nojekyll** sorgt für eine direkte Veröffentlichung der statischen
 
 Ein neu hochgeladenes Hintergrundbild wird mit **Änderungen speichern** auf der Seite aktiviert. Die Funktion **Original wiederherstellen** setzt das mitgelieferte Motiv wieder ein. Alte hochgeladene Bilder werden nicht automatisch aus dem Speicher gelöscht; der Projektverantwortliche kann ungenutzte Dateien im Storage-Bucket entfernen.
 
+## 6. Mobile Admin-App installieren
+
+- Installation und QR-Code: https://mikejaeson1-wq.github.io/schwarze-raben/app/install.html
+- App öffnen: https://mikejaeson1-wq.github.io/schwarze-raben/app/
+- QR-Code herunterladen: https://mikejaeson1-wq.github.io/schwarze-raben/app/qr.png
+
+Den QR-Code mit der Handykamera scannen und die Installationsseite im Browser öffnen. Der Code installiert die App nicht automatisch; die Installation muss auf dem Handy bestätigt werden.
+
+**Android:** Die Seite in Chrome öffnen und **App installieren** wählen, sobald der Button erscheint. Alternativ über das Browsermenü **App installieren** oder **Zum Startbildschirm hinzufügen** wählen. Danach das Symbol **Raben Admin** öffnen und in der App mit Discord anmelden.
+
+**iPhone:** Die Seite in Safari öffnen, **Teilen → Zu Home-Bildschirm hinzufügen** wählen und **Als Web-App öffnen** aktivieren, falls diese Option angezeigt wird. Mit **Hinzufügen** bestätigen. Danach das Symbol **Raben Admin** öffnen und dort mit Discord anmelden. Bei abweichendem Safari-Layout ist Teilen im Seitenmenü erreichbar.
+
+Die App öffnet nach der Freigabe direkt die Mitgliederverwaltung. Über die fünf Reiter sind Dorfangaben, öffentliche Informationen, Bilder und Effekte, geschlossene Beiträge sowie Mitgliederrechte erreichbar. Alle Änderungen landen in derselben Datenbank wie die Website. Für die Verwaltung sind eine Internetverbindung und ein aktives Admin-Konto erforderlich. Eine normale Clanmitgliedschaft reicht nicht aus.
+
+Die Installation ist öffentlich zugänglich; sie erteilt keine Adminrechte. Adminrechte prüft die Anwendung vor dem Laden der Verwaltung und vor jeder Änderung erneut. Die Datenbank erzwingt diese Rechte zusätzlich. Entzogene Rechte sperren die Oberfläche und entfernen die geladenen internen Listen und Beitragsentwürfe.
+
+Die App verwendet den bereits erlaubten Discord-Callback **clan.html** mit PKCE. Ein kurzlebiger Rückkehrhinweis im selben Browser-Tab führt anschließend zur festen Adresse **app/**, bevor Clan-Daten geladen werden. Der Hinweis enthält keine Zugangsdaten und vergibt keine Rechte. Eine weitere Discord-Anwendung oder zusätzliche Supabase-Rückkehradresse ist dafür nicht nötig.
+
+Der Service Worker hat den Bereich **app/** als Geltungsbereich. Er legt ausschließlich öffentliche Programm- und Gestaltungsdateien ab. Supabase-API-Antworten, Mitgliederlisten, interne Beiträge, authentifizierte Requests und Navigationsadressen mit Anmeldecodes werden nicht gecacht. Ohne Internet erscheint beim Öffnen ein Verbindungshinweis; Änderungen werden nicht offline gespeichert oder später automatisch versendet. Beim Installieren möglichst zuerst das App-Symbol anlegen und danach innerhalb der App anmelden, damit die Sitzung im richtigen Browser-Kontext liegt.
+
+Die App wird wie die Website über GitHub Pages aktualisiert. Änderungen an gecachten Dateien werden bei bestehender Verbindung neu geladen. Bei späteren Änderungen am Service Worker die Cache-Version in **app/sw.js** erhöhen.
+
+Offizielle Hinweise zur Installation:
+
+- https://support.apple.com/de-de/guide/iphone/iphea86e5236/ios
+- https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable
+
 ## Prüfung
 
 Lokal wurden die SQL-Dateien in einer PostgreSQL-Testumgebung mit nachgebildeten Supabase-Auth- und Storage-Schemas ausgeführt. Geprüft wurden öffentliche Leserechte, Discord-Identitätsprüfung, wartende Nutzer, Mitglieder, Admins, unerlaubte Rechteerhöhung, Bild-Upload-Rechte, Schutz des letzten Admins und Zugriffsentzug nach Sperrung.
 
 Zusätzlich wurden JavaScript-Syntax, HTML-Verweise, sicheres Einsetzen von Texten, öffentliches Nachladen von Inhalten, Reiterbedienung und die Admin-Bearbeitung mit Speicherung geprüft. Die veröffentlichte Startseite und der geschlossene Clan-Eingang wurden im Browser geprüft. Die Weiterleitung erreicht Discord mit der richtigen Supabase-Callback- und Clan-Rückkehradresse. Die Live-Datenbank verweigert Gästen den Zugriff auf Mitgliederdaten und interne Beiträge; Abfragen mit den Datenbankrechten eines nicht freigegebenen Nutzers bleiben gesperrt. Die Admin-Freigabe des verifizierten Discord-Kontos und die Mitgliedschaftsfunktion wurden ebenfalls auf der Live-Datenbank geprüft. Ein vollständiger Login mit anschließender Admin-Bearbeitung wurde noch nicht im Browser durchgeführt.
+
+Für die mobile App wurden zusätzlich Gäste, wartende Nutzer, aktive Clanmitglieder und gesperrte Nutzer auf gesperrten Admin-Zugang ohne Inhaltsabfragen geprüft. Eine Admin-Bearbeitung mit Speicherung sowie das Sperren und Leeren der Oberfläche nach Rechteentzug wurden mit dem tatsächlichen Frontend-Code getestet. Der feste Discord-Rückweg, Ablauf und einmaliger Verbrauch des Rückkehrhinweises, Installationsmanifest, Bildgrößen, HTML-Verweise und Cache-Regeln sind geprüft. Der QR-Code wurde nach der Erstellung mit einem unabhängigen Decoder ausgelesen und stimmt mit der veröffentlichten Installationsadresse überein. Eine Installation und vollständige Discord-Anmeldung auf einem tatsächlichen Android-Handy oder iPhone wurde noch nicht durchgeführt.
 
 ## Dateien
 
@@ -127,6 +157,7 @@ Zusätzlich wurden JavaScript-Syntax, HTML-Verweise, sicheres Einsetzen von Text
 - `public.js`: öffentliche Inhalte.
 - `clan.js`: geschlossener Clanbereich.
 - `admin.js`: Admin-Verwaltung.
+- `app/`: mobile Admin-Oberfläche, Installation, QR-Code, Manifest, App-Symbole und Service Worker.
 - `effects.js`: Animationen und Bewegungseinstellungen.
 - `style.css`, `portal.css`: Gestaltung.
 - `assets/`: mitgelieferte Bilder.

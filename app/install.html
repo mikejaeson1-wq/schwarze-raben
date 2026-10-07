@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark"><meta name="theme-color" content="#101619">
+  <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Raben Admin">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Raben Admin kostenlos auf dem Handy installieren. Die Verwaltung der Schwarzen Raben für freigegebene Clan-Admins mit Discord-Anmeldung.">
+  <title>Admin-App installieren · Schwarze Raben</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="../portal.css"><link rel="stylesheet" href="app.css">
+</head>
+<body class="portal-body installer">
+  <a class="skip-link" href="#installation">Zur Installation springen</a>
+  <header class="portal-header app-header"><div class="container header-inner">
+    <a class="brand" href="../"><span class="brand-mark" aria-hidden="true"><span>R</span></span><span><span class="brand-name">Schwarze Raben</span><span class="brand-caption">DIE CLANFÜHRUNG UNTERWEGS</span></span></a>
+    <nav class="app-header-nav" aria-label="Navigation"><a href="../">Website</a><a href="./">App öffnen ↗</a></nav>
+  </div></header>
+  <main class="container install-main" id="installation">
+    <div class="install-heading"><img class="install-icon" src="icons/icon-192.png" alt="Raben-Admin-Appsymbol" width="100" height="100"><div><p class="eyebrow">Raben Admin · Nur für Admins</p><h1>Die Clanführung.<br><span>Immer dabei.</span></h1><p class="install-intro">Mitglieder freigeben, Beiträge pflegen und eure Website gestalten. Auf deinem Handy, mit deinem Discord-Konto.</p></div></div>
+    <p class="status-message" id="install-status" role="status" hidden></p>
+    <div class="install-grid">
+      <section class="install-card">
+        <h2>Auf dein Handy holen.</h2><p>Öffne diese Seite im Browser deines Handys. Die App lässt sich kostenlos auf dem Startbildschirm ablegen.</p>
+        <div class="install-actions"><button class="button" id="install-app" hidden>App installieren</button><a class="button outline" href="./">App öffnen</a></div>
+        <div class="device-steps" id="android-steps"><h3>Android · Chrome</h3><ol>
+          <li>Wähle <strong>App installieren</strong>, wenn der Button erscheint. Alternativ: Browsermenü <strong>⋮ → App installieren</strong> oder <strong>Zum Startbildschirm hinzufügen</strong>.</li>
+          <li>Bestätige die Installation und öffne das Symbol <strong>Raben Admin</strong>.</li>
+          <li>Melde dich in der App mit <strong>Discord</strong> an.</li>
+        </ol></div>
+        <div class="device-steps" id="iphone-steps"><h3>iPhone · Safari</h3><ol>
+          <li>Öffne <strong>Teilen → Zu Home-Bildschirm hinzufügen</strong>.</li>
+          <li>Aktiviere <strong>Als Web-App öffnen</strong>, falls angezeigt, und wähle <strong>Hinzufügen</strong>.</li>
+          <li>Öffne <strong>Raben Admin</strong> auf dem Home-Bildschirm und melde dich mit <strong>Discord</strong> an.</li>
+        </ol></div>
+      </section>
+      <aside class="qr-card" aria-label="QR-Code zur App-Installation">
+        <h2>Scannen &amp; öffnen.</h2><img src="qr.png" width="232" height="232" alt="QR-Code: Installationsseite für Raben Admin auf dem Handy öffnen">
+        <p>Mit der Handykamera scannen. Der Code öffnet diese Anleitung; die Installation bestätigst du auf deinem Handy.</p>
+        <a href="qr.png" download="Schwarze-Raben-Admin-QR.png">QR-Code herunterladen</a>
+      </aside>
+    </div>
+    <p class="install-footnote">Zugang ausschließlich für freigegebene Admins. Dieselben Inhalte und Rechte wie auf der Website. Internet ist zum Anmelden und Verwalten erforderlich; ein App-Store-Konto brauchst du nicht.</p>
+    <noscript><p class="status-message">Die Installation über das Browsermenü ist möglich. Die Verwaltung benötigt JavaScript.</p></noscript>
+  </main>
+  <script src="install.js"></script>
+</body>
+</html>

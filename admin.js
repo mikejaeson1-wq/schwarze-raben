@@ -1,6 +1,8 @@
 (() => {
   "use strict";
   const {el,status,check} = Raben;
+  const mobileApp = document.body.dataset.adminApp === "true";
+  const asset = path => (mobileApp ? "../" : "") + path;
   let draft = null, revision = null, currentAdmin = null, editingPost = null, dirty = false, busy = false, epoch = 0;
   const effects = RabenEffects.create(document.getElementById("preview-canvas"), {type:"none"});
   const listSchemas = {
@@ -18,6 +20,7 @@
     document.getElementById("internal-posts").replaceChildren(); document.getElementById("member-manager").replaceChildren();
     document.getElementById("public-lists").replaceChildren(); document.querySelectorAll("#clan-form input, #clan-form textarea").forEach(n => n.value = "");
     document.getElementById("post-form").reset(); dirty = false;
+    const badge=document.getElementById("pending-count"); if(badge) badge.hidden=true;
   };
   const ensureAdmin = async () => {
     const member = await Raben.member();
@@ -61,8 +64,8 @@
   const populate = () => {
     document.querySelectorAll("#clan-form [name]").forEach(input => {input.value = typeof draft[input.name] === "string" ? draft[input.name] : "";});
     buildLists();
-    document.getElementById("hero-preview").src = Raben.imageUrl(draft.heroImage) || "assets/nord-dorf.webp";
-    document.getElementById("village-preview").src = Raben.imageUrl(draft.villageImage) || "assets/raben-langhaus.webp";
+    document.getElementById("hero-preview").src = Raben.imageUrl(draft.heroImage) || asset("assets/nord-dorf.webp");
+    document.getElementById("village-preview").src = Raben.imageUrl(draft.villageImage) || asset("assets/raben-langhaus.webp");
     const settings = RabenEffects.normalize(draft.effects);
     document.getElementById("effect-type").value = settings.type; document.getElementById("effect-intensity").value = settings.intensity; document.getElementById("effect-speed").value = settings.speed;
     updatePreview(); dirty = false;
@@ -121,6 +124,8 @@
     const members=await check(Raben.client().from("raben_memberships").select("user_id,discord_id,display_name,status,role,updated_at").order("created_at",{ascending:false}));
     if(ownEpoch !== epoch) return;
     const root=document.getElementById("member-manager"); root.replaceChildren();
+    const badge=document.getElementById("pending-count");
+    if(badge) {const count=members.filter(member=>member.status === "pending").length; badge.textContent=count+" wartend"; badge.hidden=count === 0;}
     if(!members.length) root.append(el("p","field-note","Es gibt noch keine Zugangsanfragen."));
     members.forEach(member => {
       const row=el("article","member-row"), info=el("div");
@@ -185,7 +190,7 @@
   document.querySelectorAll("[data-image]").forEach(input => input.addEventListener("change",() => upload(input)));
   document.querySelectorAll("[data-reset-image]").forEach(button => button.addEventListener("click",() => {
     if(!draft) return; const key=button.dataset.resetImage; draft[key]="";
-    document.getElementById(key === "heroImage" ? "hero-preview" : "village-preview").src=key === "heroImage"?"assets/nord-dorf.webp":"assets/raben-langhaus.webp";
+    document.getElementById(key === "heroImage" ? "hero-preview" : "village-preview").src=asset(key === "heroImage"?"assets/nord-dorf.webp":"assets/raben-langhaus.webp");
     updatePreview(); markDirty();
   }));
   ["effect-type","effect-intensity","effect-speed"].forEach(id => document.getElementById(id).addEventListener("input",() => {updatePreview(); markDirty();}));
@@ -203,14 +208,21 @@
   });
   window.addEventListener("beforeunload",event => {if(dirty) {event.preventDefault(); event.returnValue="";}});
   window.addEventListener("raben-lock",lock);
-  document.getElementById("logout").addEventListener("click",async () => {lock(); try {await Raben.signOut(); location.replace("clan.html");} catch(error) {message(Raben.errorMessage(error),true);}});
+  document.getElementById("logout").addEventListener("click",async () => {lock(); try {await Raben.signOut(); location.replace(mobileApp ? "./" : "clan.html");} catch(error) {message(Raben.errorMessage(error),true);}});
   const auditAccess = async () => {if(currentAdmin) {try {await ensureAdmin();} catch(error) {message("Deine Admin-Rechte sind nicht mehr aktiv. Bitte prüfe deinen Zugang.",true);}}};
   window.addEventListener("focus",auditAccess); setInterval(() => {if(!document.hidden) auditAccess();},30000);
   const init = async () => {
     try {
       if(!Raben.configured()) {message("Die Verwaltung wird noch eingerichtet."); return;}
       const member=await Raben.member();
-      if(!member || member.status !== "active" || member.role !== "admin") return;
+      document.getElementById("logout").hidden=!member;
+      if(!member || member.status !== "active" || member.role !== "admin") {
+        if(mobileApp) document.getElementById("admin-gate-text").textContent=!member
+          ? "Melde dich mit Discord an. Nur freigegebene Admins können diese App nutzen."
+          : member.status === "blocked" ? "Dein Zugang ist gesperrt. Bitte wende dich an die Clanführung."
+          : "Dieses Discord-Konto hat keine Admin-Freigabe. Bitte wende dich an die Clanführung oder melde dich mit deinem Admin-Konto an.";
+        return;
+      }
       const sb=Raben.client(); const record=await check(sb.from("raben_site_content").select("content,revision").eq("id",1).single());
       draft={...window.CLAN_DEFAULT,...record.content}; revision=record.revision; currentAdmin=member; populate();
       document.getElementById("account").textContent=member.display_name+" · Admin"; document.getElementById("account").hidden=false; document.getElementById("logout").hidden=false;

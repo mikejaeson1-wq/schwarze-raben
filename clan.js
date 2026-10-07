@@ -16,6 +16,7 @@
       if (!Raben.configured()) {status("portal-status","Die Discord-Anmeldung wird noch eingerichtet."); return;}
       const member = await Raben.member();
       if (epoch !== ownEpoch) return;
+      if (Raben.finishAdminSignIn()) return;
       identity = member;
       document.getElementById("logout").hidden = !member;
       document.getElementById("discord-login").hidden = !!member;
