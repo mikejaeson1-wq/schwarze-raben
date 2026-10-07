@@ -1,6 +1,6 @@
 # Schwarze Raben
 
-Website und geschütztes Clanportal für das Conan Exiles Roleplay-Projekt **Schwarze Raben**, mit nordischem Dorf im Schnee.
+Website und geschütztes Clanportal für den Conan Exiles Roleplay-Clan **Schwarze Raben**, mit nordischem Dorf im Schnee.
 
 - [Website](https://mikejaeson1-wq.github.io/schwarze-raben/)
 - [Dorfleben: Galerie, Karte, Chronik, Handel und Termine](https://mikejaeson1-wq.github.io/schwarze-raben/entdecken.html)
@@ -21,3 +21,5 @@ Statische HTML-, CSS- und JavaScript-Dateien ohne Build, veröffentlicht über G
 **Raben Admin** ist eine installierbare Web-App für Android und iPhone. Der QR-Code öffnet die Installationsanleitung. Nach dem Hinzufügen zum Startbildschirm die App über ihr Symbol öffnen und mit Discord anmelden. Ausschließlich aktive Admins erhalten die Verwaltungsoberfläche; normale Clanmitglieder bleiben gesperrt. Die App startet im RP-Hub mit Bewerbungen, Freigaben, anstehenden Terminen und Aufträgen und bietet dieselbe vollständige Inhaltsverwaltung wie die Desktop-Verwaltung. Die App nutzt dieselben Inhalte und Rechte wie die Website. Internet wird zum Verwalten benötigt. Der Service Worker speichert ausschließlich öffentliche Oberflächendateien, keine Mitgliederdaten, internen Beiträge oder OAuth-Rückkehradressen.
 
 Bedienung und technische Einrichtung: [ANLEITUNG.md](ANLEITUNG.md).
+
+Geplanter Ausbau und Prioritäten: [ROADMAP.md](ROADMAP.md). YouTube-Links und echte MP3-Uploads sind als nächstes Medienupdate geplant. Serverangaben werden im bearbeitbaren Infobereich gepflegt.

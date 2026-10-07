@@ -16,7 +16,7 @@
     const title = document.getElementById("hero-title");
     title.replaceChildren(document.createTextNode(name === "Schwarze Raben" ? "Schwarze" : name));
     if (name === "Schwarze Raben") { const second = document.createElement("span"); second.textContent = "Raben"; title.append(second); }
-    const description = text(CLAN.beschreibung, "Ein nordisches Roleplay-Projekt in Conan Exiles.");
+    const description = text(CLAN.beschreibung, "Ein Clan mit nordischem Roleplay in Conan Exiles.");
     setText("hero-description", description);
     document.querySelector('meta[name="description"]').content = name + " – " + description;
     setText("dorf-beschreibung", text(CLAN.dorfBeschreibung, "Unser Dorf liegt im Schnee und ist die Heimat unseres Clans."));

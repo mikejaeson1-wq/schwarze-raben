@@ -1,12 +1,12 @@
 "use strict";
 const CACHE_PREFIX = "schwarze-raben-admin-shell-";
-const CACHE_NAME = CACHE_PREFIX + "v3";
+const CACHE_NAME = CACHE_PREFIX + "v4";
 const APP = new URL("./", self.location.href);
 // Only public, version-controlled UI files. No API, auth callback or user data.
 const ASSETS = [
   "offline.html", "app.css?v=d91204f14160", "install.js?v=408e384acc86", "mobile.js?v=5be272988abf", "manifest.webmanifest", "qr.png",
   "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png",
-  "../style.css?v=ac5de8590758", "../portal.css?v=ebc9f1a69173", "../config.js?v=910867e31876", "../default-content.js?v=2bf778afac5e", "../app.js?v=3d3d13153bc3",
+  "../style.css?v=ac5de8590758", "../portal.css?v=ebc9f1a69173", "../config.js?v=910867e31876", "../default-content.js?v=013a11b115e4", "../app.js?v=3d3d13153bc3",
   "../admin.js?v=11b0bfa4baef", "../community.js?v=95bf8c4f398f", "../community.css?v=2a7809b024fb", "../effects.js?v=e6386250d97b", "../favicon.svg", "../vendor/supabase-2.117.2.js?v=b51e7b9e308e"
 ].map(path => new URL(path, APP).href);
 const STATIC_URLS = new Set(ASSETS);

@@ -1,6 +1,6 @@
 window.CLAN_DEFAULT = {
     name: "Schwarze Raben",
-    beschreibung: "Ein Clan. Ein Dorf im Schnee. Ein nordisches Roleplay-Projekt in Conan Exiles.",
+    beschreibung: "Ein Clan. Ein Dorf im Schnee. Nordisches Roleplay in Conan Exiles.",
     dorfName: "",
     serverName: "",
     clanFuehrung: "",
