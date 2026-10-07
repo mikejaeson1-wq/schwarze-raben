@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#101619">
+  <meta name="description" content="Schwarze Raben – ein Conan Exiles Roleplay-Clan. Unser Dorf im Schnee und unser nordisches Viking-Setting.">
+  <title>Schwarze Raben · Conan Exiles Roleplay</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23101619'/%3E%3Cpath d='M32 5 59 32 32 59 5 32Z' fill='none' stroke='%23c8a46c' stroke-width='2'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Georgia,serif' font-size='36' fill='%23ece9e1'%3ER%3C/text%3E%3C/svg%3E">
+
+  <!-- =============================================================
+       Inhalte werden nach der Einrichtung in der Admin-Oberfläche gepflegt.
+       default-content.js enthält die öffentliche Ausgangsversion.
+       ============================================================= -->
+  <script src="config.js"></script>
+  <script src="default-content.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body id="anfang">
+  <a class="skip-link" href="#clan">Zum Inhalt springen</a>
+  <noscript><p class="no-script">Die Clanvorstellung ist ohne JavaScript lesbar. Für das Infoboard und eure ergänzten Clanangaben bitte JavaScript aktivieren.</p></noscript>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#anfang" aria-label="Schwarze Raben – Startseite">
+        <span class="brand-mark" aria-hidden="true"><span>R</span></span>
+        <span><span class="brand-name" data-clan-name>Schwarze Raben</span><span class="brand-caption">CONAN EXILES · ROLEPLAY</span></span>
+      </a>
+      <button class="menu-toggle" id="menu-toggle" aria-expanded="true" aria-controls="hauptnavigation" aria-label="Menü schließen" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <nav class="nav-links" id="hauptnavigation" aria-label="Hauptnavigation">
+        <a href="#clan">Der Clan</a>
+        <a href="#dorf">Unser Dorf</a>
+        <a href="#infoboard" data-open-tab="rp">Roleplay</a>
+        <a href="#infoboard">Clan-Infos</a>
+        <a class="nav-clan" href="clan.html">Clanbereich</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-art" aria-hidden="true"></div>
+      <canvas id="schnee" aria-hidden="true"></canvas>
+      <div class="container hero-inner">
+        <p class="eyebrow hero-eyebrow">Conan Exiles · Nordisches Roleplay</p>
+        <h1 id="hero-title">Schwarze<span>Raben</span></h1>
+        <p class="hero-description" id="hero-description">Ein Clan. Ein Dorf im Schnee. Ein nordisches Roleplay-Projekt in Conan Exiles.</p>
+        <div class="hero-actions">
+          <a class="button" href="#dorf">Unser Dorf entdecken</a>
+          <a class="button outline" href="#infoboard">Zu den Clan-Infos</a>
+        </div>
+      </div>
+      <div class="hero-base">
+        <div class="container hero-base-inner">
+          <p class="hero-setting"><span>Conan Exiles</span><span class="small-diamond" aria-hidden="true"></span><span>Nord / Viking Setting</span></p>
+          <p class="art-caption">Nordische Stimmungsillustration</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="clan" aria-labelledby="clan-title">
+      <div class="container">
+        <div class="intro">
+          <div>
+            <p class="eyebrow"><span class="section-number">01</span>Die Schwarzen Raben</p>
+            <h2 class="section-title" id="clan-title">Eine Heimat im Norden.<br>Raum für eure Geschichten.</h2>
+          </div>
+          <div class="intro-copy">
+            <p><strong data-clan-name>Schwarze Raben</strong> ist unser Clan in Conan Exiles. Unser Roleplay-Projekt verbindet ein Dorf im Schnee mit einem Nord- und Viking-Setting.</p>
+            <p>Diese Seite ist unser Treffpunkt außerhalb des Spiels: eine Vorstellung unseres Clans und ein Ort für Charaktere, Aushänge und RP-Informationen.</p>
+            <dl class="clan-facts">
+              <div><dt>Unsere Welt</dt><dd>Conan Exiles</dd></div>
+              <div><dt>Unser Fokus</dt><dd>Roleplay</dd></div>
+              <div><dt>Unser Setting</dt><dd>Nord / Viking</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="saga" id="saga" hidden><p class="eyebrow">Die Saga der Raben</p><h3>Unsere Geschichte</h3><p id="geschichte"></p></div>
+      </div>
+    </section>
+
+    <section class="section village-section" id="dorf" aria-labelledby="dorf-title">
+      <div class="container">
+        <div class="village">
+          <figure class="village-figure">
+            <div class="village-art" role="img" aria-label="Nordische Stimmungsillustration: ein schwarzer Rabe vor einem verschneiten Langhaus mit warmem Feuerlicht."></div>
+            <figcaption class="village-caption">
+              <p id="dorf-caption">Ein Dorf im Schnee</p>
+              <p class="art-caption">Stimmungsillustration · Nord / Viking</p>
+            </figcaption>
+          </figure>
+          <div class="village-copy">
+            <p class="eyebrow"><span class="section-number">02</span>Unser Dorf</p>
+            <h2 class="section-title" id="dorf-title">Schnee vor den Toren.<br>Geschichten dahinter.</h2>
+            <p id="dorf-beschreibung">Unser Dorf liegt im Schnee. Es ist die Heimat der Schwarzen Raben und der Schauplatz unseres nordischen Roleplays in Conan Exiles.</p>
+            <dl class="clan-facts">
+              <div><dt>Kulisse</dt><dd>Schneeregion</dd></div>
+              <div><dt>Stil</dt><dd>Nord / Viking</dd></div>
+              <div><dt>Clan</dt><dd data-clan-name>Schwarze Raben</dd></div>
+            </dl>
+            <div class="village-line" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section board-section" id="infoboard" aria-labelledby="board-title">
+      <div class="container">
+        <div class="board-heading">
+          <div><p class="eyebrow"><span class="section-number">03</span>Für unsere Gemeinschaft</p><h2 class="section-title" id="board-title">Das Infoboard der Raben.</h2></div>
+          <p>Clanangaben, Charaktere und Neuigkeiten an einem Ort. Für Mitglieder und alle, die uns kennenlernen möchten.</p>
+        </div>
+        <div class="board">
+          <div class="tab-list" role="tablist" aria-label="Claninformationen">
+            <button class="tab" id="tab-ueberblick" role="tab" aria-selected="true" aria-controls="panel-ueberblick" tabindex="0" data-tab="ueberblick">Überblick</button>
+            <button class="tab" id="tab-aushang" role="tab" aria-selected="false" aria-controls="panel-aushang" tabindex="-1" data-tab="aushang">Aushänge</button>
+            <button class="tab" id="tab-mitglieder" role="tab" aria-selected="false" aria-controls="panel-mitglieder" tabindex="-1" data-tab="mitglieder">Charaktere</button>
+            <button class="tab" id="tab-rp" role="tab" aria-selected="false" aria-controls="panel-rp" tabindex="-1" data-tab="rp">RP-Infos</button>
+          </div>
+          <div class="tab-panel" id="panel-ueberblick" role="tabpanel" aria-labelledby="tab-ueberblick" tabindex="0">
+            <div class="overview">
+              <div>
+                <p class="panel-eyebrow">Clan &amp; Server</p>
+                <h3 class="panel-title">Die Raben auf einen Blick.</h3>
+                <p class="panel-copy">Unser Clan spielt in Conan Exiles mit einem nordischen Roleplay-Setting. Hier findet ihr die wichtigsten Angaben zu unserer Gemeinschaft.</p>
+                <a class="button outline" id="board-discord" href="#" target="_blank" rel="noopener noreferrer" style="margin-top:24px" hidden>Unser Discord</a>
+              </div>
+              <dl class="info-list">
+                <div class="info-row"><dt>Clan</dt><dd data-clan-name>Schwarze Raben</dd></div>
+                <div class="info-row"><dt>Server</dt><dd class="pending" id="info-server">Noch nicht eingetragen</dd></div>
+                <div class="info-row"><dt>Dorf</dt><dd id="info-dorf">Dorf im Schnee</dd></div>
+                <div class="info-row"><dt>Clanführung</dt><dd class="pending" id="info-leitung">Noch nicht eingetragen</dd></div>
+                <div class="info-row"><dt>Schwerpunkt</dt><dd>Nordisches Roleplay</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="tab-panel" id="panel-aushang" role="tabpanel" aria-labelledby="tab-aushang" tabindex="0" hidden>
+            <div id="aushang-inhalt">
+              <div class="empty-state">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" aria-hidden="true"><path d="M13 7h22v34H13zM19 16h10M19 23h10M19 30h6M9 11h4M35 37h4"/></svg>
+                <div><h3>Am schwarzen Brett ist es noch still.</h3><p>Hier finden Clan-Neuigkeiten, gemeinsame Vorhaben und RP-Termine ihren Platz. Aktuell gibt es noch keine Aushänge.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-panel" id="panel-mitglieder" role="tabpanel" aria-labelledby="tab-mitglieder" tabindex="0" hidden>
+            <div id="mitglieder-inhalt">
+              <div class="empty-state">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="24" cy="16" r="7"/><path d="M10 41v-6a14 14 0 0 1 28 0v6M6 8h5M37 8h5M6 40h5M37 40h5"/></svg>
+                <div><h3>Wer unter den Raben lebt.</h3><p>Hier stellen wir unsere RP-Charaktere vor. Namen, Rollen und Charaktergeschichten werden noch ergänzt.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-panel" id="panel-rp" role="tabpanel" aria-labelledby="tab-rp" tabindex="0" hidden>
+            <div id="rp-inhalt">
+              <div class="rp-glossary">
+                <div><p class="panel-eyebrow">IC · In Character</p><h3>In der Rolle.</h3><p>IC bezeichnet das Spiel aus Sicht eures Charakters: seine Worte, Handlungen, Begegnungen und das Wissen, das er in der Spielwelt besitzt.</p></div>
+                <div><p class="panel-eyebrow">OOC · Out of Character</p><h3>Außerhalb der Rolle.</h3><p>OOC bezeichnet euch als Spielerinnen und Spieler. Absprachen außerhalb der Spielwelt gehören hierher und sind vom Wissen eurer Charaktere getrennt.</p></div>
+              </div>
+              <p class="rp-note">Die konkreten Serverregeln und RP-Absprachen unseres Clans werden hier noch ergänzt.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="zusatz-info" aria-labelledby="zusatz-title" hidden><div class="container"><p class="eyebrow">Wissenswertes</p><h2 class="section-title" id="zusatz-title">Weitere Informationen.</h2><div id="zusatz-inhalt" class="extra-grid"></div></div></section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="container">
+        <div class="ornament" aria-hidden="true"><span class="small-diamond"></span></div>
+        <h2 id="closing-title">Der Norden ist unser Zuhause.</h2>
+        <p>Schwarze Raben · Conan Exiles · Roleplay</p>
+        <a class="button" id="closing-discord" href="#" target="_blank" rel="noopener noreferrer" hidden>Zu unserer Gemeinschaft</a>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><p class="footer-name" data-clan-name>Schwarze Raben</p><p class="footer-note">Conan Exiles Roleplay · Unabhängiges Fanprojekt</p></div>
+      <a class="top-link" href="#anfang">Zurück nach oben</a>
+    </div>
+  </footer>
+
+  <script src="vendor/supabase-2.117.2.js"></script>
+  <script src="app.js"></script>
+  <script src="effects.js"></script>
+  <script src="public.js"></script>
+</body>
+</html>

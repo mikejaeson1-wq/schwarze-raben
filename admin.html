@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark"><meta name="theme-color" content="#101619">
+  <title>Verwaltung · Schwarze Raben</title><link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="portal.css">
+</head>
+<body class="portal-body">
+  <a class="skip-link" href="#verwaltung">Zur Verwaltung springen</a>
+  <header class="portal-header"><div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><span>R</span></span><span><span class="brand-name">Schwarze Raben</span><span class="brand-caption">CLAN-VERWALTUNG</span></span></a>
+    <nav class="portal-nav" aria-label="Clan-Navigation"><a href="index.html">Website</a><a href="clan.html">Clanbereich</a><a href="admin.html" aria-current="page">Verwaltung</a><button class="text-button" id="logout" hidden>Abmelden</button></nav>
+  </div></header>
+  <main class="container portal-main" id="verwaltung">
+    <div class="portal-heading"><div><p class="eyebrow">Für die Clan-Admins</p><h1>Die Raben verwalten.</h1><p>Inhalte pflegen. Mitglieder freigeben. Eure Website gestalten.</p></div><div class="account-pill" id="account" hidden></div></div>
+    <p class="status-message" id="admin-status" role="status" hidden></p>
+    <section class="gate" id="admin-gate"><h2>Dieser Bereich gehört den Admins.</h2><p id="admin-gate-text">Melde dich mit Discord an. Zur Verwaltung benötigst du eine Admin-Freigabe.</p><a class="button" href="clan.html">Zur Discord-Anmeldung</a></section>
+    <div class="editor-layout" id="admin-content" hidden>
+      <div class="editor-nav" role="tablist" aria-label="Verwaltungsbereiche" aria-orientation="vertical">
+        <button role="tab" id="edit-tab-website" data-editor-tab="website" aria-selected="true" aria-controls="edit-website" tabindex="0">Clan &amp; Dorf</button>
+        <button role="tab" id="edit-tab-inhalte" data-editor-tab="inhalte" aria-selected="false" aria-controls="edit-inhalte" tabindex="-1">Öffentliche Inhalte</button>
+        <button role="tab" id="edit-tab-design" data-editor-tab="design" aria-selected="false" aria-controls="edit-design" tabindex="-1">Bilder &amp; Effekte</button>
+        <button role="tab" id="edit-tab-clan" data-editor-tab="clan" aria-selected="false" aria-controls="edit-clan" tabindex="-1">Geschlossene Inhalte</button>
+        <button role="tab" id="edit-tab-members" data-editor-tab="members" aria-selected="false" aria-controls="edit-members" tabindex="-1">Mitglieder &amp; Rechte</button>
+      </div>
+      <div>
+        <section class="editor-panel" id="edit-website" role="tabpanel" aria-labelledby="edit-tab-website" tabindex="0">
+          <h2>Clan und Dorf.</h2><p>Diese Angaben erscheinen auf eurer öffentlichen Website.</p>
+          <div class="form-grid" id="clan-form">
+            <label class="form-field">Clanname<input name="name" maxlength="100" required></label>
+            <label class="form-field">Dorfname<input name="dorfName" maxlength="100"></label>
+            <label class="form-field">Servername<input name="serverName" maxlength="150"></label>
+            <label class="form-field">Clanführung<input name="clanFuehrung" maxlength="200"></label>
+            <label class="form-field full">Einleitung<textarea name="beschreibung" maxlength="1000"></textarea></label>
+            <label class="form-field full">Dorf-Beschreibung<textarea name="dorfBeschreibung" maxlength="10000"></textarea></label>
+            <label class="form-field full">Clan-Geschichte<textarea name="geschichte" maxlength="20000" rows="8"></textarea><small>Mit Text erscheint ein eigener Abschnitt für eure Geschichte.</small></label>
+            <label class="form-field full">Discord-Einladungslink<input name="discordLink" type="url" placeholder="https://discord.gg/…" maxlength="500"><small>Eine öffentliche Einladung für Interessierte. Die Anmeldung ist davon unabhängig.</small></label>
+          </div>
+          <div class="editor-actions"><button class="button" data-save-public>Änderungen speichern</button><span class="field-note" data-save-note></span></div>
+        </section>
+        <section class="editor-panel" id="edit-inhalte" role="tabpanel" aria-labelledby="edit-tab-inhalte" tabindex="0" hidden>
+          <h2>Öffentliche Inhalte.</h2><p>Diese Einträge können alle Besucher eurer Website lesen.</p>
+          <div id="public-lists"></div>
+          <div class="editor-actions"><button class="button" data-save-public>Änderungen speichern</button><span class="field-note" data-save-note></span></div>
+        </section>
+        <section class="editor-panel" id="edit-design" role="tabpanel" aria-labelledby="edit-tab-design" tabindex="0" hidden>
+          <h2>Bilder und Effekte.</h2><p>Eigene Dorfaufnahmen hochladen und die Atmosphäre eurer Website anpassen.</p>
+          <div class="image-edit-grid">
+            <div class="image-editor"><h3>Startseiten-Hintergrund</h3><img class="image-preview" id="hero-preview" src="assets/nord-dorf.webp" alt="Aktueller Startseiten-Hintergrund"><label class="form-field">Neues Hintergrundbild<input type="file" accept="image/jpeg,image/png,image/webp" data-image="heroImage"><small>JPG, PNG oder WebP · maximal 8 MB</small></label><button class="text-button" data-reset-image="heroImage">Original wiederherstellen</button></div>
+            <div class="image-editor"><h3>Dorfbild</h3><img class="image-preview" id="village-preview" src="assets/raben-langhaus.webp" alt="Aktuelles Dorfbild"><label class="form-field">Neues Dorfbild<input type="file" accept="image/jpeg,image/png,image/webp" data-image="villageImage"><small>JPG, PNG oder WebP · maximal 8 MB</small></label><button class="text-button" data-reset-image="villageImage">Original wiederherstellen</button></div>
+          </div>
+          <div class="form-grid">
+            <label class="form-field">Animation<select id="effect-type"><option value="snow">Schneefall</option><option value="embers">Glutpartikel</option><option value="none">Kein Effekt</option></select></label>
+            <label class="form-field">Stärke <output id="intensity-value">45 %</output><input id="effect-intensity" type="range" min="0" max="100" value="45"></label>
+            <label class="form-field">Geschwindigkeit <output id="speed-value">1×</output><input id="effect-speed" type="range" min="0.25" max="2.5" step="0.05" value="1"></label>
+          </div>
+          <div class="effect-preview" id="effect-preview"><canvas id="preview-canvas" aria-hidden="true"></canvas><p>Ein Blick in den Norden.</p></div>
+          <p class="field-note" style="margin-top:16px">Die Vorschau berücksichtigt die Systemeinstellung für reduzierte Bewegung.</p>
+          <div class="editor-actions"><button class="button" data-save-public>Änderungen speichern</button><span class="field-note" data-save-note></span></div>
+        </section>
+        <section class="editor-panel" id="edit-clan" role="tabpanel" aria-labelledby="edit-tab-clan" tabindex="0" hidden>
+          <h2>Geschlossene Clan-Inhalte.</h2><p>Diese Beiträge erscheinen ausschließlich für freigegebene Clanmitglieder.</p>
+          <form id="post-form">
+            <div class="form-grid">
+              <label class="form-field full">Titel<input name="title" maxlength="200" required></label>
+              <label class="form-field">Art<select name="category"><option value="info">Clan-Information</option><option value="aushang">Interner Aushang</option><option value="termin">Clan-Termin</option></select></label>
+              <label class="form-field">Datum, optional<input name="event_date" type="date"></label>
+              <label class="form-field full">Text<textarea name="body" maxlength="30000" rows="7"></textarea></label>
+            </div>
+            <div class="editor-actions"><button class="button" type="submit" id="post-save">Beitrag veröffentlichen</button><button class="text-button" type="button" id="post-cancel" hidden>Bearbeitung abbrechen</button></div>
+          </form>
+          <div class="repeat-list" id="internal-posts"></div>
+        </section>
+        <section class="editor-panel" id="edit-members" role="tabpanel" aria-labelledby="edit-tab-members" tabindex="0" hidden>
+          <h2>Mitglieder und Rechte.</h2><p>Discord identifiziert das Konto. Ihr entscheidet, wer zum Clan gehört und wer verwalten darf.</p>
+          <button class="button outline small-button" id="refresh-members">Liste aktualisieren</button>
+          <div class="member-manager" id="member-manager"></div>
+        </section>
+      </div>
+    </div>
+    <noscript><p class="status-message">Die Verwaltung benötigt JavaScript und eine Discord-Anmeldung.</p></noscript>
+  </main>
+  <script src="config.js"></script><script src="default-content.js"></script><script src="vendor/supabase-2.117.2.js"></script><script src="app.js"></script><script src="effects.js"></script><script src="admin.js"></script>
+</body>
+</html>
