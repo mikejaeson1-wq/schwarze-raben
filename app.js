@@ -2,6 +2,7 @@
   "use strict";
   const config = window.RABEN_CONFIG || {};
   const adminReturnKey = "schwarze-raben-admin-return";
+  const applicationReturnKey = "schwarze-raben-application-return";
   const adminReturnLifetime = 15 * 60 * 1000;
   let client = null;
   const configured = () => /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(config.supabaseUrl || "") && !!config.supabasePublishableKey;
@@ -33,31 +34,38 @@
     return Array.isArray(rows) ? rows[0] : rows;
   };
   const signIn = async (destination = "clan") => {
-    // Both interfaces reuse the already configured Discord/PKCE callback.
-    const destinations = {clan: "clan.html", "admin-app": "clan.html"};
+    // Reuse the configured Discord/PKCE callback for all entry points.
+    const destinations = {clan: "clan.html", "admin-app": "clan.html", application: "clan.html"};
     if (!Object.hasOwn(destinations, destination)) throw new Error("Unbekanntes Anmeldeziel.");
     const redirect = new URL(destinations[destination], config.siteUrl);
     if (redirect.origin !== window.location.origin || window.location.protocol !== "https:") throw new Error("Die Discord-Anmeldung ist auf der veröffentlichten Website verfügbar.");
-    if (destination === "admin-app") window.sessionStorage.setItem(adminReturnKey, String(Date.now() + adminReturnLifetime));
-    else window.sessionStorage.removeItem(adminReturnKey);
+    window.sessionStorage.removeItem(adminReturnKey);
+    window.sessionStorage.removeItem(applicationReturnKey);
+    if (destination !== "clan") window.sessionStorage.setItem(destination === "admin-app" ? adminReturnKey : applicationReturnKey, String(Date.now() + adminReturnLifetime));
     try {
       const {error} = await getClient().auth.signInWithOAuth({provider: "discord", options: {redirectTo: redirect.href}});
       if (error) throw error;
-    } catch (error) { window.sessionStorage.removeItem(adminReturnKey); throw error; }
+    } catch (error) { window.sessionStorage.removeItem(adminReturnKey); window.sessionStorage.removeItem(applicationReturnKey); throw error; }
   };
   const finishAdminSignIn = () => {
     // A short-lived, tab-local intent flag. It conveys no credentials or rights.
-    let expires;
-    try { expires = Number(window.sessionStorage.getItem(adminReturnKey)); window.sessionStorage.removeItem(adminReturnKey); }
+    let expires, path;
+    try {
+      const admin = window.sessionStorage.getItem(adminReturnKey);
+      expires = Number(admin || window.sessionStorage.getItem(applicationReturnKey));
+      path = admin ? "app/" : "bewerben.html";
+      window.sessionStorage.removeItem(adminReturnKey); window.sessionStorage.removeItem(applicationReturnKey);
+    }
     catch (_) { return false; }
     const now = Date.now();
     if (!Number.isFinite(expires) || expires <= now || expires > now + adminReturnLifetime) return false;
-    const target = new URL("app/", config.siteUrl);
+    const target = new URL(path, config.siteUrl);
     if (target.origin !== window.location.origin) return false;
     window.location.replace(target.href);
     return true;
   };
   const signOut = async () => {
+    window.sessionStorage.removeItem(adminReturnKey); window.sessionStorage.removeItem(applicationReturnKey);
     window.dispatchEvent(new Event("raben-lock"));
     const {error} = await getClient().auth.signOut({scope: "local"});
     if (error) throw error;

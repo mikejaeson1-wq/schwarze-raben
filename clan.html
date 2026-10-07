@@ -6,28 +6,29 @@
   <meta name="color-scheme" content="dark"><meta name="theme-color" content="#101619">
   <title>Clanbereich · Schwarze Raben</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="portal.css">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="portal.css"><link rel="stylesheet" href="community.css">
 </head>
 <body class="portal-body">
   <a class="skip-link" href="#portal">Zum Clanbereich springen</a>
   <header class="portal-header"><div class="container header-inner">
     <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><span>R</span></span><span><span class="brand-name">Schwarze Raben</span><span class="brand-caption">DER GESCHLOSSENE CLANBEREICH</span></span></a>
-    <nav class="portal-nav" aria-label="Clan-Navigation"><a href="index.html">Website</a><a href="clan.html" aria-current="page">Clanbereich</a><a href="admin.html" id="admin-link" hidden>Verwaltung</a><button class="text-button" id="logout" hidden>Abmelden</button></nav>
+    <nav class="portal-nav" aria-label="Clan-Navigation"><a href="index.html">Website</a><a href="entdecken.html">Dorfleben</a><a href="clan.html" aria-current="page">Clanbereich</a><a href="admin.html" id="admin-link" hidden>Verwaltung</a><button class="text-button" id="logout" hidden>Abmelden</button></nav>
   </div></header>
   <main class="container portal-main" id="portal">
-    <div class="portal-heading"><div><p class="eyebrow">Unter schwarzen Flügeln</p><h1>Euer Clanbereich.</h1><p>Interne Informationen und Aushänge für die Schwarzen Raben.</p></div><div class="account-pill" id="account" hidden></div></div>
+    <div class="portal-heading"><div><p class="eyebrow">Unter schwarzen Flügeln</p><h1>Euer Clanbereich.</h1><p>Termine, Charaktere, Aufträge und eure gemeinsamen Geschichten.</p></div><div class="account-pill" id="account" hidden></div></div>
     <p class="status-message" id="portal-status" role="status" hidden></p>
     <section class="gate" id="gate" aria-labelledby="gate-title">
       <p class="eyebrow">Zugang für Mitglieder</p><h2 id="gate-title">Mit Discord zu den Raben.</h2>
       <p id="gate-text">Melde dich mit deinem Discord-Konto an. Den geschlossenen Bereich können ausschließlich freigegebene Clanmitglieder betreten.</p>
-      <div class="gate-actions"><button class="button" id="discord-login">Mit Discord anmelden</button><button class="button outline" id="check-access" hidden>Status prüfen</button></div>
+      <div class="gate-actions"><button class="button" id="discord-login">Mit Discord anmelden</button><button class="button outline" id="check-access" hidden>Status prüfen</button></div><p class="field-note"><a href="bewerben.html" class="text-button">Mit Charakterkonzept bewerben →</a></p>
     </section>
     <div class="portal-layout" id="member-content" hidden>
+      <section class="clan-community" id="clan-community" aria-label="Gemeinsames Clanleben"></section>
       <section class="content-stack" id="clan-posts" aria-label="Interne Clanbeiträge"></section>
       <aside class="sidebar-box"><h2>Die Raben.</h2><p class="field-note">Freigegebene Mitglieder</p><ul class="roster" id="roster"></ul></aside>
     </div>
     <noscript><p class="status-message">Der geschützte Clanbereich benötigt JavaScript und eine Discord-Anmeldung.</p></noscript>
   </main>
-  <script src="config.js"></script><script src="vendor/supabase-2.117.2.js"></script><script src="app.js"></script><script src="clan.js"></script>
+  <script src="config.js"></script><script src="vendor/supabase-2.117.2.js"></script><script src="app.js"></script><script src="community.js"></script><script src="clan.js"></script>
 </body>
 </html>

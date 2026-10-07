@@ -14,7 +14,7 @@
   const message = (value,error=false) => status("admin-status",value,error);
   const markDirty = () => {dirty = true; document.querySelectorAll("[data-save-note]").forEach(n => n.textContent = "Noch nicht gespeichert");};
   const lock = () => {
-    epoch++; currentAdmin = null; draft = null; revision = null;
+    epoch++; currentAdmin = null; draft = null; revision = null; window.RabenHub?.lock();
     document.getElementById("admin-content").hidden = true; document.getElementById("admin-gate").hidden = false;
     document.getElementById("account").hidden = true; effects.update({type:"none"});
     document.getElementById("internal-posts").replaceChildren(); document.getElementById("member-manager").replaceChildren();
@@ -206,6 +206,7 @@
       if(target !== null) {event.preventDefault(); openTab(tabs[target]); tabs[target].focus();}
     });
   });
+  window.addEventListener("raben-map-updated",event=>{if(draft && revision===event.detail.previousRevision){draft.rabenMapImage=event.detail.image;revision=event.detail.revision;}});
   window.addEventListener("beforeunload",event => {if(dirty) {event.preventDefault(); event.returnValue="";}});
   window.addEventListener("raben-lock",lock);
   document.getElementById("logout").addEventListener("click",async () => {lock(); try {await Raben.signOut(); location.replace(mobileApp ? "./" : "clan.html");} catch(error) {message(Raben.errorMessage(error),true);}});
@@ -227,7 +228,7 @@
       draft={...window.CLAN_DEFAULT,...record.content}; revision=record.revision; currentAdmin=member; populate();
       document.getElementById("account").textContent=member.display_name+" · Admin"; document.getElementById("account").hidden=false; document.getElementById("logout").hidden=false;
       document.getElementById("admin-gate").hidden=true; document.getElementById("admin-content").hidden=false;
-      await Promise.all([loadMembers(),loadPosts()]);
+      await Promise.all([loadMembers(),loadPosts(),window.RabenHub?.mountAdmin(document.getElementById("hub-admin"),member)]);
       sb.auth.onAuthStateChange(event => {if(event==='SIGNED_OUT') lock();});
     } catch(error) {lock(); message(Raben.errorMessage(error),true);}
   };

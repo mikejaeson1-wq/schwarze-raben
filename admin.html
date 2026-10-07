@@ -5,7 +5,7 @@
   <meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="dark"><meta name="theme-color" content="#101619">
   <title>Verwaltung · Schwarze Raben</title><link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="portal.css">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="portal.css"><link rel="stylesheet" href="community.css">
 </head>
 <body class="portal-body">
   <a class="skip-link" href="#verwaltung">Zur Verwaltung springen</a>
@@ -19,14 +19,16 @@
     <section class="gate" id="admin-gate"><h2>Dieser Bereich gehört den Admins.</h2><p id="admin-gate-text">Melde dich mit Discord an. Zur Verwaltung benötigst du eine Admin-Freigabe.</p><a class="button" href="clan.html">Zur Discord-Anmeldung</a></section>
     <div class="editor-layout" id="admin-content" hidden>
       <div class="editor-nav" role="tablist" aria-label="Verwaltungsbereiche" aria-orientation="vertical">
-        <button role="tab" id="edit-tab-website" data-editor-tab="website" aria-selected="true" aria-controls="edit-website" tabindex="0">Clan &amp; Dorf</button>
+        <button role="tab" id="edit-tab-hub" data-editor-tab="hub" aria-selected="true" aria-controls="edit-hub" tabindex="0">Gemeinschaft &amp; Freigaben</button>
+        <button role="tab" id="edit-tab-website" data-editor-tab="website" aria-selected="false" aria-controls="edit-website" tabindex="-1">Clan &amp; Dorf</button>
         <button role="tab" id="edit-tab-inhalte" data-editor-tab="inhalte" aria-selected="false" aria-controls="edit-inhalte" tabindex="-1">Öffentliche Inhalte</button>
         <button role="tab" id="edit-tab-design" data-editor-tab="design" aria-selected="false" aria-controls="edit-design" tabindex="-1">Bilder &amp; Effekte</button>
         <button role="tab" id="edit-tab-clan" data-editor-tab="clan" aria-selected="false" aria-controls="edit-clan" tabindex="-1">Geschlossene Inhalte</button>
         <button role="tab" id="edit-tab-members" data-editor-tab="members" aria-selected="false" aria-controls="edit-members" tabindex="-1">Mitglieder &amp; Rechte</button>
       </div>
       <div>
-        <section class="editor-panel" id="edit-website" role="tabpanel" aria-labelledby="edit-tab-website" tabindex="0">
+        <section class="editor-panel hub-admin-panel" id="edit-hub" role="tabpanel" aria-labelledby="edit-tab-hub" tabindex="0"><div id="hub-admin"></div></section>
+        <section class="editor-panel" id="edit-website" role="tabpanel" aria-labelledby="edit-tab-website" tabindex="0" hidden>
           <h2>Clan und Dorf.</h2><p>Diese Angaben erscheinen auf eurer öffentlichen Website.</p>
           <div class="form-grid" id="clan-form">
             <label class="form-field">Clanname<input name="name" maxlength="100" required></label>
@@ -82,6 +84,6 @@
     </div>
     <noscript><p class="status-message">Die Verwaltung benötigt JavaScript und eine Discord-Anmeldung.</p></noscript>
   </main>
-  <script src="config.js"></script><script src="default-content.js"></script><script src="vendor/supabase-2.117.2.js"></script><script src="app.js"></script><script src="effects.js"></script><script src="admin.js"></script>
+  <script src="config.js"></script><script src="default-content.js"></script><script src="vendor/supabase-2.117.2.js"></script><script src="app.js"></script><script src="community.js"></script><script src="effects.js"></script><script src="admin.js"></script>
 </body>
 </html>

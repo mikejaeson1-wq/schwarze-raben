@@ -5,7 +5,9 @@ Die öffentliche Website wird über GitHub Pages bereitgestellt. Supabase speich
 ## Enthalten
 
 - **index.html:** öffentliche Clanvorstellung mit Dorf, Infoboard und ergänzbaren Informationen.
-- **clan.html:** eigene Oberfläche für den geschlossenen Clanbereich.
+- **entdecken.html:** Galerie, Dorfplan, Chronik, Handel, öffentliche Termine und freigegebene Charaktere.
+- **bewerben.html:** private Clanbewerbung mit Discord-Anmeldung.
+- **clan.html:** geschlossener Clanbereich mit RP-Kalender, Charakterbuch, Aufträgen, Bauprojekten, Wissen, Abstimmungen, Tagebuch und Handel.
 - **admin.html:** Verwaltung für freigegebene Admins.
 - **app/:** installierbare mobile Admin-App mit Discord-Anmeldung, eigenem App-Symbol und QR-Code zur Installationsanleitung.
 - **Bilder:** Startseiten-Hintergrund und Dorfbild austauschen; JPG, PNG, WebP bis 8 MB.
@@ -35,7 +37,7 @@ Aktuelle offizielle Quellen:
 
 1. Diese Website nutzt das vorhandene Free-Projekt **mikejaeson1-wq's Project** (`zszsayplgifdvmjowupy`). Für einen späteren Umzug kann ein neues Free-Projekt verwendet werden.
 2. Im SQL Editor zuerst **supabase/schema.sql** ausführen.
-3. Anschließend **supabase/seed.sql** ausführen. Die Ausgangsinhalte sind öffentlich und enthalten keine erfundene Clan-Lore.
+3. Anschließend **supabase/seed.sql** ausführen. Die Ausgangsinhalte sind öffentlich und enthalten keine erfundene Clan-Lore. In einem neuen Projekt danach die Dateien unter **supabase/migrations/** in zeitlicher Reihenfolge einmalig ausführen. Auf dem bestehenden Projekt ist das Gesamtupdate bereits angewendet; dort diese Dateien nicht erneut ausführen.
 4. Die **Projekt-URL** und den **öffentlichen Publishable Key** aus den Projekteinstellungen in `config.js` eintragen. Ein alter `anon`-Key wird ebenfalls unterstützt.
 5. **Niemals** einen Secret-Key, Service-Role-Key, Discord Client Secret oder ein Datenbankpasswort in diese Datei oder ins GitHub-Repository schreiben.
 
@@ -126,7 +128,7 @@ Den QR-Code mit der Handykamera scannen und die Installationsseite im Browser ö
 
 **iPhone:** Die Seite in Safari öffnen, **Teilen → Zu Home-Bildschirm hinzufügen** wählen und **Als Web-App öffnen** aktivieren, falls diese Option angezeigt wird. Mit **Hinzufügen** bestätigen. Danach das Symbol **Raben Admin** öffnen und dort mit Discord anmelden. Bei abweichendem Safari-Layout ist Teilen im Seitenmenü erreichbar.
 
-Die App öffnet nach der Freigabe direkt die Mitgliederverwaltung. Über die fünf Reiter sind Dorfangaben, öffentliche Informationen, Bilder und Effekte, geschlossene Beiträge sowie Mitgliederrechte erreichbar. Alle Änderungen landen in derselben Datenbank wie die Website. Für die Verwaltung sind eine Internetverbindung und ein aktives Admin-Konto erforderlich. Eine normale Clanmitgliedschaft reicht nicht aus.
+Die App öffnet nach der Freigabe direkt den **RP-Hub** mit Bewerbungen, Freigaben, anstehenden Terminen und Clan-Aufträgen. Über die sechs Reiter sind RP-Hub, Dorfangaben, öffentliche Informationen, Bilder und Effekte, geschlossene Beiträge sowie Mitgliederrechte erreichbar. Alle Änderungen landen in derselben Datenbank wie die Website. Für die Verwaltung sind eine Internetverbindung und ein aktives Admin-Konto erforderlich. Eine normale Clanmitgliedschaft reicht nicht aus.
 
 Die Installation ist öffentlich zugänglich; sie erteilt keine Adminrechte. Adminrechte prüft die Anwendung vor dem Laden der Verwaltung und vor jeder Änderung erneut. Die Datenbank erzwingt diese Rechte zusätzlich. Entzogene Rechte sperren die Oberfläche und entfernen die geladenen internen Listen und Beitragsentwürfe.
 
@@ -141,6 +143,33 @@ Offizielle Hinweise zur Installation:
 - https://support.apple.com/de-de/guide/iphone/iphea86e5236/ios
 - https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable
 
+## 7. Das Gesamtupdate benutzen
+
+In der Desktop-Verwaltung **Gemeinschaft & Freigaben** öffnen, in der Handy-App **RP-Hub**. Die Unterreiter verwalten alle neuen Bereiche. **Neu erstellen** öffnet das passende Formular; **Bearbeiten** hält den vorhandenen Eintrag und seine Version fest. Bei einem Konflikt bleiben die Eingaben stehen. Diese vor dem Neuladen sichern.
+
+| Bereich | Bedienung |
+| --- | --- |
+| Übersicht | Zeigt wartende Bewerbungen, Freigaben, kommende Termine und Clan-Aufträge. Die Karten öffnen den passenden Bereich. |
+| Bewerbungen | Konzept, RP-Wünsche und Spielzeiten prüfen; Rückmeldung schreiben; annehmen oder ablehnen. Annehmen schaltet den Clan-Zugang frei. Ablehnen entzieht eine bereits erteilte Mitgliedschaft nicht; dafür Mitgliederrechte verwenden. |
+| Freigaben | Eingereichte Einträge bearbeiten und ihre Sichtbarkeit nach Prüfung ändern. Öffentlich freigegebene Texte und Bilder sehen alle Besucher. |
+| Dorfgalerie | Eigene Aufnahmen mit Titel, Beschreibung und Datum hochladen. Öffentliche Galerieeinträge benötigen ein Bild. |
+| Dorfplan | Eine Karte als Galerieaufnahme hochladen, veröffentlichen und **Als Dorfplankarte verwenden** wählen. Unter Dorfplan Orte mit Koordinaten von 0 bis 100 Prozent ergänzen. Die Karte und Orte müssen öffentlich freigegeben sein. |
+| Chronik | Datierten Ereigniseintrag erstellen und veröffentlichen. Tagebuchberichte können mit **Für Chronik übernehmen** kopiert, redigiert und gesondert veröffentlicht werden. |
+| Handel & Diplomatie | Angebot, Gesuch oder diplomatische Anfrage mit RP-Kontakt und optionalem Gültigkeitsdatum erstellen. Mitglieder reichen eigene Beiträge ein; Admins veröffentlichen sie. |
+| RP-Kalender | Datum und Uhrzeit gelten in **Europe/Berlin**. Ort und Anmeldestatus angeben. Mitglieder sagen **Dabei**, **Vielleicht** oder **Absage**; Zusagen sind im Clan sichtbar. Vergangene Termine über die entsprechende Option anzeigen. |
+| Charakterbuch | Mitglieder erstellen und bearbeiten ihre eigenen Steckbriefe mit Beruf, Geschichte, Beziehungen und Bild. **Geheimnotizen** speichert getrennte Inhalte ausschließlich für Besitzer und Admins. Admins können Steckbriefe öffentlich freigeben. |
+| Auftragsbrett | Admins und Mitglieder erstellen Aufträge. Ein Mitglied übernimmt den Auftrag, markiert ihn als erledigt oder löst die Übernahme. Pro Auftrag gibt es eine zuständige Person; Admins können die Übernahme ebenfalls verwalten. |
+| Bauprojekte | Admins pflegen Verantwortliche, Materialbedarf und vorhandene Bestände sowie Fortschritt in Prozent. Diese Angaben werden manuell aktualisiert. |
+| Wissensarchiv | Admins und Mitglieder ergänzen eigene Wissenseinträge mit Kategorie und Schlagwörtern. Die deutsche Volltextsuche durchsucht Titel, Text und Schlagwörter. |
+| Abstimmungen | Admins legen zwei bis acht unterschiedliche Antworten und optional einen letzten Abstimmungstag fest. Mitglieder haben eine Stimme und können sie bis zum Ende ändern. Sichtbar sind Gesamtergebnisse; eigene Stimmen sehen die jeweiligen Mitglieder, Admins können die einzelnen Stimmen einsehen. Nach der ersten Stimme lassen sich die Antwortmöglichkeiten nicht verändern. Zum Schließen **Abstimmung offen** deaktivieren. |
+| RP-Tagebuch | Mitglieder berichten von ihren Erlebnissen. Admins können ausgewählte Berichte für die Chronik übernehmen. Die Kopie wird vor einer öffentlichen Veröffentlichung separat bearbeitet und freigegeben. |
+
+**Sichtbarkeit:** Entwürfe, Einträge zur Freigabe und archivierte Einträge sind nur für ihre Besitzer und Admins sichtbar. **Clanintern** lesen aktive Clanmitglieder. **Öffentlich** lesen alle Besucher; nur Admins können diese Sichtbarkeit setzen. **Archivierte Einträge anzeigen** blendet das eigene oder für Admins das gesamte Archiv ein. Keine Geheimnotizen in einen öffentlichen Steckbrief schreiben.
+
+Neue Bilder landen zunächst im privaten Bucket **raben-media**. Die Oberfläche lädt sie nur über eine authentifizierte Anfrage. Erst eine Admin-Veröffentlichung erzeugt eine gesonderte öffentliche Bildkopie im Bucket **raben-public**. Bereits veröffentlichte Bilder bleiben dort, auch wenn ein Eintrag später archiviert oder gelöscht wird; die ursprüngliche Veröffentlichung lässt sich damit nicht vollständig zurücknehmen. Ungenutzte Dateien können durch den Projektverantwortlichen im Storage entfernt werden.
+
+Die neuen Bereiche beginnen ohne erfundene Dorfnamen, Termine, Mitgliedergeschichten oder Abstimmungen. Eure eigenen Einträge werden über die Verwaltung ergänzt.
+
 ## Prüfung
 
 Lokal wurden die SQL-Dateien in einer PostgreSQL-Testumgebung mit nachgebildeten Supabase-Auth- und Storage-Schemas ausgeführt. Geprüft wurden öffentliche Leserechte, Discord-Identitätsprüfung, wartende Nutzer, Mitglieder, Admins, unerlaubte Rechteerhöhung, Bild-Upload-Rechte, Schutz des letzten Admins und Zugriffsentzug nach Sperrung.
@@ -149,17 +178,21 @@ Zusätzlich wurden JavaScript-Syntax, HTML-Verweise, sicheres Einsetzen von Text
 
 Für die mobile App wurden zusätzlich Gäste, wartende Nutzer, aktive Clanmitglieder und gesperrte Nutzer auf gesperrten Admin-Zugang ohne Inhaltsabfragen geprüft. Eine Admin-Bearbeitung mit Speicherung sowie das Sperren und Leeren der Oberfläche nach Rechteentzug wurden mit dem tatsächlichen Frontend-Code getestet. Der feste Discord-Rückweg, Ablauf und einmaliger Verbrauch des Rückkehrhinweises, Installationsmanifest, Bildgrößen, HTML-Verweise und Cache-Regeln sind geprüft. Der QR-Code wurde nach der Erstellung mit einem unabhängigen Decoder ausgelesen und stimmt mit der veröffentlichten Installationsadresse überein. Eine Installation und vollständige Discord-Anmeldung auf einem tatsächlichen Android-Handy oder iPhone wurde noch nicht durchgeführt.
 
+Für das Gesamtupdate wurden zusätzlich die tatsächlichen Datenbankregeln für Bewerbungsannahme, Eigentumsrechte, private Notizen, erneute Veröffentlichung, doppelte Zusagen und Stimmen, Auftragsübernahmen, geschlossene Abstimmungen, Bildrechte und unmittelbaren Zugriffsentzug geprüft. Der Frontend-Code wurde mit den Abläufen für Zusagen, Bearbeitung, Versionskonflikte, Aufträge, Abstimmungen, Bildfreigabe und Chronik-Übernahme ausgeführt. In der Live-Datenbank sind alle sechs neuen Tabellen durch RLS geschützt; Gäste haben keine Tabellenrechte auf Bewerbungen, Notizen, Zusagen, Übernahmen oder Stimmen. Die neuen öffentlichen RPC-Funktionen laufen als SECURITY INVOKER. In der Live-Datenbank wurden mit den Rechten des bereits verifizierten Admins außerdem Notizen, Zusagen, Stimmen und Auftragsübernahmen in einer zurückgerollten Transaktion erfolgreich ausgeführt; es bleiben keine Testeinträge bestehen.
+
 ## Dateien
 
 - `config.js`: öffentliche Projekt-Verbindung.
 - `default-content.js`: öffentliche Ausgangsinhalte.
 - `app.js`: gemeinsame Supabase-Verbindung und Discord-Anmeldung.
 - `public.js`: öffentliche Inhalte.
+- `community.js`: neue öffentliche, Mitglieder- und Admin-Funktionen.
+- `community-page.js`: Einstieg für Dorfleben und Bewerbungen.
 - `clan.js`: geschlossener Clanbereich.
 - `admin.js`: Admin-Verwaltung.
 - `app/`: mobile Admin-Oberfläche, Installation, QR-Code, Manifest, App-Symbole und Service Worker.
 - `effects.js`: Animationen und Bewegungseinstellungen.
-- `style.css`, `portal.css`: Gestaltung.
+- `style.css`, `portal.css`, `community.css`: Gestaltung.
 - `assets/`: mitgelieferte Bilder.
 - `vendor/`: fest eingebundener Supabase-Client 2.117.2 samt Lizenz; kein externer Script-CDN zur Laufzeit.
 - `supabase/`: Schema, öffentliche Ausgangsinhalte und Admin-Freigabe-Hinweise.

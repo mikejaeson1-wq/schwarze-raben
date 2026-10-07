@@ -1,10 +1,10 @@
 (() => {
   "use strict";
   const {el,status,check} = Raben;
-  let loading = false, epoch = 0, identity = null;
+  let loading = false, epoch = 0, identity = null, hubIdentity = null;
   const gate = document.getElementById("gate");
   const lock = () => {
-    epoch++; identity = null;
+    epoch++; identity = null; hubIdentity = null; window.RabenHub?.lock();
     gate.hidden = false; document.getElementById("member-content").hidden = true;
     document.getElementById("clan-posts").replaceChildren(); document.getElementById("roster").replaceChildren();
     ["account","admin-link"].forEach(id => {document.getElementById(id).hidden = true;});
@@ -47,6 +47,8 @@
       document.getElementById("account").hidden = false;
       document.getElementById("admin-link").hidden = member.role !== "admin";
       gate.hidden = true; document.getElementById("member-content").hidden = false; status("portal-status","");
+      const hubKey=member.user_id+":"+member.role;
+      if(window.RabenHub && hubIdentity!==hubKey){hubIdentity=hubKey;await RabenHub.mountMember(document.getElementById("clan-community"),member);}
     } catch(error) {lock(); status("portal-status",Raben.errorMessage(error),true);} finally {loading = false;}
   };
   document.getElementById("discord-login").addEventListener("click",async () => {try {await Raben.signIn();} catch(error) {status("portal-status",Raben.errorMessage(error),true);}});

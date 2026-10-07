@@ -1,0 +1,101 @@
+.hub { min-width: 0; }
+.clan-community { grid-column: 1 / -1; margin-bottom: 12px; }
+.hub-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 3px 3px 16px; scrollbar-color: var(--line) var(--deep); }
+.hub-tab { flex: 0 0 auto; min-height: 46px; padding: 10px 17px; border: 1px solid var(--line); background: #121d24; color: var(--muted); font-size: .875rem; }
+.hub-tab:hover { color: var(--text); border-color: #7f8b92; }
+.hub-tab[aria-selected="true"] { background: #c8a46c18; color: var(--gold-light); border-color: var(--gold); }
+.hub-panel { min-width: 0; outline-offset: 6px; }
+.hub-toolbar { padding: 20px 0 24px; display: flex; align-items: end; flex-wrap: wrap; gap: 18px; }
+.hub-title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; width: 100%; }
+.hub-title-row h2 { margin: 0 auto 0 0; font-size: clamp(1.8rem, 4vw, 2.5rem); }
+.hub-search { display: flex; align-items: end; gap: 10px; flex: 1 1 300px; }
+.hub-search .form-field { flex: 1; }
+.hub-search input { min-width: 0; }
+.hub label:has(input[type="checkbox"]) { display: flex; flex-direction: row; align-items: center; gap: 10px; font-size: .875rem; }
+.hub input[type="checkbox"] { width: 21px; height: 21px; min-height: 21px; padding: 0; flex: 0 0 auto; accent-color: var(--gold); }
+.hub-list { display: grid; gap: 20px; margin-bottom: 24px; }
+.hub-card { min-width: 0; padding: 28px; border: 1px solid var(--line); background: linear-gradient(135deg, #19252d, #131d23); overflow-wrap: anywhere; }
+.hub-card h3 { font-size: 1.8rem; line-height: 1.35; margin: 9px 0 14px; }
+.hub-card-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hub-card-head .eyebrow { margin-right: auto; font-size: .75rem; }
+.hub-badge { display: inline-block; width: fit-content; color: var(--gold-light); border: 1px solid #c8a46c55; background: #c8a46c10; font-size: .75rem; padding: 3px 10px; }
+.hub-body { white-space: pre-wrap; overflow-wrap: anywhere; color: #d0d8dc; margin-block: 14px; }
+.hub-meta { color: var(--gold-light); }
+.hub-card .field-note { margin-top: 12px; }
+.hub-inline-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.hub-inline-actions .button { letter-spacing: .02em; }
+.hub-image { width: 100%; max-height: 460px; object-fit: contain; background: var(--deep); display: block; margin-bottom: 22px; }
+.hub-gallery, .hub-characters { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.hub-gallery .hub-image { aspect-ratio: 16 / 10; object-fit: cover; }
+.hub-editor { display: grid; gap: 20px; border: 1px solid #c8a46c66; border-top: 3px solid var(--gold); background: #19242b; padding: 28px; margin-bottom: 25px; }
+.hub-editor h3 { font-size: 1.7rem; line-height: 1.4; }
+.hub-editor .editor-actions { padding-top: 18px; margin-top: 4px; gap: 12px; }
+.hub-editor textarea { min-height: 140px; }
+.hub-editor-host { scroll-margin-top: 25px; }
+.hub-empty { padding: 30px; border: 1px dashed #46545b; color: var(--muted); font-size: 1rem; }
+.hub-interactions { padding-top: 18px; margin-top: 23px; border-top: 1px solid var(--line); }
+.hub-interactions .field-note:first-child { margin-top: 0; }
+.hub-assignment { padding: 10px 14px; border-left: 2px solid var(--gold); background: #c8a46c0a; color: var(--gold-light); }
+.hub .button.is-selected { color: var(--deep); background: var(--gold-light); border-color: var(--gold-light); }
+.hub-details { color: var(--muted); margin-top: 14px; font-size: .875rem; }
+.hub-details summary { cursor: pointer; padding-block: 8px; color: var(--gold-light); }
+.hub progress { display: block; width: 100%; height: 11px; margin-block: 14px; border: 0; accent-color: var(--gold); }
+.hub progress::-webkit-progress-bar { background: #0c1419; }
+.hub progress::-webkit-progress-value { background: var(--gold); }
+.hub progress::-moz-progress-bar { background: var(--gold); }
+.hub-poll-option { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(40px, 1fr) 25px; gap: 15px; align-items: center; margin-top: 14px; }
+.hub-poll-option .button { justify-content: start; text-align: left; }
+.hub-poll-option .field-note { margin: 0; }
+.hub-dashboard { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.hub-stat { display: flex; flex-direction: column; align-items: start; gap: 7px; color: var(--text); padding: 23px; border: 1px solid var(--line); background: #192730; text-align: left; }
+.hub-stat:hover { border-color: var(--gold); }
+.hub-stat strong { font: 2.6rem var(--serif); color: var(--gold-light); }
+.hub-stat span { font-size: .9375rem; }
+.hub-map { position: relative; width: 100%; aspect-ratio: 16 / 10; min-height: 260px; border: 1px solid #536368; overflow: hidden; background: #182830; }
+.hub-map img { width: 100%; height: 100%; object-fit: fill; display: block; }
+.hub-map.without-background { background: repeating-linear-gradient(0deg, transparent 0 39px, #d3e7eb0a 40px), repeating-linear-gradient(90deg, transparent 0 39px, #d3e7eb0a 40px), radial-gradient(ellipse at 30% 60%, #38525b, #14222b); }
+.hub-map-pin { position: absolute; transform: translate(-50%, -50%); display: grid; place-items: center; min-width: 38px; min-height: 38px; padding: 3px; border: 2px solid var(--gold-light); background: #101b24ed; color: var(--gold-light); border-radius: 50%; box-shadow: 0 3px 10px #0008; }
+.hub-map-pin:hover, .hub-map-pin:focus-visible { background: var(--gold-light); color: var(--deep); z-index: 2; }
+.hub-map-selection { min-height: 50px; color: var(--gold-light); background: #c8a46c0a; padding: 14px 18px; }
+.hub-chronicle { border-left: 1px solid var(--gold); padding-left: 22px; }
+.hub-chronicle .hub-card { position: relative; }
+.hub-chronicle .hub-card::before { content: ''; position: absolute; left: -28px; top: 32px; width: 10px; height: 10px; transform: rotate(45deg); background: var(--gold); }
+.community-heading { padding-bottom: 30px; border-bottom: 1px solid var(--line); }
+.community-intro { max-width: 700px; }
+.community-intro .eyebrow { margin-bottom: 9px; }
+.community-heading h1 { font-size: clamp(2.2rem, 6vw, 3.8rem); line-height: 1.15; }
+.community-heading p:not(.eyebrow) { color: var(--muted); margin-top: 20px; }
+.community-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 25px; }
+.public-community { padding-top: 26px; }
+.application-root { max-width: 800px; margin-top: 30px; }
+.application-root > h2 { font-size: 2rem; margin-block: 15px; }
+.application-root > .button { margin-top: 18px; }
+.application-root > .hub-badge { margin-bottom: 18px; }
+.community-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 32px; }
+.community-preview a { display: block; padding: 30px; border: 1px solid var(--line); background: var(--panel); }
+.community-preview a:hover { border-color: var(--gold); }
+.community-preview h3 { font-size: 1.8rem; color: var(--gold-light); margin-bottom: 12px; }
+.community-preview p { color: var(--muted); }
+.mobile-admin .hub-admin-panel { padding: 20px 16px; }
+.mobile-admin .hub-tabs { margin-inline: -3px; }
+.mobile-admin .hub-card, .mobile-admin .hub-editor { padding: 22px; }
+.mobile-admin .hub-title-row h2 { flex: 1 1 100%; }
+.mobile-admin .hub-gallery, .mobile-admin .hub-characters { grid-template-columns: 1fr; }
+@media(max-width: 800px) {
+  .hub-gallery, .hub-characters, .community-preview { grid-template-columns: 1fr; }
+  .hub-card, .hub-editor { padding: 23px; }
+  .hub-title-row h2 { flex: 1 1 100%; }
+  .hub-poll-option { grid-template-columns: minmax(120px, 1fr) minmax(30px, .65fr) 20px; gap: 10px; }
+  .hub .button { min-height: 44px; }
+}
+@media(max-width: 450px) {
+  .hub-card, .hub-editor, .mobile-admin .hub-card, .mobile-admin .hub-editor { padding: 19px 16px; }
+  .hub-dashboard { gap: 10px; }
+  .hub-stat { padding: 18px 13px; }
+  .hub-stat span { font-size: .8125rem; }
+  .hub-tab { padding-inline: 13px; }
+  .hub-poll-option { grid-template-columns: 1fr 20px; }
+  .hub-poll-option .button { grid-column: 1 / -1; }
+  .hub-map-pin { min-width: 34px; min-height: 34px; }
+  .hub .form-field input, .hub .form-field textarea, .hub .form-field select { font-size: 16px; }
+}

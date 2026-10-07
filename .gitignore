@@ -3,3 +3,6 @@
 !.env.example
 node_modules/
 *.log
+
+# Local Supabase CLI state
+supabase/.temp/

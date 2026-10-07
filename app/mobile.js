@@ -16,8 +16,8 @@
   window.addEventListener("offline", updateConnection);
   updateConnection();
   const requested = new URL(window.location.href).searchParams.get("bereich");
-  const allowed = ["website", "inhalte", "design", "clan", "members"];
-  const initial = allowed.includes(requested) ? requested : "members";
+  const allowed = ["hub", "website", "inhalte", "design", "clan", "members"];
+  const initial = allowed.includes(requested) ? requested : "hub";
   document.getElementById("edit-tab-" + initial).click();
   document.querySelectorAll("[data-editor-tab]").forEach(tab => tab.addEventListener("click", () => {
     document.getElementById("verwaltung").scrollIntoView({block: "start", behavior: "instant"});
