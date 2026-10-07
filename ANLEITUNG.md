@@ -17,7 +17,7 @@ Die HTML-Oberflächen und der Programmcode sind auf GitHub öffentlich. Interne 
 
 ## Stand der Einrichtung
 
-Die Anwendung ist auf Inhaltsbearbeitung und Datenbank-Zugriffsrechte geprüft. Sie nutzt das vorhandene kostenlose Supabase-Projekt mit aktiver Discord-Anmeldung. Eigene Tabellen mit dem Präfix `raben_` und das nicht öffentlich angebotene Schema `raben_private` halten die Clanrechte getrennt von anderen Anwendungen. Die Rückkehradresse der Website muss unter den erlaubten Supabase-Redirects stehen.
+Die Website ist seit dem 7. Oktober 2026 veröffentlicht: **https://mikejaeson1-wq.github.io/schwarze-raben/**. Discord-Provider und Rückkehradresse sind eingerichtet, das verantwortliche Discord-Konto ist als erster Admin freigegeben. Die Anwendung ist auf Inhaltsbearbeitung und Datenbank-Zugriffsrechte geprüft. Sie nutzt das vorhandene kostenlose Supabase-Projekt mit aktiver Discord-Anmeldung. Eigene Tabellen mit dem Präfix `raben_` und das nicht öffentlich angebotene Schema `raben_private` halten die Clanrechte getrennt von anderen Anwendungen. Die Rückkehradresse `https://mikejaeson1-wq.github.io/schwarze-raben/clan.html` steht unter den erlaubten Supabase-Redirects. Die vorhandene Site URL des RP-Planers bleibt erhalten.
 
 `config.js` enthält die öffentlichen Projektangaben. Solange Supabase-URL und öffentlicher Schlüssel leer sind, funktioniert die öffentliche Ausgangsseite; Anmeldung und Verwaltung zeigen einen Einrichtungshinweis. Das ist kein Demo-Login und es gibt keinen automatisch offenen Adminzugang.
 
@@ -88,13 +88,13 @@ Die Admin-ID in dieser Allowlist bleibt als verantwortliches Konto zugangsberech
 
 ## 4. Auf GitHub veröffentlichen
 
-Das vorgesehene neue Repository ist **mikejaeson1-wq/schwarze-raben**. Keine Dateien in bestehende BluePulse- oder RP-Planer-Repositories kopieren.
+Das veröffentlichte Repository ist **mikejaeson1-wq/schwarze-raben**: https://github.com/mikejaeson1-wq/schwarze-raben. Die folgenden Schritte beschreiben die Einrichtung für einen späteren Umzug. Keine Dateien in bestehende BluePulse- oder RP-Planer-Repositories kopieren.
 
 1. Ein eigenes öffentliches Repository **schwarze-raben** mit einem initialen README erstellen.
 2. Die Dateien und Ordner aus diesem Paket in das Hauptverzeichnis hochladen, einschließlich **assets** und **vendor**. Diese Version besteht aus mehreren zusammengehörenden Dateien.
 3. In **Settings → Pages** die Veröffentlichung aus einem Branch wählen.
 4. **main** und **/(root)** auswählen und speichern.
-5. Die Veröffentlichung abwarten. Die geplante Website-Adresse lautet:
+5. Die Veröffentlichung abwarten. Die Website-Adresse lautet:
    `https://mikejaeson1-wq.github.io/schwarze-raben/`
 6. Die Discord-Rückkehradressen müssen exakt zur tatsächlich veröffentlichten Adresse passen. Bei einem anderen Repository-Namen sowohl `config.js` als auch die Supabase-URL-Einstellungen anpassen.
 
@@ -117,7 +117,7 @@ Ein neu hochgeladenes Hintergrundbild wird mit **Änderungen speichern** auf der
 
 Lokal wurden die SQL-Dateien in einer PostgreSQL-Testumgebung mit nachgebildeten Supabase-Auth- und Storage-Schemas ausgeführt. Geprüft wurden öffentliche Leserechte, Discord-Identitätsprüfung, wartende Nutzer, Mitglieder, Admins, unerlaubte Rechteerhöhung, Bild-Upload-Rechte, Schutz des letzten Admins und Zugriffsentzug nach Sperrung.
 
-Zusätzlich wurden JavaScript-Syntax, HTML-Verweise, sicheres Einsetzen von Texten, öffentliches Nachladen von Inhalten, Reiterbedienung und die Admin-Bearbeitung mit Speicherung geprüft. Die tatsächliche Discord-Anmeldung und die Veröffentlichung müssen nach der Produktiv-Einrichtung überprüft werden.
+Zusätzlich wurden JavaScript-Syntax, HTML-Verweise, sicheres Einsetzen von Texten, öffentliches Nachladen von Inhalten, Reiterbedienung und die Admin-Bearbeitung mit Speicherung geprüft. Die veröffentlichte Startseite und der geschlossene Clan-Eingang wurden im Browser geprüft. Die Weiterleitung erreicht Discord mit der richtigen Supabase-Callback- und Clan-Rückkehradresse. Die Live-Datenbank verweigert Gästen den Zugriff auf Mitgliederdaten und interne Beiträge; Abfragen mit den Datenbankrechten eines nicht freigegebenen Nutzers bleiben gesperrt. Die Admin-Freigabe des verifizierten Discord-Kontos und die Mitgliedschaftsfunktion wurden ebenfalls auf der Live-Datenbank geprüft. Ein vollständiger Login mit anschließender Admin-Bearbeitung wurde noch nicht im Browser durchgeführt.
 
 ## Dateien
 
