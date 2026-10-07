@@ -196,3 +196,67 @@ Für das Gesamtupdate wurden zusätzlich die tatsächlichen Datenbankregeln für
 - `assets/`: mitgelieferte Bilder.
 - `vendor/`: fest eingebundener Supabase-Client 2.117.2 samt Lizenz; kein externer Script-CDN zur Laufzeit.
 - `supabase/`: Schema, öffentliche Ausgangsinhalte und Admin-Freigabe-Hinweise.
+
+
+## Medien, Geschichten, Versionen und Sicherungen
+
+Das Roadmap-Update ist in der Desktop-Verwaltung und in der installierten Admin-App verfügbar. Öffne dort den **RP-Hub**. Im Clanbereich können Mitglieder eigene Medien, Charaktere und erlaubte Beiträge bearbeiten; **Versionen**, **Speicher** und **Sicherung** bleiben Admins vorbehalten.
+
+### YouTube oder MP3 hinzufügen
+
+1. Öffne **Medien → Neu erstellen** und trage Titel und Beschreibung ein.
+2. Wähle **Bild**, **YouTube-Video** oder **MP3-Aufnahme**. Für YouTube einen HTTPS-Videolink einfügen, für MP3 eine echte Datei vom Computer oder Handy auswählen.
+3. Bei Video und Audio kannst du zusätzlich ein Cover hochladen. Bilder dürfen bis 8 MB, MP3-Dateien bis 20 MB groß sein.
+4. Wähle die Sichtbarkeit und speichere. Mitglieder können einen Entwurf, einen Clanbeitrag oder einen Eintrag zur Freigabe erstellen. Nur Admins können **Öffentlich** wählen.
+5. Im Editor eines Charakters, Tagebuchberichts, Chronikeintrags oder anderen Beitrags unter **Medienanhänge** das Medium auswählen und **Hinzufügen** drücken. Mit den Pfeilen die Reihenfolge verändern. Eine Entfernung des Anhangs löscht die Originaldatei nicht.
+
+Der YouTube-Player wird erst mit **Video laden** aktiviert. MP3-Aufnahmen spielen im Audioplayer mit Start, Pause und Zeitregler. Interne Aufnahmen werden erst mit **Aufnahme laden** abgerufen. Es gibt keinen automatischen Ton beim Öffnen einer Seite. Ein YouTube-Link wird in der Website entsprechend dem Beitrag angezeigt; die Erreichbarkeit des Videos selbst hängt weiterhin von dessen YouTube-Einstellungen ab.
+
+Uploads zeigen den Fortschritt. **Upload abbrechen** pausiert den laufenden Vorgang; **Speichern** versucht ihn mit der weiterhin gewählten Datei erneut. Diese Fortsetzung gilt für die geöffnete Seite. Nach dem Schließen oder Neuladen eine Datei erneut auswählen. Die App benötigt eine Internetverbindung; sie speichert keine Clan-Dateien für die Offline-Wiedergabe.
+
+Eine Veröffentlichung legt eine gesonderte Kopie im öffentlichen Speicher an. Bereits veröffentlichte Dateien können außerhalb der Website weitergegeben worden sein. Eine spätere interne Sichtbarkeit macht solche bereits geteilten Kopien nicht rückwirkend geheim. Die Speicherübersicht zeigt öffentliche Kopien und ihre Verwendung an.
+
+### Medien auf der Startseite
+
+Unter **Öffentliche Inhalte** kannst du bereits freigegebene Medien an einzelne **Weitere Informationen** anhängen. Darunter gibt es außerdem die Auswahl **Zusätzliche Medien auf der Startseite**. Diese erscheinen im Abschnitt **Die Raben in Bild und Klang**. Änderungen über **Änderungen speichern** veröffentlichen. Interne Medien stehen dort nicht zur Auswahl.
+
+### Geschichten verbinden und Wissen anheften
+
+- Im Beitragseditor unter **Verknüpfte Charaktere, Ereignisse und Beiträge** einen vorhandenen Eintrag auswählen und hinzufügen. Die Verknüpfung öffnet den zugehörigen Beitrag.
+- Einträge, die zu derselben Geschichte gehören, erhalten denselben Namen im Feld **Gemeinsame Geschichte oder Handlungsfaden**. Unter **Geschichten** stehen die dazugehörigen Beiträge; ein Klick auf den Geschichtenknopf an einem Beitrag filtert direkt danach.
+- Das Wissensarchiv lässt sich zusätzlich nach Kategorie filtern. Admins können **Im Wissensarchiv anheften** aktivieren. Angeheftete Einträge stehen zuerst. Mitglieder ändern den Anheftstatus nicht.
+- Öffentlich verknüpfte Einträge und Medien müssen ihrerseits öffentlich freigegeben sein. Geheimnotizen sind keine verknüpfbaren oder öffentlichen Beiträge.
+
+### Frühere Versionen wiederherstellen
+
+**Versionen** zeigt Zeitpunkt, Bearbeiter, Inhaltsbereich und gespeicherte Fassungen. Suche nach Titel oder Bearbeiter; über **Vorschau ansehen** den Inhalt prüfen. **Wiederherstellen** speichert die gewählte Fassung als neue Version. Gleichzeitige Änderungen eines anderen Admins werden erkannt und nicht still überschrieben.
+
+Clan- und Medienbeiträge werden dabei zunächst **Entwürfe**. Prüfe sie und gib sie anschließend im jeweiligen Bereich erneut frei. Die Wiederherstellung von Website-Inhalten verändert die öffentliche Startseite direkt; die Bestätigung weist darauf hin. Geheimnotizen und ältere interne Clan-Infos bleiben intern.
+
+Die Versionen erfassen Änderungen ab diesem Update. Für zuvor bestehende Inhalte gibt es eine Ausgangsversion mit der Kennzeichnung **Bestand vor dem Update**. Einträge zu Mitgliedsrechten oder Discord-Anmeldedaten werden dadurch nicht zu öffentlich einsehbaren Inhalten.
+
+**Version entfernen** verwirft eine ausgewählte frühere Fassung nach Bestätigung. Das entfernt nicht den aktuellen Beitrag. Dateien, die nur diese Fassung benötigte, lassen sich danach gegebenenfalls unter **Speicher** aufräumen. Entfernte gespeicherte Fassungen können ohne separate Sicherung nicht wiederhergestellt werden.
+
+### Dateiverwendung und Speicher
+
+**Speicher** zählt die privaten und öffentlichen Clan-Dateien und zeigt ihre Verwendung in Beiträgen, Website-Einstellungen und gespeicherten Versionen. Die Übersicht meldet fehlende Bild- oder Audiodateien und nicht mehr verfügbare Medienanhänge. **Verwendung ansehen** an einem Medienbeitrag zeigt die verknüpften Beiträge.
+
+Dateien mit Verwendung können nicht über das Aufräumen entfernt werden. Unbenutzte Dateien lassen sich einzeln nach Bestätigung löschen. Soll ein Medienbeitrag gelöscht werden, zuerst seine Anhänge aus den zugehörigen Beiträgen oder Startseiteninformationen entfernen. Die Speicherzahl bezieht sich auf diese beiden Clan-Buckets; andere Anwendungen im selben Supabase-Projekt sind darin nicht enthalten.
+
+### Sicherung herunterladen und Inhalte zurückholen
+
+1. Unter **Sicherung** mit **Inhalte als JSON sichern** eine Inhaltssicherung herunterladen. Sie umfasst Website und Clanbeiträge, Geheimnotizen, Bewerbungen, Mitgliederinformationen, Interaktionen und Inhaltsversionen. Bewahre diese Datei privat auf.
+2. Mit **Inhalte und Dateien als ZIP sichern** zusätzlich die tatsächlichen Bilder und MP3-Dateien herunterladen. Größere Sicherungen werden in Teile von ungefähr 40 MB aufgeteilt. **Alle ZIP-Teile aufbewahren.** Jeder Teil enthält `backup.json`; die Dateien liegen unter `files/raben-media/` beziehungsweise `files/raben-public/`. Die Browserfreigabe für mehrere Downloads kann dafür nötig sein.
+3. Die JSON-Datei beziehungsweise `backup.json` unter **Inhaltssicherung zur Prüfung auswählen** öffnen. Einen einzelnen Inhalt wählen, die Vorschau prüfen und gezielt wiederherstellen. Vorhandene fremde Änderungen werden dabei geprüft; andere Inhalte werden nicht gelöscht.
+4. Falls eine Originaldatei fehlt, den passenden ZIP-Teil entpacken. In der Datei-Wiederherstellung zuerst den Eintrag aus der Sicherung auswählen und dann die dazugehörige Datei vom Gerät hochladen. Bestehende Dateien werden nicht überschrieben. Die Rückkehr einer zuvor öffentlichen Datei benötigt eine ausdrückliche öffentliche Bestätigung.
+5. Bei fehlenden verknüpften Medien zuerst diese Medienbeiträge und Originaldateien wiederherstellen. Danach Charaktere, Tagebuch oder Chronik und zuletzt die öffentlichen Website-Verknüpfungen wiederherstellen und bei Bedarf wieder freigeben.
+
+Der Inhaltsimport ist für die Wiederherstellung im bestehenden Clan-Projekt gedacht. Er verändert keine Discord-Konten, Mitgliedsrechte, Bewerbungsentscheidungen, Stimmen oder Teilnehmerzusagen. Diese Daten sind im Export zur Sicherung enthalten, ihre Wiederherstellung benötigt eine gezielte technische Prüfung. Für einen Umzug in ein neues Supabase-Projekt muss insbesondere die Zuordnung der Discord-Mitglieder geprüft werden. Geheimschlüssel und Discord-Anmeldedaten sind kein Bestandteil des Exports.
+
+Für umfangreiche Mediensicherungen am besten einen Computer verwenden. Wird eine Sicherung unterbrochen oder eine Datei fehlt, zeigt die Verwaltung einen Fehler; eine unvollständige Sicherung wird nicht als vollständig bestätigt. Eine reine JSON-Datei ersetzt nicht die separate Sicherung der eigentlichen MP3- und Bilddateien.
+
+### Technische Einrichtung dieses Updates
+
+Bestehende Installation: Zusätzlich die Migration `supabase/migrations/20261007205601_media_history_roadmap.sql` anwenden. Das veröffentlichte Clan-Projekt ist bereits aktualisiert. Bei einer neuen Installation zuerst `schema.sql` und `seed.sql`, anschließend die Gemeinschafts-Migration und danach diese Medien-Migration einrichten. Alle Tabellen und Funktionen gehören zum Namensraum `raben_`; andere Anwendungen werden nicht geändert.
+
+Die zusätzlichen Browser-Bibliotheken liegen lokal und fest versioniert im Repository. Die Admin-App aktualisiert ihre öffentlichen Oberflächendateien über den Service Worker. Interne Daten, Audiodateien, Bilder aus dem geschützten Speicher, Sicherungen und Discord-Rückkehradressen werden weiterhin nicht in dessen Cache aufgenommen. Falls die App nach dem Update noch offen war, einmal schließen und erneut öffnen.

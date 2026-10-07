@@ -1,10 +1,12 @@
 (() => {
   "use strict";
   let CLAN = window.CLAN_DEFAULT;
+  const mediaContext={public:true,epoch:0,disposed:false,urls:new Set(),players:new Set()};
   const effect = window.RabenEffects.create(document.getElementById("schnee"), CLAN.effects);
   const original = {};
   ["mitglieder-inhalt","aushang-inhalt","rp-inhalt"].forEach(id => { original[id] = [...document.getElementById(id).childNodes].map(n => n.cloneNode(true)); });
   function render() {
+    mediaContext.epoch++;window.RabenMedia?.releasePlayers(mediaContext);
     Object.entries(original).forEach(([id,nodes]) => document.getElementById(id).replaceChildren(...nodes.map(n => n.cloneNode(true))));
     const text = (value, fallback = "") => typeof value === "string" ? value.trim() || fallback : fallback;
     const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
@@ -91,7 +93,8 @@
     const extra = document.getElementById("zusatz-inhalt"); extra.replaceChildren();
     const infos = list(CLAN.extraInfos).filter(v => v && text(v.titel));
     document.getElementById("zusatz-info").hidden = !infos.length;
-    infos.forEach(info => { const article = element("article", "extra-info"); article.append(element("h3", "", text(info.titel)), element("p", "", text(info.text))); extra.append(article); });
+    infos.forEach(info => { const article = element("article", "extra-info"); article.append(element("h3", "", text(info.titel)), element("p", "", text(info.text))); extra.append(article);if(info.mediaIds?.length&&window.RabenMedia){const host=element("div","media-attachments");article.append(host);RabenMedia.references(mediaContext,info.mediaIds,host).catch(()=>host.append(element("p","field-note","Die Medien sind gerade nicht verfügbar.")));} });
+    const siteMedia=document.getElementById("site-media"),siteMediaSection=document.getElementById("site-media-section");if(siteMedia&&siteMediaSection){siteMedia.replaceChildren();const ids=Array.isArray(CLAN.rabenInfoMediaIds)?CLAN.rabenInfoMediaIds:[];siteMediaSection.hidden=!ids.length;if(ids.length&&window.RabenMedia)RabenMedia.references(mediaContext,ids,siteMedia).catch(()=>siteMedia.append(element("p","field-note","Die Medien sind gerade nicht verfügbar.")));}
   }
     const tabs = [...document.querySelectorAll("[data-tab]")];
     const openTab = (key, focus = false) => {

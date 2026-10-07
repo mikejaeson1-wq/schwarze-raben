@@ -11,6 +11,7 @@ window.CLAN_DEFAULT = {
     aushang: [],
     rpHinweise: [],
     extraInfos: [],
+    rabenInfoMediaIds: [],
     effects: {type: "snow", intensity: 45, speed: 1},
     heroImage: "",
     villageImage: ""

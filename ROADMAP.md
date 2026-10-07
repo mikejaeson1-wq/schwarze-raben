@@ -2,15 +2,15 @@
 
 Stand: 7. Oktober 2026. Die Schwarzen Raben sind ein Roleplay-Clan in Conan Exiles mit einem nordischen Dorf im Schnee. Serverangaben stehen im bearbeitbaren Infobereich, damit die Website bei einem Serverwechsel weiterverwendet werden kann.
 
-Diese Roadmap beschreibt den geplanten Ausbau. YouTube-Einbettungen und MP3-Uploads sind noch nicht eingebaut. Die Reihenfolge gibt die Priorität an; feste Veröffentlichungstermine sind noch nicht festgelegt.
+Die vier Ausbauschritte sind umgesetzt. Die Übersicht beschreibt die verfügbaren Funktionen der Website, des Clanbereichs und der Admin-App.
 
 | Schritt | Status | Schwerpunkt | Ergebnis |
 | --- | --- | --- | --- |
 | Grundlage | Fertig | Öffentliche Website, geschlossener Clanbereich und Admin-App | Discord-Anmeldung, Rollen und Freigaben, bearbeitbare Texte und Bilder, Effekte, Galerie, Dorfkarte, Chronik, Bewerbungen, Kalender, Charaktere, Aufträge, Bauprojekte, Wissen, Abstimmungen und Tagebuch |
-| 1 | Nächstes Update | YouTube und echte MP3-Dateien | Videos per Link einbetten und Audiodateien direkt hochladen und abspielen |
-| 2 | Danach vorgeschlagen | Gemeinsame Medienverwaltung | Bilder, Videos und Audio finden, zuordnen und bequem am Handy verwalten |
-| 3 | Danach vorgeschlagen | RP-Geschichten verbinden | Charaktere, Tagebucheinträge, Chronik und Ereignisse miteinander verknüpfen |
-| 4 | Danach vorgeschlagen | Verwaltung und Wiederherstellung | Änderungen nachvollziehen, frühere Inhaltsversionen wiederherstellen und Daten exportieren |
+| 1 | Fertig | YouTube und echte MP3-Dateien | Videos per Link einbetten und Audiodateien direkt hochladen und abspielen |
+| 2 | Fertig | Gemeinsame Medienverwaltung | Bilder, Videos und Audio finden, zuordnen und bequem am Handy verwalten |
+| 3 | Fertig | RP-Geschichten verbinden | Charaktere, Tagebucheinträge, Chronik und Ereignisse miteinander verknüpfen |
+| 4 | Fertig | Verwaltung und Wiederherstellung | Änderungen nachvollziehen, frühere Inhaltsversionen wiederherstellen und Daten exportieren |
 
 ## 1. Medienupdate: YouTube und MP3
 
@@ -20,7 +20,7 @@ Diese Roadmap beschreibt den geplanten Ausbau. YouTube-Einbettungen und MP3-Uplo
 - Titel, Beschreibung und optional ein vorhandenes Bild als Vorschaubild vergeben.
 - Den Videoplayer erst auf Wunsch laden; die Wiedergabe startet durch eine bewusste Aktion.
 - Links bearbeiten, ersetzen und entfernen. Ungültige Links werden verständlich angezeigt.
-- Videos zunächst in Medienbeiträgen und Chronikeinträgen einbinden; anschließend dieselben Anhänge auch in Charakteren, Tagebuch und zusätzlichen Informationen anbieten.
+- Videos in Medienbeiträgen, Chronikeinträgen, Charakteren, Tagebuch und zusätzlichen Informationen einbinden.
 - Die Sichtbarkeit folgt dem jeweiligen Eintrag: intern oder nach Admin-Freigabe öffentlich. Der Zugriff auf das Video selbst richtet sich nach den YouTube-Einstellungen.
 
 ### Echte MP3-Dateien
@@ -30,13 +30,13 @@ Diese Roadmap beschreibt den geplanten Ausbau. YouTube-Einbettungen und MP3-Uplo
 - Titel, Beschreibung und optional ein Cover aus den vorhandenen Bildern hinzufügen.
 - Eigene Lieder, erzählte Sagen oder RP-Aufnahmen zu Medienbeiträgen, Charakteren und Geschichten zuordnen.
 - Dateien ersetzen oder entfernen; Uploadfortschritt und verständliche Fehlermeldungen anzeigen.
-- Die passende Dateigrößengrenze und den verfügbaren Speicher vor der Freigabe festlegen. MP3-Dateien werden nicht ins öffentliche GitHub-Repository geschrieben.
+- MP3-Dateien bis 20 MB und Bilder bis 8 MB hochladen. MP3-Dateien liegen im Medienspeicher und werden nicht ins öffentliche GitHub-Repository geschrieben.
 
 ### Sichtbarkeit und Freigaben
 
 Admins verwalten die neuen Medien auch über die bestehende Admin-App. Interne MP3-Dateien bleiben im geschützten Medienspeicher. Ein öffentlicher Beitrag erhält erst nach einer ausdrücklichen Admin-Freigabe eine öffentlich abrufbare Datei. Geheimnotizen behalten ihre getrennten Rechte. Mitglieder dürfen Anhänge nur dort bearbeiten, wo sie bereits ihren eigenen Eintrag bearbeiten dürfen.
 
-Das Medienupdate gilt als fertig, wenn YouTube-Links und echte MP3-Uploads auf Computer und Handy funktionieren, Änderungen in Website und Admin-App sichtbar werden und Gäste sowie gesperrte Mitglieder keinen Zugriff auf interne Audiodateien erhalten.
+Die Medienverwaltung steht auf Computer und Handy bereit. Gäste und gesperrte Mitglieder erhalten keinen Zugriff auf interne Audiodateien; Veröffentlichungen bleiben eine gesonderte Admin-Entscheidung.
 
 ## 2. Medien im Alltag verwalten
 
@@ -64,10 +64,12 @@ Die vorhandenen Kalender, Charakterbücher und Tagebücher bilden dafür die Gru
 
 ## Technische Grundlage des Medienupdates
 
-Die vorhandene Website und Admin-App bleiben der Ausgangspunkt. YouTube stellt einen einbettbaren Player bereit; MP3-Dateien lassen sich über den HTML-Audioplayer abspielen. Die gemeinsame Umsetzung soll dieselben Inhaltsrechte und Freigaben verwenden, die heute bereits für Bilder und Clanbeiträge gelten.
+Die vorhandene Website und Admin-App bleiben der Ausgangspunkt. YouTube stellt einen einbettbaren Player bereit; MP3-Dateien lassen sich über den HTML-Audioplayer abspielen. Die Umsetzung verwendet die bestehenden Inhaltsrechte und Admin-Freigaben für Bilder und Clanbeiträge.
 
 - [YouTube: Videos einbetten](https://support.google.com/youtube/answer/171780?hl=de)
 - [YouTube: Einbettbarer Player und Parameter](https://developers.google.com/youtube/player_parameters)
 - [MDN: HTML-Audioplayer und MP3-Quellen](https://developer.mozilla.org/de/docs/Web/HTML/Reference/Elements/audio)
 
 Zur aktuellen Website: [Schwarze Raben](https://mikejaeson1-wq.github.io/schwarze-raben/). Bedienung und Einrichtung stehen in [ANLEITUNG.md](ANLEITUNG.md).
+
+Die Sicherung umfasst JSON-Inhalte sowie Bilder und MP3-Dateien in ZIP-Teilen. Inhalte lassen sich einzeln nach Vorschau importieren. Clan- und Medienbeiträge werden bei der Wiederherstellung zunächst Entwürfe. Discord-Konten und Mitgliedsrechte werden dabei nicht automatisch übernommen. Die genaue Bedienung steht in [ANLEITUNG.md](ANLEITUNG.md).

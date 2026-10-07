@@ -5,6 +5,8 @@
   const asset = path => (mobileApp ? "../" : "") + path;
   let draft = null, revision = null, currentAdmin = null, editingPost = null, dirty = false, busy = false, epoch = 0;
   const effects = RabenEffects.create(document.getElementById("preview-canvas"), {type:"none"});
+  let siteMediaPicker=null;const infoPickers=new WeakMap();
+  const mediaContext=()=>({admin:true,public:false,actor:currentAdmin,epoch,disposed:false,authorize:ensureAdmin});
   const listSchemas = {
     mitglieder: {title:"Öffentliche Charaktervorstellungen", item:"Charakter", fields:[['name','Name'],['rolle','Rolle'],['beschreibung','Beschreibung','textarea']]},
     aushang: {title:"Öffentliche Aushänge", item:"Aushang", fields:[['titel','Titel'],['datum','Datum','date'],['text','Text','textarea']]},
@@ -18,6 +20,7 @@
     document.getElementById("admin-content").hidden = true; document.getElementById("admin-gate").hidden = false;
     document.getElementById("account").hidden = true; effects.update({type:"none"});
     document.getElementById("internal-posts").replaceChildren(); document.getElementById("member-manager").replaceChildren();
+    document.getElementById("site-media-picker")?.replaceChildren();siteMediaPicker=null;
     document.getElementById("public-lists").replaceChildren(); document.querySelectorAll("#clan-form input, #clan-form textarea").forEach(n => n.value = "");
     document.getElementById("post-form").reset(); dirty = false;
     const badge=document.getElementById("pending-count"); if(badge) badge.hidden=true;
@@ -41,6 +44,7 @@
     const remove = el("button","button danger small-button","Entfernen"); remove.type="button";
     remove.addEventListener("click",() => {card.remove(); markDirty();}); head.append(remove);
     const grid = el("div","form-grid"); schema.fields.forEach(([name,label,type]) => grid.append(field(name,label,type,item[name] || "")));
+    if(key==="extraInfos"&&window.RabenMedia){const picker=RabenMedia.picker(mediaContext(),item.mediaIds||[],"Medien in dieser Information",{media:true,publicOnly:true});infoPickers.set(card,picker);picker.wrap.addEventListener("change",markDirty);grid.append(picker.wrap);}
     card.append(head,grid); document.getElementById("list-"+key).append(card);
   };
   const buildLists = () => {
@@ -64,6 +68,7 @@
   const populate = () => {
     document.querySelectorAll("#clan-form [name]").forEach(input => {input.value = typeof draft[input.name] === "string" ? draft[input.name] : "";});
     buildLists();
+    const mediaHost=document.getElementById("site-media-picker");if(mediaHost&&window.RabenMedia){mediaHost.replaceChildren();siteMediaPicker=RabenMedia.picker(mediaContext(),draft.rabenInfoMediaIds||[],"Zusätzliche Medien auf der Startseite",{media:true,publicOnly:true});mediaHost.append(siteMediaPicker.wrap);siteMediaPicker.wrap.addEventListener("change",markDirty);}
     document.getElementById("hero-preview").src = Raben.imageUrl(draft.heroImage) || asset("assets/nord-dorf.webp");
     document.getElementById("village-preview").src = Raben.imageUrl(draft.villageImage) || asset("assets/raben-langhaus.webp");
     const settings = RabenEffects.normalize(draft.effects);
@@ -81,9 +86,10 @@
     }
     Object.keys(listSchemas).forEach(key => {
       content[key] = [...document.querySelectorAll('[data-list-item="'+key+'"]')].map(card => {
-        const item={}; card.querySelectorAll("[data-field]").forEach(input => {item[input.dataset.field] = input.value.trim();}); return item;
+        const item={}; card.querySelectorAll("[data-field]").forEach(input => {item[input.dataset.field] = input.value.trim();});if(key==="extraInfos")item.mediaIds=infoPickers.get(card)?.read()||[]; return item;
       }).filter(item => item.name || item.titel);
     });
+    if(siteMediaPicker)content.rabenInfoMediaIds=siteMediaPicker.read();
     content.effects = readEffects(); return content;
   };
   const savePublic = async () => {
@@ -205,6 +211,10 @@
       const target=event.key==='Home'?0:event.key==='End'?tabs.length-1:['ArrowDown','ArrowRight'].includes(event.key)?(index+1)%tabs.length:['ArrowUp','ArrowLeft'].includes(event.key)?(index+tabs.length-1)%tabs.length:null;
       if(target !== null) {event.preventDefault(); openTab(tabs[target]); tabs[target].focus();}
     });
+  });
+  window.addEventListener("raben-content-restored",async event=>{
+    if(!currentAdmin)return;
+    try{await ensureAdmin();if(event.detail.source==="raben_site_content"){const record=await check(Raben.client().from("raben_site_content").select("content,revision").eq("id",1).single());draft={...window.CLAN_DEFAULT,...record.content};revision=record.revision;populate();}if(event.detail.source==="raben_clan_posts")await loadPosts();}catch(error){message(Raben.errorMessage(error),true);}
   });
   window.addEventListener("raben-map-updated",event=>{if(draft && revision===event.detail.previousRevision){draft.rabenMapImage=event.detail.image;revision=event.detail.revision;}});
   window.addEventListener("beforeunload",event => {if(dirty) {event.preventDefault(); event.returnValue="";}});

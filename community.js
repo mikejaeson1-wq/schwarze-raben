@@ -2,6 +2,7 @@
   "use strict";
   const {el,check}=Raben;
   const definitions={
+    media:{label:"Medien",singular:"Medienbeitrag",public:true,member:true,fields:[['mediaType','Medienart','select',[['image','Bild'],['youtube','YouTube-Video'],['mp3','MP3-Aufnahme']]]],image:true},
     gallery:{label:"Dorfgalerie",singular:"Dorfaufnahme",public:true,fields:[['date','Aufnahmedatum','date']],image:true},
     place:{label:"Dorfplan",singular:"Ort",public:true,fields:[['category','Art des Ortes'],['x','Position von links (%)','number'],['y','Position von oben (%)','number']]},
     chronicle:{label:"Chronik",singular:"Chronikeintrag",public:true,fields:[['date','Datum des Ereignisses','date']],image:true},
@@ -15,15 +16,25 @@
     journal:{label:"RP-Tagebuch",singular:"Tagebucheintrag",member:true,fields:[['date','Datum des Erlebnisses','date']]}
   };
   const scopes=new Set(),applicationRoots=new Set(); let sequence=0,applicationEpoch=0;
-  const memberKinds=['event','character','task','project','knowledge','poll','journal','trade'];
-  const publicKinds=['gallery','place','chronicle','trade','event','character'];
-  const publicEmpty={gallery:'Dorfaufnahmen',place:'Orte',chronicle:'Chronikeinträge',trade:'Handels- und Diplomatieeinträge',event:'RP-Termine',character:'Charaktervorstellungen'};
+  const memberKinds=['media','gallery','chronicle','place','event','character','task','project','knowledge','poll','journal','trade'];
+  const publicKinds=['media','gallery','place','chronicle','trade','event','character'];
+  const publicEmpty={media:'Medienbeiträge',stories:'Geschichten',gallery:'Dorfaufnahmen',place:'Orte',chronicle:'Chronikeinträge',trade:'Handels- und Diplomatieeinträge',event:'RP-Termine',character:'Charaktervorstellungen'};
   const visibilityNames={draft:'Entwurf',clan:'Clanintern',review:'Zur Freigabe',public:'Öffentlich',archived:'Archiviert'};
   const route=path=>new URL(path,Raben.config.siteUrl).href;
   const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Berlin'}).format(new Date());
   const formatDate=value=>/^\d{4}-\d{2}-\d{2}$/.test(value||'')?new Intl.DateTimeFormat('de-DE',{timeZone:'UTC',dateStyle:'medium'}).format(new Date(value+'T12:00:00Z')):'';
   const failure=error=>{
     const m=error?.message||'';
+    if(m.includes('audio_file_required'))return 'Bitte wähle eine MP3-Datei für diese Aufnahme aus.';
+    if(m.includes('image_required'))return 'Bitte lade ein Bild für diesen Medienbeitrag hoch.';
+    if(m.includes('invalid_mp3'))return 'Bitte wähle eine echte MP3-Datei mit maximal 20 MB.';
+    if(m.includes('invalid_youtube'))return 'Bitte füge einen gültigen HTTPS-Link zu einem YouTube-Video ein.';
+    if(m.includes('upload_interrupted'))return 'Der Upload wurde unterbrochen. Deine Eingaben bleiben erhalten. Mit Speichern kannst du ihn fortsetzen.';
+    if(m.includes('media_in_use'))return 'Dieses Medium wird noch verwendet. Öffne „Verwendung ansehen“ und entferne zuerst die Verknüpfungen.';
+    if(m.includes('linked_record_not_public'))return 'Öffentliche Beiträge brauchen öffentlich freigegebene Medien und Verknüpfungen. Gib diese zuerst frei oder entferne den Anhang.';
+    if(m.includes('linked_record_missing'))return 'Ein verknüpfter Eintrag fehlt oder ist für dich nicht mehr freigegeben. Entferne ihn aus der Auswahl.';
+    if(m.includes('audio_file_missing'))return 'Die MP3-Datei fehlt. Lade sie erneut hoch oder stelle sie aus deiner Sicherung wieder her.';
+    if(m.includes('admin_pin_required'))return 'Nur Admins können Wissenseinträge anheften oder lösen.';
     if(m.includes('notes_conflict'))return 'Die Geheimnotizen wurden inzwischen geändert. Deine Eingaben bleiben erhalten. Schließe die Bearbeitung und lade die aktuellen Notizen erneut.';
     if(m.includes('conflict'))return 'Der Eintrag wurde inzwischen geändert. Deine Eingaben bleiben erhalten. Schließe die Bearbeitung und lade den aktuellen Eintrag erneut.';
     if(m.includes('poll_has_votes'))return 'Die Antworten können nach der ersten Stimme nicht mehr geändert werden. Lege dafür eine neue Abstimmung an.';
@@ -47,7 +58,7 @@
   };
   const note=(text,classes='field-note')=>el('p',classes,text);
   const clearScope=ctx=>{
-    ctx.epoch++;ctx.disposed=true;ctx.dirty=false;
+    window.RabenMedia?.release(ctx);ctx.epoch++;ctx.disposed=true;ctx.dirty=false;
     ctx.urls.forEach(url=>URL.revokeObjectURL(url));ctx.urls.clear();ctx.records=[];ctx.names.clear();
     ctx.root.replaceChildren();ctx.root.append(note('Dein Zugang ist nicht mehr aktiv. Bitte melde dich erneut an.','status-message'));
     scopes.delete(ctx);
@@ -71,13 +82,15 @@
     if(!src||ctx.disposed||epoch!==ctx.epoch||!card.isConnected)return;
     const img=document.createElement('img');img.src=src;img.alt=row.title;img.loading='lazy';img.className='hub-image';card.prepend(img);
   };
-  const upload=async(ctx,file,owner)=>{
+  const upload=async(ctx,file,owner,controls)=>{
+    if(window.RabenMedia)return RabenMedia.upload(ctx,file,owner,controls);
     await ensure(ctx);
     if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>8388608)throw new Error('invalid_image');
     const path=(owner||ctx.actor.user_id)+'/'+crypto.randomUUID()+'.'+({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[file.type]);
     await check(Raben.client().storage.from('raben-media').upload(path,file,{contentType:file.type,cacheControl:'0',upsert:false}));return path;
   };
   const publishImage=async(ctx,details)=>{
+    if(window.RabenMedia)return RabenMedia.publish(ctx,details);
     if(!details.imagePath||details.publicImage)return details;
     await ensure(ctx);
     if(ctx.actor.role!=='admin')throw {code:'42501'};
@@ -118,6 +131,13 @@
     const admin=ctx.actor.role==='admin',choices=admin?[['draft','Entwurf'],['clan','Clanintern'],['review','Zur Freigabe'],...(schema.public?[['public','Öffentlich']]:[]),['archived','Archiviert']]:[['draft','Mein Entwurf'],['clan','Im Clan teilen'],['review',schema.public?'Öffentliche Freigabe anfragen':'Admin-Prüfung anfragen'],['archived','Archivieren']];
     const visibility=field('Sichtbarkeit','select',row?.visibility==='public'&&!admin?'review':row?.visibility||'clan',choices);inputs.visibility=visibility.input;grid.append(visibility.wrap);
     if(schema.image){const f=field('Bild, optional (JPG, PNG, WebP · maximal 8 MB)','file');f.input.accept='image/jpeg,image/png,image/webp';inputs.image=f.input;grid.append(f.wrap);}
+    const controls=kind==='media'?null:window.RabenMedia?.progressControls();if(controls)grid.append(controls.wrap);
+    const source=kind==='media'?window.RabenMedia?.editSource(ctx,row,grid,inputs):null;
+    const mediaPicker=window.RabenMedia?.picker(ctx,details.mediaIds||[],'Medienanhänge',{media:true,exclude:row?.id});
+    const relatedPicker=window.RabenMedia?.picker(ctx,details.relatedIds||[],'Verknüpfte Charaktere, Ereignisse und Beiträge',{exclude:row?.id});
+    if(mediaPicker)grid.append(mediaPicker.wrap);if(relatedPicker)grid.append(relatedPicker.wrap);
+    const story=field('Gemeinsame Geschichte oder Handlungsfaden','text',details.story||'');story.input.maxLength=100;inputs.story=story.input;grid.append(story.wrap);
+    if(kind==='knowledge'&&admin){const pin=field('Im Wissensarchiv anheften','checkbox',details.pinned===true);inputs.pinned=pin.input;grid.append(pin.wrap);}
     if(kind==='place')form.append(note('Die Position wird als Prozentwert auf eurem Dorfplan gespeichert. Einen Kartenhintergrund legst du über eine öffentliche Dorfaufnahme fest.'));
     if(kind==='character')form.append(note('Geheimnotizen bearbeitest du nach dem Speichern separat. Eine öffentliche Freigabe umfasst nur Steckbrief, Beruf, Beziehungen und ein freigegebenes Bild.'));
     if(schema.public)form.append(note(admin?'„Öffentlich“ macht diesen Eintrag für alle Besucher sichtbar. Prüfe den gesamten Text vor der Veröffentlichung.':'Eine öffentliche Veröffentlichung benötigt eine Admin-Freigabe. Änderungen an einem veröffentlichten Steckbrief werden erneut geprüft.'));
@@ -126,13 +146,18 @@
     form.addEventListener('input',()=>{ctx.dirty=true;});form.addEventListener('change',()=>{ctx.dirty=true;});
     form.addEventListener('submit',event=>{event.preventDefault();run(ctx,save,async()=>{
       let data={};schema.fields.forEach(([key,,type])=>{const input=inputs[key];if(type==='checkbox')data[key]=input.checked;else if(type==='number')data[key]=Number(input.value);else if(type==='options')data[key]=input.value.split('\n').map(s=>s.trim()).filter(Boolean);else if(input.value.trim())data[key]=input.value.trim();});
-      ['imagePath','publicImage','sourceId'].forEach(key=>{if(details[key])data[key]=details[key];});
-      if(inputs.image?.files?.[0]){data.imagePath=await upload(ctx,inputs.image.files[0],current?.created_by);delete data.publicImage;details.imagePath=data.imagePath;delete details.publicImage;inputs.image.value='';}
-      if(inputs.visibility.value==='public')data=await publishImage(ctx,data);
+      ['imagePath','publicImage','sourceId','audioPath','publicAudio','youtubeId','fileName'].forEach(key=>{if(details[key])data[key]=details[key];});
+      data.mediaIds=mediaPicker?mediaPicker.read():details.mediaIds||[];data.relatedIds=relatedPicker?relatedPicker.read():details.relatedIds||[];data.story=inputs.story.value.trim();
+      if(kind==='knowledge')data.pinned=inputs.pinned?inputs.pinned.checked:details.pinned===true;
+      if(source)data=await source.collect(data);
+      if(inputs.image?.files?.[0]){data.imagePath=await upload(ctx,inputs.image.files[0],current?.created_by,source?.controls||controls);delete data.publicImage;details.imagePath=data.imagePath;delete details.publicImage;inputs.image.value='';}
+      Object.keys(details).forEach(key=>delete details[key]);Object.assign(details,data);
+      if(inputs.visibility.value==='public'){if(kind==='media'&&(current?.visibility!=='public'||data.audioPath!==current?.details.audioPath||data.imagePath!==current?.details.imagePath||data.youtubeId!==current?.details.youtubeId)&&!confirm('Dieses Medium einschließlich Bild, Video oder MP3-Aufnahme öffentlich freigeben?'))return;data=await publishImage(ctx,data);}
+      if(ctx.disposed||!form.isConnected)return;
       const payload={title:inputs.title.value.trim(),body:inputs.body.value.trim(),details:data,visibility:inputs.visibility.value};
       const result=current?await check(Raben.client().from('raben_records').update(payload).eq('id',current.id).eq('revision',current.revision).select('id,kind,title,body,details,visibility,created_by,revision,updated_at')):await check(Raben.client().from('raben_records').insert({...payload,kind}).select('id,kind,title,body,details,visibility,created_by,revision,updated_at'));
       if(!result.length)throw new Error('record_conflict');if(ctx.disposed)return;
-      current=result[0];Object.assign(details,current.details);ctx.dirty=false;await loadList(ctx,true);inform(ctx,'Gespeichert · '+visibilityNames[current.visibility]+'.');
+      current=result[0];Object.assign(details,current.details);source?.committed?.(current.details);ctx.dirty=false;await loadList(ctx,true);inform(ctx,'Gespeichert · '+visibilityNames[current.visibility]+'.');
     });});
     ctx.editor.append(form);title.input.focus();
   };
@@ -181,11 +206,14 @@
     });
   };
   const renderCard=(ctx,row)=>{
-    const d=row.details||{},card=el('article','hub-card');card.dataset.recordId=row.id;
+    const d=row.details||{},card=el('article','hub-card');card.dataset.recordId=row.id;card.id='eintrag-'+row.id;
     const head=el('div','hub-card-head');head.append(el('p','eyebrow',definitions[row.kind].singular));if(!ctx.public)head.append(el('span','hub-badge',visibilityNames[row.visibility]));
     card.append(head,el('h3','',row.title));
     const meta=[];if(d.date)meta.push(formatDate(d.date));if(d.time)meta.push(d.time+' Uhr · Berlin');if(d.location)meta.push(d.location);if(d.profession)meta.push(d.profession);if(d.category)meta.push(d.category);if(d.dueDate)meta.push('Bis '+formatDate(d.dueDate));if(d.expires)meta.push('Gültig bis '+formatDate(d.expires));
+    if(d.mediaType)meta.push({image:'Bild',youtube:'YouTube',mp3:'MP3'}[d.mediaType]||'Medium');
+    if(d.pinned)meta.push('Angeheftet');
     if(meta.length)card.append(note(meta.join(' · '),'hub-meta'));
+    if(d.story){const storyButton=button('Geschichte: '+d.story,()=>{ctx.storyFilter.value=d.story;selectKind(ctx,'stories');});card.append(storyButton);}
     if(row.body)card.append(el('p','hub-body',row.body));
     if(d.relationships)card.append(el('p','hub-body','Beziehungen: '+d.relationships));if(d.contact)card.append(note('RP-Kontakt: '+d.contact));if(d.tags)card.append(note('Schlagwörter: '+d.tags));
     if(row.kind==='project'){
@@ -195,12 +223,17 @@
     if(!ctx.public)card.append(note('Eingetragen von '+(ctx.names.get(row.created_by)||'Clanmitglied')));
     const actions=el('div','hub-inline-actions');
     if(canEdit(ctx,row)){
-      actions.append(button('Bearbeiten',()=>openEditor(ctx,row.kind,row)));const remove=button('Löschen',()=>removeRecord(ctx,row,remove),'button danger small-button');actions.append(remove);
+      actions.append(button('Bearbeiten',()=>openEditor(ctx,row.kind,row)));
+      if(ctx.actor.role==='admin'&&window.RabenHistory)actions.append(button('Versionen',()=>{if(discard(ctx)){ctx.dirty=false;RabenHistory.view(ctx,'raben_records',row.id).catch(error=>inform(ctx,failure(error),true));}}));const remove=button('Löschen',()=>removeRecord(ctx,row,remove),'button danger small-button');actions.append(remove);
       if(row.kind==='character')actions.append(button('Geheimnotizen',()=>openNotes(ctx,row).catch(error=>inform(ctx,failure(error),true))));
       if(ctx.admin&&row.kind==='journal')actions.append(button('Für Chronik übernehmen',()=>{if(discard(ctx)){ctx.dirty=false;selectKind(ctx,'chronicle');openEditor(ctx,'chronicle',null,{title:row.title,body:row.body,details:{date:d.date||today(),sourceId:row.id}});}}));
       if(ctx.actor.role==='admin'&&row.kind==='gallery'&&row.visibility==='public'&&d.publicImage){const map=button('Als Dorfplankarte verwenden',()=>setMap(ctx,row,map));actions.append(map);}
     }
+    if(row.kind==='media'&&!ctx.public){const uses=el('div','media-usage');actions.append(button('Verwendung ansehen',()=>RabenMedia.usage(ctx,row,uses).catch(error=>inform(ctx,failure(error),true))));card.append(uses);}
     if(actions.childNodes.length)card.append(actions);
+    if(row.kind==='media'&&window.RabenMedia)RabenMedia.render(ctx,row,card).catch(error=>inform(ctx,failure(error),true));
+    if(d.mediaIds?.length&&window.RabenMedia){const attachments=el('div','media-attachments');card.append(attachments);RabenMedia.references(ctx,d.mediaIds,attachments).catch(error=>inform(ctx,failure(error),true));}
+    if(d.relatedIds?.length&&window.RabenMedia)RabenMedia.relations(ctx,d.relatedIds,card).catch(error=>inform(ctx,failure(error),true));
     if(definitions[row.kind].image)paintImage(ctx,row,card).catch(()=>{});
     if(!ctx.public&&['clan','public'].includes(row.visibility)){
       if(row.kind==='event')responses(ctx,row,card).catch(error=>inform(ctx,failure(error),true));
@@ -224,18 +257,24 @@
     try{
       await ensure(ctx);if(epoch!==ctx.epoch||ctx.disposed)return;
       let q=Raben.client().from('raben_records').select(ctx.public?'id,kind,title,body,details,visibility,updated_at':'id,kind,title,body,details,visibility,created_by,revision,updated_at',{count:'exact'});
-      if(ctx.kind==='review')q=q.eq('visibility','review');else q=q.eq('kind',ctx.kind);
+      if(ctx.kind==='review')q=q.eq('visibility','review');else if(ctx.kind==='stories')q=q.not('details->>story','is',null).neq('details->>story','');else q=q.eq('kind',ctx.kind);
       if(ctx.public)q=q.eq('visibility','public');else if(!ctx.archive.checked)q=q.neq('visibility','archived');
       if(ctx.search.value.trim())q=q.textSearch('search',ctx.search.value.trim(),{config:'german',type:'websearch'});
-      q=['event','chronicle'].includes(ctx.kind)?q.order('details->>date',{ascending:ctx.kind==='event'&&!ctx.past.checked,nullsFirst:false}):q.order('updated_at',{ascending:false});
+      if(ctx.kind==='media'&&ctx.typeFilter.value)q=q.eq('details->>mediaType',ctx.typeFilter.value);
+      if(!ctx.public&&ctx.visibilityFilter.value)q=q.eq('visibility',ctx.visibilityFilter.value);
+      if(ctx.kind==='knowledge'&&ctx.categoryFilter.value.trim())q=q.eq('details->>category',ctx.categoryFilter.value.trim());
+      if(ctx.kind==='stories'&&ctx.storyFilter.value.trim())q=q.eq('details->>story',ctx.storyFilter.value.trim());
+      if(ctx.kind==='knowledge')q=q.order('details->>pinned',{ascending:false,nullsFirst:false});
+      q=ctx.kind==='stories'?q.order('details->>date',{ascending:true,nullsFirst:false}):['event','chronicle'].includes(ctx.kind)?q.order('details->>date',{ascending:ctx.kind==='event'&&!ctx.past.checked,nullsFirst:false}):q.order('updated_at',{ascending:false});
       if(ctx.kind==='event')q=ctx.past.checked?q.lt('details->>date',today()):q.gte('details->>date',today());
       const result=await q.range(ctx.offset,ctx.offset+11);if(result.error)throw result.error;if(epoch!==ctx.epoch||ctx.disposed)return;
-      ctx.records=reset?result.data:ctx.records.concat(result.data);ctx.list.replaceChildren();
+      ctx.records=reset?result.data:ctx.records.concat(result.data);window.RabenMedia?.releasePlayers(ctx);ctx.list.replaceChildren();
       ctx.urls.forEach(url=>URL.revokeObjectURL(url));ctx.urls.clear();
       if(!ctx.records.length)ctx.list.append(note(ctx.public?'Hier erscheinen die ersten freigegebenen '+publicEmpty[ctx.kind]+'.':ctx.kind==='review'?'Es warten keine Einträge auf Freigabe.':'Noch keine passenden Einträge.','hub-empty'));
+      if(ctx.targetId&&!ctx.records.some(row=>row.id===ctx.targetId)){const target=await check(Raben.client().from('raben_records').select(ctx.public?'id,kind,title,body,details,visibility':'id,kind,title,body,details,visibility,created_by,revision').eq('id',ctx.targetId).limit(1));if(epoch!==ctx.epoch)return;if(target[0])ctx.list.append(renderCard(ctx,target[0]));}
       ctx.records.forEach(row=>ctx.list.append(renderCard(ctx,row)));ctx.more.hidden=ctx.records.length>=Number(result.count||0);
       if(ctx.kind==='place')await drawMap(ctx,ctx.records);
-      inform(ctx,'');
+      inform(ctx,'');if(ctx.targetId)document.getElementById('eintrag-'+ctx.targetId)?.scrollIntoView?.({block:'start'});
     }catch(error){if(epoch===ctx.epoch)inform(ctx,failure(error),true);}finally{ctx.refresh.disabled=false;}
   };
   const applications=async ctx=>{
@@ -251,43 +290,51 @@
   };
   const dashboard=async ctx=>{
     await ensure(ctx);const epoch=++ctx.epoch;ctx.list.replaceChildren();ctx.editor.replaceChildren();ctx.more.hidden=true;
-    const specs=[['applications','Bewerbungen',()=>Raben.client().from('raben_applications').select('user_id',{count:'exact',head:true}).eq('status','waiting')],['review','Einträge zur Freigabe',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('visibility','review')],['event','Anstehende Termine',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('kind','event').in('visibility',['clan','public']).gte('details->>date',today())],['task','Clan-Aufträge',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('kind','task').eq('visibility','clan')]];
+    const specs=[['applications','Bewerbungen',()=>Raben.client().from('raben_applications').select('user_id',{count:'exact',head:true}).eq('status','waiting')],['review','Einträge zur Freigabe',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('visibility','review')],['event','Anstehende Termine',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('kind','event').in('visibility',['clan','public']).gte('details->>date',today())],['media','Medienbeiträge',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('kind','media')],['history','Inhaltsversionen',()=>Raben.client().from('raben_content_versions').select('id',{count:'exact',head:true})],['task','Clan-Aufträge',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('kind','task').eq('visibility','clan')]];
     const result=await Promise.all(specs.map(async([key,label,query])=>{const r=await query();if(r.error)throw r.error;return {key,label,count:r.count};}));if(epoch!==ctx.epoch)return;
-    const grid=el('div','hub-dashboard');result.forEach(item=>{const b=button('',()=>selectKind(ctx,item.key),'hub-stat');b.append(el('strong','',String(item.count)),el('span','',item.label));grid.append(b);});ctx.list.append(grid,el('article','hub-card'));
+    const grid=el('div','hub-dashboard');result.forEach(item=>{const b=button('',()=>selectKind(ctx,item.key),'hub-stat');b.append(el('strong','',String(item.count)),el('span','',item.label));grid.append(b);});ctx.list.append(grid,el('article','hub-card'));window.RabenHistory?.dashboard(ctx,grid).catch(error=>inform(ctx,failure(error),true));
     const intro=ctx.list.lastChild;intro.append(el('h3','','Euer Dorfleben verwalten.'),note('Wähle einen Bereich, um Inhalte anzulegen oder zu bearbeiten. Mitglieder erstellen eigene Charaktere, Aufträge, Wissenseinträge, Handelsanfragen und Tagebuchberichte. „Öffentlich“ wird ausschließlich durch Admins freigegeben.'),note('Für den Dorfplan zuerst eine Karte in der Galerie veröffentlichen und als Dorfplankarte festlegen. Danach Orte mit Positionen ergänzen.'));inform(ctx,'');
   };
   const selectKind=(ctx,kind)=>{
-    if(!discard(ctx))return;ctx.kind=kind;ctx.offset=0;ctx.dirty=false;ctx.editor.replaceChildren();ctx.records=[];
+    if(!discard(ctx))return;window.RabenMedia?.release(ctx);if(kind!==ctx.targetKind)ctx.targetId=null;ctx.kind=kind;ctx.offset=0;ctx.dirty=false;ctx.editor.replaceChildren();ctx.records=[];
     ctx.tabs.forEach(tab=>{const active=tab.dataset.kind===kind;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;});
     if(kind==='applications')ctx.applications=[];
-    const special=['dashboard','applications','review'].includes(kind);
-    ctx.create.hidden=special||ctx.public||(!definitions[kind]?.member&&ctx.actor.role!=='admin');ctx.searchWrap.hidden=special;ctx.archiveWrap.hidden=ctx.public||special;ctx.pastWrap.hidden=kind!=='event';
-    ctx.heading.textContent=definitions[kind]?.label||({dashboard:'Alles im Blick',applications:'Bewerbungen',review:'Einträge zur Freigabe'}[kind]);
+    const special=['dashboard','applications','review','history','storage','backup'].includes(kind);
+    ctx.create.hidden=special||kind==='stories'||ctx.public||(!definitions[kind]?.member&&ctx.actor.role!=='admin');ctx.searchWrap.hidden=special;ctx.archiveWrap.hidden=ctx.public||special;ctx.pastWrap.hidden=kind!=='event';ctx.typeWrap.hidden=kind!=='media';ctx.visibilityWrap.hidden=ctx.public||special;ctx.categoryWrap.hidden=kind!=='knowledge';ctx.storyWrap.hidden=kind!=='stories';
+    ctx.heading.textContent=definitions[kind]?.label||({dashboard:'Alles im Blick',applications:'Bewerbungen',review:'Einträge zur Freigabe',stories:'Gemeinsame RP-Geschichten',history:'Änderungen & Versionen',storage:'Dateien & Speicher',backup:'Sicherung & Wiederherstellung'}[kind]);
     ctx.panel.setAttribute('aria-labelledby','hub-tab-'+ctx.uid+'-'+kind);
     ctx.list.classList.toggle('hub-gallery',kind==='gallery');ctx.list.classList.toggle('hub-characters',kind==='character');ctx.list.classList.toggle('hub-chronicle',kind==='chronicle');
-    const action=kind==='dashboard'?dashboard(ctx):kind==='applications'?applications(ctx):loadList(ctx,true);action.catch(error=>inform(ctx,failure(error),true));
+    const action=kind==='dashboard'?dashboard(ctx):kind==='applications'?applications(ctx):['history','storage','backup'].includes(kind)?RabenHistory.mount(ctx,kind):loadList(ctx,true);action.catch(error=>inform(ctx,failure(error),true));
   };
   const mount=async(root,actor,mode)=>{
     if(!root)return;for(const old of scopes)if(old.root===root){clearScope(old);break;}
     const ctx={root,actor,admin:mode==='admin',public:mode==='public',epoch:0,disposed:false,dirty:false,offset:0,records:[],urls:new Set(),names:new Map(),tabs:[]};
     if(!ctx.public){const checked=await Raben.member();if(!checked||checked.status!=='active'||(ctx.admin&&checked.role!=='admin'))return;ctx.actor=checked;}
+    ctx.authorize=()=>ensure(ctx);ctx.report=(text,error=false)=>inform(ctx,text,error);ctx.reload=()=>loadList(ctx,true);ctx.navigate=kind=>selectKind(ctx,kind);ctx.describe=kind=>definitions[kind]?.label||kind;
     scopes.add(ctx);root.replaceChildren();root.classList.add('hub');
     ctx.status=el('p','status-message');ctx.status.setAttribute('role','status');ctx.status.hidden=true;
     const tabs=el('div','hub-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Gemeinschaftsbereiche');
-    const kinds=ctx.public?publicKinds:ctx.admin?['dashboard','applications','review',...Object.keys(definitions)]:memberKinds;
+    const kinds=ctx.public?[...publicKinds,'stories']:ctx.admin?['dashboard','applications','review',...Object.keys(definitions),'stories','history','storage','backup']:[...memberKinds,'stories'];
     const uid=++sequence;ctx.uid=uid;
-    kinds.forEach((kind,index)=>{const b=button(definitions[kind]?.label||({dashboard:'Übersicht',applications:'Bewerbungen',review:'Freigaben'}[kind]),()=>selectKind(ctx,kind),'hub-tab');b.dataset.kind=kind;b.setAttribute('role','tab');b.setAttribute('aria-controls','hub-panel-'+uid);b.setAttribute('aria-selected',String(index===0));b.tabIndex=index===0?0:-1;b.id='hub-tab-'+uid+'-'+kind;ctx.tabs.push(b);tabs.append(b);});
+    kinds.forEach((kind,index)=>{const b=button(definitions[kind]?.label||({dashboard:'Übersicht',applications:'Bewerbungen',review:'Freigaben',stories:'Geschichten',history:'Versionen',storage:'Speicher',backup:'Sicherung'}[kind]),()=>selectKind(ctx,kind),'hub-tab');b.dataset.kind=kind;b.setAttribute('role','tab');b.setAttribute('aria-controls','hub-panel-'+uid);b.setAttribute('aria-selected',String(index===0));b.tabIndex=index===0?0:-1;b.id='hub-tab-'+uid+'-'+kind;ctx.tabs.push(b);tabs.append(b);});
     ctx.tabs.forEach((tab,index)=>tab.addEventListener('keydown',event=>{const n=event.key==='Home'?0:event.key==='End'?ctx.tabs.length-1:event.key==='ArrowRight'?(index+1)%ctx.tabs.length:event.key==='ArrowLeft'?(index+ctx.tabs.length-1)%ctx.tabs.length:null;if(n!==null){event.preventDefault();ctx.tabs[n].click();ctx.tabs[n].focus();}}));
     const panel=el('div','hub-panel');ctx.panel=panel;panel.id='hub-panel-'+uid;panel.setAttribute('role','tabpanel');panel.tabIndex=0;
-    ctx.heading=el('h2','');ctx.create=button('Neu erstellen',()=>openEditor(ctx,ctx.kind),'button small-button');ctx.refresh=button('Aktualisieren',()=>{const f=ctx.kind==='applications'?(ctx.offset=0,applications(ctx)):ctx.kind==='dashboard'?dashboard(ctx):loadList(ctx,true);f.catch(error=>inform(ctx,failure(error),true));});
+    ctx.heading=el('h2','');ctx.create=button('Neu erstellen',()=>openEditor(ctx,ctx.kind),'button small-button');ctx.refresh=button('Aktualisieren',()=>{const f=ctx.kind==='applications'?(ctx.offset=0,applications(ctx)):ctx.kind==='dashboard'?dashboard(ctx):['history','storage','backup'].includes(ctx.kind)?RabenHistory.mount(ctx,ctx.kind):loadList(ctx,true);f.catch(error=>inform(ctx,failure(error),true));});
     const bar=el('div','hub-toolbar'),titles=el('div','hub-title-row');titles.append(ctx.heading,ctx.create,ctx.refresh);bar.append(titles);
-    const sf=field('Suchen','search');ctx.search=sf.input;ctx.searchWrap=sf.wrap;ctx.search.placeholder='Titel, Text oder Schlagwörter';const searchForm=el('form','hub-search');ctx.searchWrap=searchForm;searchForm.append(sf.wrap,button('Suchen',null));searchForm.lastChild.type='submit';searchForm.addEventListener('submit',event=>{event.preventDefault();loadList(ctx,true);});bar.append(searchForm);
+    const sf=field('Suchen','search');ctx.search=sf.input;ctx.searchWrap=sf.wrap;ctx.search.placeholder='Titel, Text oder Schlagwörter';const searchForm=el('form','hub-search');ctx.searchWrap=searchForm;searchForm.append(sf.wrap,button('Suchen',null));searchForm.lastChild.type='submit';searchForm.addEventListener('submit',event=>{event.preventDefault();ctx.targetId=null;loadList(ctx,true);});bar.append(searchForm);
     const af=field('Archivierte Einträge anzeigen','checkbox',false);ctx.archive=af.input;ctx.archiveWrap=af.wrap;ctx.archive.addEventListener('change',()=>loadList(ctx,true));
     const pf=field('Vergangene Termine anzeigen','checkbox',false);ctx.past=pf.input;ctx.pastWrap=pf.wrap;ctx.past.addEventListener('change',()=>loadList(ctx,true));bar.append(af.wrap,pf.wrap);
+    const filters=el('div','hub-filters');
+    const type=field('Medienart','select','',[['','Alle Medien'],['image','Bilder'],['youtube','YouTube'],['mp3','MP3']]);ctx.typeFilter=type.input;ctx.typeWrap=type.wrap;
+    const visible=field('Sichtbarkeit','select','',[['','Alle sichtbaren Einträge'],['draft','Entwürfe'],['clan','Clanintern'],['review','Zur Freigabe'],['public','Öffentlich'],['archived','Archiviert']]);ctx.visibilityFilter=visible.input;ctx.visibilityWrap=visible.wrap;
+    const category=field('Kategorie genau filtern','search');ctx.categoryFilter=category.input;ctx.categoryWrap=category.wrap;
+    const story=field('Geschichte genau filtern','search');ctx.storyFilter=story.input;ctx.storyWrap=story.wrap;
+    [type,visible,category,story].forEach(f=>{filters.append(f.wrap);f.input.addEventListener('change',()=>loadList(ctx,true));});bar.append(filters);
     ctx.editor=el('div','hub-editor-host');ctx.list=el('div','hub-list');ctx.more=button('Weitere laden',()=>{ctx.offset=ctx.kind==='applications'?(ctx.applications||[]).length:ctx.records.length;const f=ctx.kind==='applications'?applications(ctx):loadList(ctx,false);f.catch(error=>inform(ctx,failure(error),true));});ctx.more.hidden=true;
     panel.append(bar,ctx.status,ctx.editor,ctx.list,ctx.more);root.append(tabs,panel);
     if(!ctx.public)await loadNames(ctx);if(ctx.disposed)return;
-    selectKind(ctx,kinds[0]);return ctx;
+    let initial=kinds[0];const target=new URL(location.href).searchParams.get('eintrag');if(window.RabenMedia?.UUID.test(target||'')){let q=Raben.client().from('raben_records').select('id,kind').eq('id',target);if(ctx.public)q=q.eq('visibility','public');const found=await check(q.limit(1));if(found[0]&&kinds.includes(found[0].kind)){ctx.targetId=target;ctx.targetKind=found[0].kind;initial=found[0].kind;}}
+    selectKind(ctx,initial);return ctx;
   };
   const mountApplication=async root=>{
     const epoch=++applicationEpoch;applicationRoots.add(root);let actor=await Raben.member();if(epoch!==applicationEpoch)return;root.replaceChildren();root.classList.add('hub');

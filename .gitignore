@@ -6,3 +6,4 @@ node_modules/
 
 # Local Supabase CLI state
 supabase/.temp/
+tests/node_modules/

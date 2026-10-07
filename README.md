@@ -22,4 +22,8 @@ Statische HTML-, CSS- und JavaScript-Dateien ohne Build, veröffentlicht über G
 
 Bedienung und technische Einrichtung: [ANLEITUNG.md](ANLEITUNG.md).
 
-Geplanter Ausbau und Prioritäten: [ROADMAP.md](ROADMAP.md). YouTube-Links und echte MP3-Uploads sind als nächstes Medienupdate geplant. Serverangaben werden im bearbeitbaren Infobereich gepflegt.
+Umgesetzter Ausbau: [ROADMAP.md](ROADMAP.md). YouTube-Links, echte MP3-Uploads, Medienanhänge, RP-Verknüpfungen, geschützte Inhaltsversionen und Sicherungen stehen in Website, Clanbereich und Admin-App bereit. Serverangaben werden im bearbeitbaren Infobereich gepflegt.
+
+Medien verwalten: **RP-Hub → Medien**. MP3-Dateien bis 20 MB und Bilder bis 8 MB lassen sich vom Computer oder Handy hochladen. YouTube-Player laden erst auf Wunsch. Beiträge können mehrere geordnete Medienanhänge und Verknüpfungen zu anderen RP-Einträgen erhalten. Das Feld „Gemeinsame Geschichte“ verbindet Einträge; Admins können Wissenseinträge anheften. Unter **Versionen**, **Speicher** und **Sicherung** stehen Vorschau und Wiederherstellung, Dateiverwendung und Aufräumen sowie JSON- und ZIP-Sicherungen bereit. Interne Dateien und Sicherungen werden nicht vom Service Worker gespeichert.
+
+Prüfungen für Rechte und Bedienung: `npm ci --prefix tests` und `npm test --prefix tests`. Die Website benötigt weiterhin keinen Build. Die zusätzlichen lokalen Browser-Bibliotheken sind tus-js-client 4.3.1 und fflate 0.8.3; ihre Lizenzen liegen neben den Dateien in `vendor/`.
