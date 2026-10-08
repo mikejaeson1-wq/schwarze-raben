@@ -53,10 +53,10 @@ async function setup(actor,mode='member',personalData=null){
  },async rpc(name,args={}){
   calls.push({rpc:name,args});if(['raben_storage_inventory','raben_export_content','raben_restore_version','raben_restore_backup_item'].includes(name)&&currentActor?.role!=='admin')return {error:{code:'42501'}};
   if(name==='raben_storage_inventory')return {data:inventory(),error:null};
-  if(name==='raben_save_profile'){
+  if(name==='raben_save_profile'||name==='raben_save_account'){
    let row=data.raben_profiles.find(p=>p.user_id===currentActor.user_id);
    if(!row){row={user_id:currentActor.user_id,revision:0};data.raben_profiles.push(row);}
-   Object.assign(row,{display_name:args.p_name,revision:row.revision+1});return {data:structuredClone(row),error:null};
+   Object.assign(row,{display_name:args.p_name,revision:row.revision+1,...(name==='raben_save_account'?{avatar_path:args.p_avatar_path}:{})});return {data:structuredClone(row),error:null};
   }
   if(name==='raben_save_profile_item'){
    let row=data.raben_profile_items.find(p=>p.id===args.p_id);
@@ -86,7 +86,7 @@ async function setup(actor,mode='member',personalData=null){
    async abort(){this.aborted=true;}
   }}
  };context.window=context;const sandbox=vm.createContext(context);
- for(const name of ['vendor/fflate-0.8.3.js','media.js','history.js','profiles.js','community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
+ for(const name of ['vendor/fflate-0.8.3.js','media.js','identity.js','history.js','profiles.js','community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
  const root=document.getElementById('root');const hubContext=await (mode==='public'?context.RabenHub.mountPublic(root):mode==='admin'?context.RabenHub.mountAdmin(root,actor):context.RabenHub.mountMember(root,actor));await wait();
  const click=async text=>{const b=[...root.querySelectorAll('button')].find(b=>b.textContent===text&&!b.disabled);assert.ok(b,'Button: '+text);b.click();await wait();return b;};
  return {context,sandbox,document,Event,root,hubContext,data,files,calls,copies,transfers,downloads,exports,click,setActor:value=>{currentActor=value;}};
@@ -159,3 +159,77 @@ friendProfiles.data.raben_profile_grants=[];await friendProfiles.context.RabenPr
 personal.setActor({...member,status:'blocked'});personal.context.dispatchEvent(new personal.Event('raben-lock'));assert.ok(!personal.root.textContent.includes('Persönliche Notiz'));assert.equal(personal.root.querySelector('.profile-avatar'),null);
 assert.equal(visitor.root.querySelector('[data-kind="profiles"]'),null,'Profiles have no public tab');
 console.log('PASS: member profile creation, private default, multiple info/character entries, selected recipient validation, private resumable image uploads, avatar rendering, plain text, no admin controls/visibility override, revoked-grant refresh and logout clearing.');
+
+const accounts=await setup(member,'member',personal.data);
+for(const [path,blob] of personal.files)accounts.files.set(path,blob);
+accounts.data.raben_profile_items.push({id:id(700),owner_id:friend.user_id,kind:'character',title:'Fremder privater Charakter',body:'Geheim',visibility:'private',revision:1});
+accounts.data.raben_records.push({id:id(701),kind:'character',title:'Fremder Charakterbucheintrag',created_by:friend.user_id,visibility:'clan',revision:1,details:{}});
+await accounts.click('Mein Profil öffnen');await accounts.click('Kontoname & Bild');
+let accountForm=accounts.root.querySelector('.account-editor'),pick=accountForm.querySelector('[data-account-field="character"]');
+assert.ok([...pick.options].some(o=>o.value===personalCharacter.title),'Own private character available');
+assert.ok([...pick.options].some(o=>o.value===fixtures[2].title),'Own legacy character available');
+assert.ok(!pick.textContent.includes('Fremder'),'Only own characters are offered');
+pick.value=personalCharacter.title;pick.dispatchEvent(new accounts.Event('change'));
+assert.equal(accountForm.querySelector('input[type="text"]').value,personalCharacter.title);
+const accountFile=new File([profilePic],'kontobild.png',{type:'image/png'}),accountInput=accountForm.querySelector('[data-account-field="avatar"]');
+Object.defineProperty(accountInput,'files',{value:[accountFile],configurable:true});accountInput.dispatchEvent(new accounts.Event('change'));await wait();
+assert.ok(accountForm.querySelector('.account-preview img'),'Circular preview before saving');
+accountForm.dispatchEvent(new accounts.Event('submit'));await wait();
+const accountCore=accounts.data.raben_profiles.find(p=>p.user_id===member.user_id),accountPath=accountCore.avatar_path;
+assert.equal(accountCore.display_name,personalCharacter.title);assert.ok(accountPath.startsWith(member.user_id+'/'));
+assert.equal(accounts.data.raben_profile_items.find(p=>p.id===personalCharacter.id).visibility,'selected','Using character name does not share the character');
+assert.ok(accounts.root.querySelector('.account-avatar img'));assert.equal(accounts.copies.length,0,'No public account image copy');
+// All author instances for one person use one authenticated image download per view.
+accounts.data.raben_records.push({id:id(702),kind:'journal',title:'Mein RP-Bericht',body:'Erlebnis',details:{},visibility:'clan',created_by:member.user_id,revision:1});
+await accounts.click('RP-Tagebuch');assert.ok(accounts.root.querySelector('[data-account-id="'+member.user_id+'"] .account-avatar img'));
+accounts.data.raben_profiles[0].display_name='Eisrabe <img src=x onerror=evil()>';
+accounts.context.dispatchEvent(new accounts.Event('raben-identity-updated'));await wait();
+assert.ok(accounts.root.textContent.includes('Eingetragen von Eisrabe <img src=x onerror=evil()>'));
+assert.equal(accounts.root.querySelector('img[onerror]'),null,'Account names are plain text');
+const authorCtx=accounts.hubContext,host=accounts.document.createElement('div');accounts.root.append(host);
+const beforeDownloads=accounts.downloads.filter(d=>d.path===accountPath).length;
+for(let i=0;i<8;i++)host.append(accounts.context.RabenIdentity.person(authorCtx,member.user_id));await wait();
+assert.equal(accounts.downloads.filter(d=>d.path===accountPath).length,beforeDownloads,'Repeated avatar nodes reuse one download');
+// Incoming account refresh leaves an open editor and the member's draft intact.
+await accounts.click('Neu erstellen');let journalForm=accounts.root.querySelector('.hub-editor');journalForm.querySelector('input[type="text"]').value='Noch nicht gespeichert';
+accounts.context.dispatchEvent(new accounts.Event('raben-identity-updated'));await wait();assert.equal(accounts.root.querySelector('.hub-editor'),journalForm);assert.equal(journalForm.querySelector('input[type="text"]').value,'Noch nicht gespeichert');
+const accountFriend=await setup(friend,'member',accounts.data);accountFriend.files.set('raben-profile-media/'+accountPath,accountFile);accountFriend.root.querySelector('.profile-directory-card').click();await wait();
+assert.ok(accountFriend.root.querySelector('.account-avatar img'),'Clan sees shared account avatar');assert.equal(accountFriend.root.querySelector('.profile-avatar'),null,'Private personal portrait still hidden');
+assert.ok(![...accountFriend.root.querySelectorAll('button')].some(b=>b.textContent==='Kontoname & Bild'));
+await accounts.click('Clanprofile');await accounts.click('Mein Profil öffnen');await accounts.click('Kontoname & Bild');accountForm=accounts.root.querySelector('.account-editor');
+accountForm.querySelector('[data-account-field="remove"]').checked=true;accountForm.querySelector('input[type="text"]').value='Hrafn';accountForm.dispatchEvent(new accounts.Event('submit'));await wait();
+assert.equal(accounts.data.raben_profiles[0].avatar_path,null);assert.equal(accounts.root.querySelector('.account-avatar img'),null);assert.ok(accounts.root.querySelector('.profile-avatar'),'Account image removal does not delete private portrait');
+// Local crop creates a small WebP once per source file, including EXIF-aware decoding.
+let crop,decoded=0,closed=0;const originalCreate=accounts.document.createElement.bind(accounts.document);
+accounts.context.createImageBitmap=async(_file,options)=>{assert.equal(options.imageOrientation,'from-image');decoded++;return {width:1200,height:800,close(){closed++;}};};
+accounts.document.createElement=tag=>tag==='canvas'?{width:0,height:0,getContext:()=>({drawImage:(_image,...args)=>{crop=args;}}),toBlob:callback=>callback(new Blob(['thumbnail'],{type:'image/webp'}))}:originalCreate(tag);
+const cropSource=new File([profilePic],'portrait.png',{type:'image/png'}),thumb=await accounts.context.RabenIdentity.thumbnail(cropSource);assert.equal(thumb.type,'image/webp');assert.deepEqual(crop,[200,0,800,800,0,0,256,256]);
+assert.equal(await accounts.context.RabenIdentity.thumbnail(cropSource),thumb);assert.equal(decoded,1);assert.equal(closed,1);accounts.document.createElement=originalCreate;
+accounts.context.dispatchEvent(new accounts.Event('raben-lock'));assert.equal(accounts.root.querySelector('.account-person'),null);assert.equal(authorCtx.identityImages.size,0);
+console.log('PASS: account settings, own-character name choice, isolated private content, round preview, shared avatar, author alias refresh, repeated-image reuse, plain-text names, retained drafts, portrait removal, local 256px crop and logout cleanup.');
+
+// Exercise the real clan page and both admin shells, rather than only the shared hub.
+for(const pageName of ['clan.html','admin.html','app/index.html']){
+ const adminPage=pageName!=='clan.html',page=await setup(adminPage?lead:member,adminPage?'admin':'member',accounts.data);
+ page.context.RabenHub.lock();
+ const template=parseHTML(await readFile(pageName,'utf8')).document;
+ page.document.body.replaceChildren(...template.body.childNodes);page.document.body.dataset.adminApp=pageName==='app/index.html'?'true':'false';
+ page.data.raben_profiles=[{user_id:member.user_id,display_name:'Hrafn aus dem Eis',avatar_path:accountPath,revision:4},{user_id:lead.user_id,display_name:'Jarl der Raben',avatar_path:null,revision:1}];
+ page.data.raben_clan_posts=[{id:id(710),title:'Ein Hinweis an die Raben',body:'Treffen am Langhaus',category:'aushang',created_by:member.user_id,created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'}];
+ page.files.set('raben-profile-media/'+accountPath,accountFile);
+ Object.assign(page.context.Raben,{configured:()=>true,finishAdminSignIn:()=>false,status:(id,text)=>{const n=page.document.getElementById(id);if(n){n.textContent=text;n.hidden=!text;}},applyImages:()=>{}});
+ page.context.requestAnimationFrame=()=>0;page.context.RabenEffects={create:()=>({update(){}}),normalize:v=>v};
+ page.context.Raben.client().auth.onAuthStateChange=()=>({});
+ for(const form of page.document.querySelectorAll('form')){form.reset=()=>{};Object.defineProperty(form,'elements',{value:Object.fromEntries([...form.querySelectorAll('[name]')].map(n=>[n.name,n])),configurable:true});}
+ if(adminPage)vm.runInContext(await readFile('default-content.js','utf8'),page.sandbox);
+ vm.runInContext(await readFile(adminPage?'admin.js':'clan.js','utf8'),page.sandbox);await wait();await wait();
+ const manager=page.document.getElementById(adminPage?'member-manager':'roster'),posts=page.document.getElementById(adminPage?'internal-posts':'clan-posts');
+ assert.ok(manager.textContent.includes('Hrafn aus dem Eis'),pageName+' roster account name');assert.ok(manager.querySelector('.account-avatar img'),pageName+' round portrait');
+ assert.ok(posts.textContent.includes('Veröffentlicht von Hrafn aus dem Eis'),pageName+' post attribution');assert.ok(posts.querySelector('.account-avatar img'));
+ assert.ok(page.document.getElementById('account').textContent.includes(adminPage?'Jarl der Raben':'Hrafn aus dem Eis'));
+ page.data.raben_profiles[0].display_name='Hrafn der Schwarze';page.context.dispatchEvent(new page.Event('raben-identity-updated'));await wait();await wait();
+ assert.ok(manager.textContent.includes('Hrafn der Schwarze'),pageName+' existing roster refresh');assert.ok(posts.textContent.includes('Hrafn der Schwarze'),pageName+' existing author refresh');
+ page.setActor({...adminPage?lead:member,status:'blocked'});page.context.dispatchEvent(new page.Event('raben-lock'));
+ assert.equal(manager.querySelector('.account-person'),null);assert.equal(posts.querySelector('.account-person'),null);assert.equal(page.document.getElementById('account').childNodes.length,0);
+}
+console.log('PASS: actual clan roster/header/post authors and desktop/mobile admin identity display, live rename refresh and logout clearing.');

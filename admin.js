@@ -7,6 +7,15 @@
   const effects = RabenEffects.create(document.getElementById("preview-canvas"), {type:"none"});
   let siteMediaPicker=null;const infoPickers=new WeakMap();
   let imageUploadContext=null;const imageUploads=new WeakMap();
+  let accountContext=null;
+  const loadAccounts=async(people=null)=>{
+    if(!window.RabenIdentity)return null;
+    if(!accountContext)accountContext={admin:true,public:false,actor:currentAdmin,epoch:0,disposed:false,urls:new Set(),authorize:ensureAdmin};
+    accountContext.actor=currentAdmin;await RabenIdentity.load(accountContext,people);return accountContext;
+  };
+  const paintAccount=()=>{
+    const node=document.getElementById('account');if(accountContext)node.replaceChildren(RabenIdentity.person(accountContext,currentAdmin.user_id,{suffix:' · Admin'}));
+  };
   const mediaContext=()=>({admin:true,public:false,actor:currentAdmin,epoch,disposed:false,authorize:ensureAdmin});
   const listSchemas = {
     mitglieder: {title:"Öffentliche Charaktervorstellungen", item:"Charakter", fields:[['name','Name'],['rolle','Rolle'],['beschreibung','Beschreibung','textarea']]},
@@ -17,10 +26,11 @@
   const message = (value,error=false) => status("admin-status",value,error);
   const markDirty = () => {dirty = true; document.querySelectorAll("[data-save-note]").forEach(n => n.textContent = "Noch nicht gespeichert");};
   const lock = () => {
+    if(accountContext){accountContext.disposed=true;window.RabenIdentity?.release(accountContext);accountContext=null;}
     if(imageUploadContext){imageUploadContext.disposed=true;window.RabenMedia?.release(imageUploadContext);imageUploadContext=null;}
     epoch++; currentAdmin = null; draft = null; revision = null; window.RabenHub?.lock();
     document.getElementById("admin-content").hidden = true; document.getElementById("admin-gate").hidden = false;
-    document.getElementById("account").hidden = true; effects.update({type:"none"});
+    document.getElementById("account").hidden = true;document.getElementById('account').replaceChildren(); effects.update({type:"none"});
     document.getElementById("internal-posts").replaceChildren(); document.getElementById("member-manager").replaceChildren();
     document.getElementById("site-media-picker")?.replaceChildren();siteMediaPicker=null;
     document.getElementById("public-lists").replaceChildren(); document.querySelectorAll("#clan-form input, #clan-form textarea").forEach(n => n.value = "");
@@ -30,7 +40,8 @@
   };
   const ensureAdmin = async () => {
     const member = await Raben.member();
-    if (!member || member.status !== "active" || member.role !== "admin") {lock(); throw new Error("Admin access required");}
+    if (!member || member.status !== "active" || member.role !== "admin" || currentAdmin&&member.user_id!==currentAdmin.user_id) {lock(); throw new Error("Admin access required");}
+    currentAdmin=member;
     return member;
   };
   const field = (key,label,type,value="") => {
@@ -137,6 +148,7 @@
   const loadMembers = async () => {
     const ownEpoch=epoch; await ensureAdmin();
     const members=await check(Raben.client().from("raben_memberships").select("user_id,discord_id,display_name,status,role,updated_at").order("created_at",{ascending:false}));
+    await loadAccounts(members);
     if(ownEpoch !== epoch) return;
     const root=document.getElementById("member-manager"); root.replaceChildren();
     const badge=document.getElementById("pending-count");
@@ -144,9 +156,10 @@
     if(!members.length) root.append(el("p","field-note","Es gibt noch keine Zugangsanfragen."));
     members.forEach(member => {
       const row=el("article","member-row"), info=el("div");
-      info.append(el("h3","",member.display_name),el("p","","Discord-ID: "+member.discord_id));
+      const heading=el('h3','');heading.append(accountContext?RabenIdentity.person(accountContext,member.user_id,{fallback:member.display_name,link:member.status==='active'}):el('span','',member.display_name));
+      info.append(heading,el("p","","Discord-ID: "+member.discord_id));
       const actions=el("div","member-actions"), select=document.createElement("select");
-      select.setAttribute("aria-label","Rechte für "+member.display_name);
+      select.setAttribute("aria-label","Rechte für "+(accountContext?RabenIdentity.name(accountContext,member.user_id,member.display_name):member.display_name));
       [['pending','Wartend'],['member','Clanmitglied'],['admin','Admin'],['blocked','Gesperrt']].forEach(([value,label]) => {const option=el("option","",label); option.value=value; select.append(option);});
       select.value=member.status === "active" ? member.role : member.status;
       const save=el("button","button small-button","Übernehmen");
@@ -165,7 +178,8 @@
   };
   const loadPosts = async () => {
     const ownEpoch=epoch; await ensureAdmin();
-    const posts=await check(Raben.client().from("raben_clan_posts").select("id,title,body,category,event_date,updated_at").order("created_at",{ascending:false}));
+    const posts=await check(Raben.client().from("raben_clan_posts").select("id,title,body,category,event_date,updated_at,created_by").order("created_at",{ascending:false}));
+    if(!accountContext)await loadAccounts();
     if(ownEpoch !== epoch) return;
     const root=document.getElementById("internal-posts"); root.replaceChildren();
     posts.forEach(post => {
@@ -184,7 +198,7 @@
         try {await ensureAdmin(); const rows=await check(Raben.client().from("raben_clan_posts").delete().eq("id",post.id).eq("updated_at",post.updated_at).select("id")); if(!rows.length) throw new Error("post_conflict"); await loadPosts(); message("Beitrag gelöscht.");}
         catch(error) {message(error.message==='post_conflict'?"Der Beitrag wurde inzwischen geändert. Bitte lade die Beitragsliste neu.":Raben.errorMessage(error),true);}
       });
-      buttons.append(edit,remove); head.append(buttons); card.append(head,el("p","field-note",post.body.slice(0,200))); root.append(card);
+      buttons.append(edit,remove); head.append(buttons); card.append(head);if(accountContext){const by=el('p','field-note');by.append(RabenIdentity.person(accountContext,post.created_by,{prefix:'Veröffentlicht von '}));card.append(by);}card.append(el("p","field-note",post.body.slice(0,200))); root.append(card);
     });
   };
   const resetPost = () => {editingPost=null; document.getElementById("post-form").reset(); document.getElementById("post-save").textContent="Beitrag veröffentlichen"; document.getElementById("post-cancel").hidden=true;};
@@ -229,7 +243,8 @@
   window.addEventListener("beforeunload",event => {if(dirty) {event.preventDefault(); event.returnValue="";}});
   window.addEventListener("raben-lock",lock);
   document.getElementById("logout").addEventListener("click",async () => {lock(); try {await Raben.signOut(); location.replace(mobileApp ? "./" : "clan.html");} catch(error) {message(Raben.errorMessage(error),true);}});
-  const auditAccess = async () => {if(currentAdmin) {try {await ensureAdmin();} catch(error) {message("Deine Admin-Rechte sind nicht mehr aktiv. Bitte prüfe deinen Zugang.",true);}}};
+  const auditAccess = async () => {if(currentAdmin) {try {await ensureAdmin();await loadAccounts();paintAccount();} catch(error) {lock();message("Deine Admin-Rechte sind nicht mehr aktiv. Bitte prüfe deinen Zugang.",true);}}};
+  window.addEventListener('raben-identity-updated',auditAccess);
   window.addEventListener("focus",auditAccess); setInterval(() => {if(!document.hidden) auditAccess();},30000);
   const init = async () => {
     try {
@@ -248,6 +263,7 @@
       document.getElementById("account").textContent=member.display_name+" · Admin"; document.getElementById("account").hidden=false; document.getElementById("logout").hidden=false;
       document.getElementById("admin-gate").hidden=true; document.getElementById("admin-content").hidden=false;
       await Promise.all([loadMembers(),loadPosts(),window.RabenHub?.mountAdmin(document.getElementById("hub-admin"),member)]);
+      paintAccount();
       sb.auth.onAuthStateChange(event => {if(event==='SIGNED_OUT') lock();});
     } catch(error) {lock(); message(Raben.errorMessage(error),true);}
   };

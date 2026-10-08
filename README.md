@@ -30,3 +30,6 @@ Medien verwalten: **RP-Hub → Medien**. MP3-Dateien bis 20 MB und Bilder bis 50
 Prüfungen für Rechte und Bedienung: `npm ci --prefix tests` und `npm test --prefix tests`. Die Website benötigt weiterhin keinen Build. Die zusätzlichen lokalen Browser-Bibliotheken sind tus-js-client 4.3.1 und fflate 0.8.3; ihre Lizenzen liegen neben den Dateien in `vendor/`.
 
 **Persönliche Clanprofile:** Im Clanbereich unter **Clanprofile** das eigene Profil anlegen. Profilbild, mehrere Charaktere und Infokarten erhalten getrennte Freigaben: nur Besitzer, ganzer Clan oder ausgewählte Mitglieder. Neue Einträge sind privat; andere Admins erhalten keinen Sonderzugriff. Profile und Profilbilder sind von der allgemeinen Admin-Sicherung und Inhaltsgeschichte ausgeschlossen. Der Profilname ist für aktive Clanmitglieder sichtbar.
+
+
+Mit **Kontoname & Bild** pflegt jedes aktive Mitglied seinen frei änderbaren Website-Namen und ein rundes, clanweit sichtbares Kontobild. Ein eigener Charaktername kann übernommen werden. Mitgliederlisten, Autoren von Beiträgen, Zusagen, Auftragsübernahmen und Bearbeiterhinweise verwenden die aktuelle Kontoanzeige. Private persönliche Profilbilder und Charakterinfos behalten ihre getrennten Freigaben. Die Discord-Anmeldung und Rollen ändern sich nicht. Neue Kontobilder erhalten in aktuellen Browsern vor dem Upload eine 256×256-Vorschau.

@@ -31,7 +31,10 @@
     const {data, error} = await sb.auth.getUser();
     if (error || !data.user) return null;
     const rows = await check(sb.rpc("raben_request_membership"));
-    return Array.isArray(rows) ? rows[0] : rows;
+    const membership=Array.isArray(rows)?rows[0]:rows;
+    if(!membership||membership.status!=="active")return membership;
+    const [profile]=await check(sb.from("raben_profiles").select("display_name,avatar_path").eq("user_id",membership.user_id).limit(1));
+    return profile?{...membership,discord_name:membership.display_name,display_name:profile.display_name,avatar_path:profile.avatar_path}:membership;
   };
   const signIn = async (destination = "clan") => {
     // Reuse the configured Discord/PKCE callback for all entry points.

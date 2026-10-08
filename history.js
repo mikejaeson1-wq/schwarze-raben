@@ -39,7 +39,7 @@
     if(ctx.kind==='history')await mount(ctx,'history');else if(ctx.reload)await ctx.reload();
   });
   const versionCard=(ctx,v)=>{
-    const card=el('article','hub-card');card.append(el('p','eyebrow',labels[v.source_table]+' · '+operations[v.operation]),el('h3','',v.title),note('Version '+v.revision+' · '+stamp(v.changed_at)+' · '+v.actor_name));
+    const card=el('article','hub-card'),by=note('Version '+v.revision+' · '+stamp(v.changed_at));by.append(RabenIdentity.person(ctx,v.changed_by,{prefix:' · ',fallback:v.actor_name||'System'}));card.append(el('p','eyebrow',labels[v.source_table]+' · '+operations[v.operation]),el('h3','',v.title),by);
     const details=el('details','hub-details'),body=el('div','history-preview');details.append(el('summary','','Vorschau ansehen'),body);let loaded=false;
     details.addEventListener('toggle',()=>{if(details.open&&!loaded){loaded=true;preview(ctx,v.source_table,v.snapshot,body);}});
     const buttons=el('div','hub-inline-actions'),restoreButton=btn('Wiederherstellen');restoreButton.addEventListener('click',()=>restore(ctx,v,restoreButton));
@@ -59,7 +59,10 @@
       await admin(ctx);const attempt=++request;if(reset){offset=0;list.replaceChildren();}more.disabled=true;
       let q=Raben.client().from('raben_content_versions').select('*').order('changed_at',{ascending:false}).order('id',{ascending:false});
       if(source||select.value)q=q.eq('source_table',source||select.value);if(key)q=q.eq('entity_key',key);
-      if(search.value.trim())q=q.ilike('title','%'+search.value.trim()+'%');if(actor.value.trim())q=q.ilike('actor_name','%'+actor.value.trim()+'%');
+      if(search.value.trim())q=q.ilike('title','%'+search.value.trim()+'%');if(actor.value.trim()){
+        const term=actor.value.trim().toLocaleLowerCase('de'),ids=[...ctx.identities.values()].filter(p=>p.display_name.toLocaleLowerCase('de').includes(term)).map(p=>p.user_id);
+        q=ids.length?q.in('changed_by',ids):q.ilike('actor_name','%'+actor.value.trim()+'%');
+      }
       const rows=await check(q.range(offset,offset+19));if(ctx.disposed||ctx.epoch!==epoch||attempt!==request)return;
       if(!rows.length&&offset===0)list.append(note('Keine passenden Inhaltsversionen.'));rows.forEach(v=>list.append(versionCard(ctx,v)));offset+=rows.length;more.hidden=rows.length<20;more.disabled=false;
     };

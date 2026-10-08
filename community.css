@@ -172,3 +172,18 @@
   .hub-map-pin { min-width: 34px; min-height: 34px; }
   .hub .form-field input, .hub .form-field textarea, .hub .form-field select { font-size: 16px; }
 }
+/* Clan account names and portraits: shared everywhere, never public avatars. */
+.account-person { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; max-width: 100%; vertical-align: middle; line-height: 1.4; }
+.account-avatar { flex: 0 0 32px; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; overflow: hidden; border: 1px solid var(--gold); background: #17252d; color: var(--gold-light); font-size: 14px; font-weight: 600; line-height: 1; }
+.account-avatar img { width: 100%; height: 100%; max-height: none; display: block; object-fit: cover; border-radius: 50%; margin: 0; }
+.account-name { min-width: 0; overflow-wrap: anywhere; color: inherit; }
+a.account-name { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
+a.account-name:hover { color: var(--gold-light); text-decoration-color: var(--gold); }
+.account-person-large .account-avatar { flex-basis: 64px; width: 64px; height: 64px; font-size: 24px; }
+.account-person-large .account-name { font-size: 1.2rem; color: var(--gold-light); }
+.account-preview { padding: 16px; border: 1px solid var(--line); }
+.account-pill { max-width: 100%; }
+.roster .account-person { flex-wrap: nowrap; }
+.roster small { margin-left: 40px; }
+.profile-directory-card > .account-person { justify-content: center; flex-direction: column; }
+.clan-post > .field-note { margin-bottom: 16px; }

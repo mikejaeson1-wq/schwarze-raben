@@ -26,6 +26,7 @@ await db.exec(await readFile(path+'migrations/20261007205601_media_history_roadm
 await db.exec(await readFile(path+'migrations/20261008081126_repair_uploads_and_large_images.sql','utf8'));
 await db.exec(await readFile(path+'migrations/20261008094929_private_clan_profiles.sql','utf8'));
 await db.exec(await readFile(path+'migrations/20261008095414_profile_grant_index.sql','utf8'));
+await db.exec(await readFile(path+'migrations/20261008105012_clan_account_identity.sql','utf8'));
 assert.equal(Number((await db.query("select file_size_limit from storage.buckets where id='raben-media'")).rows[0].file_size_limit),50*1024*1024);
 assert.equal(Number((await db.query("select file_size_limit from storage.buckets where id='raben-public'")).rows[0].file_size_limit),50*1024*1024);
 const admin='00000000-0000-4000-a000-000000000001';
@@ -117,4 +118,6 @@ await as('authenticated',admin);
 console.log('PASS: private MP3 access, publication, attachments, ownership, blocked/anonymous access, protected history, restore conflicts, notes/site restore, exports, pinned knowledge and used-file retention.');
 const {verifyProfiles}=await import('./profile-access-cases.mjs');
 await verifyProfiles(db,{as,denied,scalar,admin,member,other,blocked});
+const {verifyAccounts}=await import('./account-access-cases.mjs');
+await verifyAccounts(db,{as,denied,scalar,admin,member,other,blocked});
 await db.close();

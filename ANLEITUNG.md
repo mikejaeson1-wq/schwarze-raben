@@ -273,7 +273,7 @@ Für bestehende eigene Installationen außerdem `supabase/migrations/20261008081
 ## Persönliche Clanprofile
 
 1. Mit Discord im **Clanbereich** anmelden. Ein Admin muss die Mitgliedschaft angenommen beziehungsweise auf **aktiv** gesetzt haben.
-2. Im ersten Reiter **Clanprofile** auf **Mein Profil erstellen** klicken. Der Profilname ist für aktive Clanmitglieder sichtbar; er kann später geändert werden.
+2. Im ersten Reiter **Clanprofile** auf **Mein Profil erstellen** klicken. Der Kontoname und das optionale runde Kontobild sind für alle aktiven Clanmitglieder sichtbar. Persönliche Profileinträge haben eigene Freigaben.
 3. **Profilbild hinzufügen**, **Charakter hinzufügen** oder **Infokarte hinzufügen** wählen. Mehrere Charaktere und Infokarten sind möglich, beispielsweise für Herkunft und Beruf, RP-Vorlieben oder Spielzeiten.
 4. Pro Eintrag die Sichtbarkeit wählen: **Nur du** (Standard), **Ganzer Clan** oder **Ausgewählte Mitglieder**. Bei gezielter Freigabe mindestens eine, höchstens 20 aktive Personen markieren. Das zugehörige Bild erhält automatisch dieselben Rechte.
 5. Speichern. Zum Ändern oder Entfernen den eigenen Eintrag über **Bearbeiten** beziehungsweise **Löschen** öffnen. Eine neue Freigabe ersetzt die vorige. Das gilt auch für das Profilbild.
@@ -293,3 +293,16 @@ Bei einer eigenen bestehenden Installation zusätzlich `supabase/migrations/2026
 Die Migration ergänzt ausschließlich eigene Tabellen und einen privaten Bucket: `raben_profiles`, `raben_profile_items`, `raben_profile_grants` und `raben-profile-media`. Alle Tabellen verwenden RLS und Besitzerrechte. Die neuen RPC- und Bildprüffunktionen laufen als **SECURITY INVOKER**. Restriktive Storage-Regeln schützen Profilbilder auch gegen fremde allgemeine Freigaberichtlinien; Dateien lassen sich nicht überschreiben oder verschieben, solange sie als Profilbilder gespeichert sind. Verwendete Bilder sind vor Löschung geschützt.
 
 Prüfung: `npm test --prefix tests`. Die tatsächliche Migration wird in PostgreSQL mit Besitzer, ausgewähltem Mitglied, unbeteiligtem Mitglied, Admin, wartendem, gesperrtem und anonymem Konto geprüft. Tests decken Profil- und Bildrechte, Freigabeentzug, Besitzer- und Empfängersperre, Versionskonflikte, fehlende Admin-Sonderrechte und den Ausschluss aus Sicherungen ab. UI-Tests prüfen Profilanlage, mehrere Einträge, sichere Standardwerte, Empfängerauswahl, private Bild-Uploads, unveränderte Portraits beim Bearbeiten, aktualisierte Freigaben und Logout.
+
+
+### Kontoname und rundes Kontobild
+
+Unter **Clanprofile → Mein Profil öffnen → Kontoname & Bild** kannst du den Namen deines Website-Kontos jederzeit frei ändern. Bis zur ersten Änderung wird der bisherige Discord-Anzeigename verwendet. Im Formular lässt sich auch der Name eines eigenen Profil- oder Charakterbuchcharakters übernehmen; übernommen wird nur der Name, höchstens 80 Zeichen. Die Anmeldung läuft weiter über dasselbe Discord-Konto. Discord-Name, ID und Mitgliederrechte werden dabei nicht verändert.
+
+Das **Kontobild** frei als JPG, PNG oder WebP bis 50 MB wählen. Aktuelle Browser schneiden es mittig quadratisch zu und erzeugen vor dem Upload eine kleine 256×256-Vorschau. Die Website stellt diese rund dar. Bei älteren Browsern bleibt der Originalupload möglich. Mit **Kontobild entfernen** wird wieder eine Initiale angezeigt. Namens- und Bildänderungen werden zusammen gespeichert; parallele Änderungen überschreiben keine neuere Fassung.
+
+Name und rundes Bild erscheinen bei Mitgliederlisten, dem angemeldeten Konto, Beiträgen und Aushängen, Terminantworten, Auftragsübernahmen und Bearbeiterhinweisen. Vorhandene Beiträge zeigen den aktuellen Kontonamen. Ausgeschiedene Mitglieder erscheinen ohne Kontobild. Die Anzeige aktualisiert sich nach dem Speichern, beim Zurückkehren zum Fenster und regelmäßig. Eigene Bearbeitungsformulare bleiben dabei erhalten.
+
+**Sichtbarkeit:** Das Kontobild ist bewusst für den ganzen aktiven Clan sichtbar. Gäste, wartende und gesperrte Konten erhalten keinen Zugriff. Das getrennte persönliche Profilbild sowie Charaktere und Infokarten bleiben weiterhin privat, clanweit oder gezielt geteilt, entsprechend deiner Auswahl. Ein bisher privates Bild wird durch dieses Update nicht automatisch zum Kontobild. Andere Admins können deine Kontoeinstellungen nicht ändern.
+
+Für eigene Installationen zusätzlich die Migration `supabase/migrations/20261008105012_clan_account_identity.sql` nach den bisherigen Profilmigrationen anwenden. Die Veröffentlichungsdateien verwenden neue Dateihashes und die Admin-App den Cache **v8**. Tests prüfen zusätzlich Kontobildrechte, Eigentümersperre, fehlende Rechteausweitung, Namenswechsel, private Charakterauswahl, Autorenanzeigen und Vorschaubilder.

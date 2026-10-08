@@ -149,6 +149,7 @@
     }};
   };
   const releasePlayers=ctx=>{
+    window.RabenIdentity?.releaseImages(ctx);
     for(const player of ctx.players||[]){if(player.tagName==='AUDIO'){player.pause?.();player.removeAttribute('src');player.load?.();}else player.remove();}
     ctx.players?.clear();ctx.urls?.forEach(url=>URL.revokeObjectURL(url));ctx.urls?.clear();
   };

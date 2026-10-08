@@ -12,13 +12,15 @@ Stand: **8. Oktober 2026**. [Lesbare Roadmap auf der Website](https://mikejaeson
 - Reparierte fortsetzbare Uploads: Bilder und Hintergründe bis 50 MB, MP3 bis 20 MB.
 - **Neu: persönliche Clanprofile** mit Profilbild, mehreren Charakteren und Infokarten. Sichtbarkeit pro Eintrag: nur Besitzer, ganzer Clan oder ausgewählte aktive Mitglieder. Bilder folgen der jeweiligen Freigabe; neue Einträge sind privat. Kein Sonderzugriff anderer Clanadmins.
 
+- **Neu: Kontoname und rundes Kontobild** selbst ändern, eigenen Charakternamen übernehmen und Namen/Bild bei Mitgliederlisten, Beiträgen, Terminantworten, Aufträgen und Bearbeiterhinweisen anzeigen. Das Kontobild ist ausschließlich im aktiven Clan sichtbar und wird getrennt von privat freigegebenen Profilbildern gespeichert.
+
 ## Nächste Schritte
 
-Diese Punkte sind Empfehlungen für den nächsten Ausbau und **noch nicht umgesetzt**. Die Reihenfolge ist eine Priorisierung, kein zugesagter Terminplan.
+Diese Punkte sind die bestätigte Roadmap für den nächsten Ausbau und **noch nicht umgesetzt**. Die Reihenfolge ist eine Priorisierung, kein zugesagter Terminplan.
 
 | Reihenfolge | Bereich | Aktuelle Lücke | Verbesserung und Abnahmeziel |
 | --- | --- | --- | --- |
-| 1 / P1 | Öffentlich + Clan | Große Originalbilder werden ohne automatische Vorschauen geladen. | WebP-Vorschauen und responsive Hintergründe kostenlos im Browser erzeugen. Originale erhalten; Übersichten laden kleine Varianten statt vollständiger 30-MB-Dateien. |
+| 1 / P1 | Öffentlich + Clan | Große Hintergrund- und Medienoriginale werden noch ohne automatische Vorschauen geladen; neue Kontobilder werden bereits verkleinert. | WebP-Vorschauen und responsive Hintergründe kostenlos im Browser erzeugen. Originale erhalten; Übersichten laden kleine Varianten statt vollständiger 30-MB-Dateien. |
 | 2 / P1 | Clan + Admin-App | Viele nebeneinander liegende Reiter erschweren den Einstieg am Handy. | Clan-Startseite mit nächstem Termin, offenen Aufträgen, eigenen Charakteren und freigegebenen Neuigkeiten; häufige Bereiche direkt erreichbar. |
 | 3 / P1 | Öffentlich | Die Funktionen für Galerie, Karte, Chronik und Vorstellungen brauchen eure tatsächlichen Dorfinhalte. | Eure Bilder und Lore ergänzen, Bewerbung und RP-Einstieg erklären. Serverangaben nur im bearbeitbaren Infobereich; keine automatische Veröffentlichung persönlicher Profile. |
 | 4 / P2 | Clan | Termine bleiben bisher im Website-Kalender; Export und Erinnerungen fehlen. | ICS-Export, wiederkehrende Termine und Absagen. Später freiwillige Discord-Erinnerungen mit gesondert aktivierter Bot-Anbindung; keine privaten Profile in Nachrichten. |
@@ -28,7 +30,9 @@ Diese Punkte sind Empfehlungen für den nächsten Ausbau und **noch nicht umgese
 
 ## Profilrechte im aktuellen Update
 
-Der Profilname ist innerhalb des aktiven Clans sichtbar. Für Profilbild, jeden Charakter und jede Infokarte wird separat gewählt:
+Der frei änderbare **Kontoname und das runde Kontobild** sind innerhalb des aktiven Clans sichtbar, auch bei älteren Beiträgen. Ein gewählter Charaktername wird nur als Name übernommen; das gibt weder Charakterinfos noch dessen Bild frei. Discord-Konto, Anmeldung und Rollen bleiben unverändert.
+
+Für das getrennte persönliche Profilbild, jeden Charakter und jede Infokarte wird separat gewählt:
 
 | Auswahl | Wer kann den Eintrag und dessen Bild sehen? |
 | --- | --- |

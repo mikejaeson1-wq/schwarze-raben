@@ -59,7 +59,7 @@
   };
   const note=(text,classes='field-note')=>el('p',classes,text);
   const clearScope=ctx=>{
-    window.RabenMedia?.release(ctx);window.RabenProfiles?.release(ctx);ctx.epoch++;ctx.disposed=true;ctx.dirty=false;
+    window.RabenMedia?.release(ctx);window.RabenProfiles?.release(ctx);window.RabenIdentity?.release(ctx);ctx.epoch++;ctx.disposed=true;ctx.dirty=false;
     ctx.urls.forEach(url=>URL.revokeObjectURL(url));ctx.urls.clear();ctx.records=[];ctx.names.clear();
     ctx.root.replaceChildren();ctx.root.append(note('Dein Zugang ist nicht mehr aktiv. Bitte melde dich erneut an.','status-message'));
     scopes.delete(ctx);
@@ -101,8 +101,7 @@
     return {...details,publicImage:path};
   };
   const loadNames=async ctx=>{
-    const people=await check(Raben.client().from('raben_memberships').select('user_id,display_name').eq('status','active'));
-    if(!ctx.disposed)people.forEach(p=>ctx.names.set(p.user_id,p.display_name));
+    await RabenIdentity.load(ctx);
   };
   const openNotes=async(ctx,row)=>{
     if(!discard(ctx))return;await ensure(ctx);const epoch=ctx.epoch;
@@ -182,7 +181,7 @@
     [['yes','Dabei'],['maybe','Vielleicht'],['no','Absage']].forEach(([choice,label])=>{const b=button(label,()=>run(ctx,b,async()=>{await check(Raben.client().rpc('raben_event_respond',{p_record:row.id,p_choice:choice}));await loadList(ctx,true);inform(ctx,'Deine Rückmeldung wurde gespeichert.');}));b.disabled=closed;b.classList.toggle('is-selected',mine?.choice===choice);b.setAttribute('aria-pressed',String(mine?.choice===choice));actions.append(b);});
     area.append(note(closed?'Anmeldung geschlossen.':'Deine Teilnahme'),actions);
     const counts=el('p','field-note',items.filter(p=>p.choice==='yes').length+' dabei · '+items.filter(p=>p.choice==='maybe').length+' vielleicht · '+items.filter(p=>p.choice==='no').length+' abgesagt');area.append(counts);
-    if(items.length){const detail=el('details','hub-details');detail.append(el('summary','','Zusagen ansehen'));items.forEach(p=>detail.append(note((ctx.names.get(p.user_id)||'Clanmitglied')+' · '+({yes:'Dabei',maybe:'Vielleicht',no:'Absage'}[p.choice]))));area.append(detail);}
+    if(items.length){const detail=el('details','hub-details');detail.append(el('summary','','Zusagen ansehen'));items.forEach(p=>{const line=note('');line.append(RabenIdentity.person(ctx,p.user_id,{suffix:' · '+({yes:'Dabei',maybe:'Vielleicht',no:'Absage'}[p.choice])}));detail.append(line);});area.append(detail);}
     card.append(area);
   };
   const claim=async(ctx,row,card)=>{
@@ -190,7 +189,7 @@
     const assignment=items[0],actions=el('div','hub-inline-actions');
     if(!assignment){const b=button('Auftrag übernehmen',()=>run(ctx,b,async()=>{await check(Raben.client().from('raben_task_claims').insert({record_id:row.id}));await loadList(ctx,true);inform(ctx,'Du hast den Auftrag übernommen.');}));actions.append(b);}
     else{
-      card.append(note((assignment.state==='done'?'Erledigt von ':'Übernommen von ')+(ctx.names.get(assignment.user_id)||'Clanmitglied'),'hub-assignment'));
+      const line=note('','hub-assignment');line.append(RabenIdentity.person(ctx,assignment.user_id,{prefix:assignment.state==='done'?'Erledigt von ':'Übernommen von '}));card.append(line);
       if(assignment.user_id===ctx.actor.user_id||ctx.actor.role==='admin'){
         const state=assignment.state==='done'?'claimed':'done',done=button(state==='done'?'Als erledigt markieren':'Wieder öffnen',()=>run(ctx,done,async()=>{await check(Raben.client().from('raben_task_claims').update({state}).eq('record_id',row.id));await loadList(ctx,true);}));
         const release=button('Übernahme lösen',()=>run(ctx,release,async()=>{if(!confirm('Übernahme dieses Auftrags lösen?'))return;await check(Raben.client().from('raben_task_claims').delete().eq('record_id',row.id));await loadList(ctx,true);}));actions.append(done,release);
@@ -221,7 +220,7 @@
       if(d.responsible)card.append(note('Verantwortlich: '+d.responsible));if(d.materials)card.append(el('p','hub-body','Materialien und Bestände\n'+d.materials));
       const progress=document.createElement('progress');progress.max=100;progress.value=d.progress||0;progress.setAttribute('aria-label','Baufortschritt');card.append(note('Fortschritt: '+(d.progress||0)+' %'),progress);
     }
-    if(!ctx.public)card.append(note('Eingetragen von '+(ctx.names.get(row.created_by)||'Clanmitglied')));
+    if(!ctx.public){const author=note('');author.append(RabenIdentity.person(ctx,row.created_by,{prefix:'Eingetragen von '}));card.append(author);}
     const actions=el('div','hub-inline-actions');
     if(canEdit(ctx,row)){
       actions.append(button('Bearbeiten',()=>openEditor(ctx,row.kind,row)));
@@ -358,7 +357,8 @@
     }catch(error){status.textContent=failure(error);status.classList.add('is-error');}finally{status.hidden=false;save.disabled=false;}});
     root.append(form,button('Entscheidung aktualisieren',()=>{if(!dirty||confirm('Ungespeicherte Eingaben verwerfen?'))mountApplication(root).catch(error=>{status.textContent=failure(error);status.hidden=false;});}));
   };
-  const audit=async()=>{for(const ctx of [...scopes])if(!ctx.public&&!ctx.disposed){try{await ensure(ctx);if(ctx.kind==='profiles')await window.RabenProfiles?.audit(ctx);}catch(_){}}};
+  const audit=async()=>{for(const ctx of [...scopes])if(!ctx.public&&!ctx.disposed){try{await ensure(ctx);await loadNames(ctx);if(ctx.kind==='profiles')await window.RabenProfiles?.audit(ctx);}catch(_){}}};
+  window.addEventListener('raben-identity-updated',audit);
   window.addEventListener('focus',audit);window.addEventListener('visibilitychange',()=>{if(!document.hidden)audit();});setInterval(()=>{if(!document.hidden)audit();},30000);
   window.addEventListener('beforeunload',event=>{if([...scopes].some(ctx=>ctx.dirty)){event.preventDefault();event.returnValue='';}});
   window.addEventListener('raben-lock',()=>{applicationEpoch++;for(const root of applicationRoots){root.replaceChildren();root.append(note('Du bist abgemeldet. Lade die Seite neu, um dich wieder anzumelden.'));}for(const ctx of [...scopes])if(!ctx.public)clearScope(ctx);});

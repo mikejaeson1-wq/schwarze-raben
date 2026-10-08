@@ -2,12 +2,14 @@
   "use strict";
   const {el,status,check} = Raben;
   let loading = false, epoch = 0, identity = null, hubIdentity = null;
+  let accountContext=null;
   const gate = document.getElementById("gate");
   const lock = () => {
+    if(accountContext){accountContext.disposed=true;RabenIdentity.release(accountContext);accountContext=null;}
     epoch++; identity = null; hubIdentity = null; window.RabenHub?.lock();
     gate.hidden = false; document.getElementById("member-content").hidden = true;
     document.getElementById("clan-posts").replaceChildren(); document.getElementById("roster").replaceChildren();
-    ["account","admin-link"].forEach(id => {document.getElementById(id).hidden = true;});
+    document.getElementById("account").replaceChildren();["account","admin-link"].forEach(id => {document.getElementById(id).hidden = true;});
   };
   const load = async () => {
     if (loading) return;
@@ -29,21 +31,26 @@
       }
       const sb = Raben.client();
       const [posts, roster] = await Promise.all([
-        check(sb.from("raben_clan_posts").select("id,title,body,category,event_date,created_at").order("created_at",{ascending:false})),
+        check(sb.from("raben_clan_posts").select("id,title,body,category,event_date,created_at,created_by").order("created_at",{ascending:false})),
         check(sb.from("raben_memberships").select("user_id,display_name,role").eq("status","active").order("display_name"))
       ]);
       if (epoch !== ownEpoch) return;
+      if(!accountContext)accountContext={actor:member,epoch:0,disposed:false,public:false,urls:new Set(),authorize:async()=>{
+        const current=await Raben.member();if(!current||current.status!=='active'||current.user_id!==accountContext?.actor.user_id){lock();throw {code:'42501'};}return current;
+      }};
+      accountContext.actor=member;await RabenIdentity.load(accountContext,roster);if(epoch!==ownEpoch)return;
       const root = document.getElementById("clan-posts"); root.replaceChildren();
       if (!posts.length) {const empty = el("article","clan-post"); empty.append(el("p","eyebrow","Der erste Aushang kommt noch"),el("h2","","Willkommen im Clanbereich."),el("p","post-body","Hier erscheinen die internen Informationen, Termine und Aushänge eurer Admins.")); root.append(empty);}
       posts.forEach(post => {
         const article = el("article","clan-post");
         const category = {info:"Clan-Information",aushang:"Interner Aushang",termin:"Clan-Termin"}[post.category] || "Clan-Information";
         const meta = el("p","post-meta",category + (post.event_date ? " · " + new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"UTC"}).format(new Date(post.event_date+"T12:00:00Z")) : ""));
-        article.append(meta,el("h2","",post.title),el("p","post-body",post.body)); root.append(article);
+        const by=el('p','field-note');by.append(RabenIdentity.person(accountContext,post.created_by,{prefix:'Veröffentlicht von '}));
+        article.append(meta,el("h2","",post.title),by,el("p","post-body",post.body)); root.append(article);
       });
       const list = document.getElementById("roster"); list.replaceChildren();
-      roster.forEach(person => {const li = el("li",""),a=el("a","",person.display_name);a.href="clan.html?profil="+encodeURIComponent(person.user_id);li.append(a);if(person.role === "admin") li.append(el("small","","Admin"));list.append(li);});
-      document.getElementById("account").textContent = member.display_name;
+      roster.forEach(person => {const li = el("li","");li.append(RabenIdentity.person(accountContext,person.user_id));if(person.role === "admin") li.append(el("small","","Admin"));list.append(li);});
+      document.getElementById("account").replaceChildren(RabenIdentity.person(accountContext,member.user_id));
       document.getElementById("account").hidden = false;
       document.getElementById("admin-link").hidden = member.role !== "admin";
       gate.hidden = true; document.getElementById("member-content").hidden = false; status("portal-status","");
@@ -59,6 +66,7 @@
   });
   window.addEventListener("raben-lock",lock);
   window.addEventListener("focus",load);
+  window.addEventListener("raben-identity-updated",()=>{setTimeout(load,0);});
   setInterval(() => {if(!document.hidden) load();},30000);
   if (Raben.configured()) Raben.client().auth.onAuthStateChange(event => {
     if(event === "SIGNED_OUT") lock();
