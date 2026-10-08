@@ -2,7 +2,7 @@
 
 Die neue Ausbaustufe ist in Website, Clanbereich und Admin-App umgesetzt. Alle privaten Freigaben gelten auch für Suche, Medien, Kommentare und Hinweise.
 
-1. **Bilder optimieren.** Originalbilder bleiben erhalten. Neue Uploads erzeugen kleine WebP-Vorschauen und responsive Hintergrundvarianten. Bestehende Hintergründe können Admins unter „Öffentliche Seiten“ optimieren.
+1. **Bilder optimieren.** Originalbilder bleiben erhalten. Neue Uploads erzeugen kleine WebP-Vorschauen und responsive Hintergrundvarianten. Bestehende Hintergründe können Admins unter „Öffentliche Texte“ optimieren.
 
 2. **Mobil einfacher navigieren.** Gruppierte Bereichsauswahl, Schnellzugriffe, große Schaltflächen und Tastaturbedienung. Animationen lassen sich auf dem eigenen Gerät abschalten.
 
@@ -16,7 +16,7 @@ Die neue Ausbaustufe ist in Website, Clanbereich und Admin-App umgesetzt. Alle p
 
 7. **RP-Gesuche.** Gewünschte Spielzeit, eigener Charakter und Ablaufdatum. Mitglieder können antworten; abgelaufene oder geschlossene Gesuche verschwinden für andere Mitglieder.
 
-8. **Kalender mit Serien und Warteliste.** Wöchentliche, zweiwöchentliche und monatliche Serien, Einzelabsagen, Teilnehmerlimit, automatisches Nachrücken und ICS-Export. Discord-Erinnerungen benötigen später eine gesonderte Bot-Anbindung.
+8. **Kalender mit Serien und Warteliste.** Wöchentliche, zweiwöchentliche und monatliche Serien, Einzelabsagen, Teilnehmerlimit, automatisches Nachrücken und ICS-Export. Neue und geänderte Termine lassen sich über einen Clan-Webhook in Discord ankündigen.
 
 9. **IC und OOC unterscheiden.** Beiträge und Einträge mit IC, OOC oder gemischter Ebene kennzeichnen.
 
@@ -42,4 +42,7 @@ Die neue Ausbaustufe ist in Website, Clanbereich und Admin-App umgesetzt. Alle p
 
 20. **Geprüfte Updates und Betriebsübersicht.** Automatische Tests für Rechte, Bedienung, Profile, Kalender und Uploads. Admins sehen Dateiverwendung, Speicherverbrauch, unbenutzte Dateien und die letzte Mediensicherung.
 
-Discord-Bot-Erinnerungen sind als spätere optionale Anbindung vorgesehen und werden ohne Bot-Konfiguration nicht verschickt. Die neue CI prüft main, Pull Requests und release-Zweige. Veröffentlichungen erfolgen erst nach erfolgreichen Prüfungen des Release-Zweigs.
+Discord-Meldungen für Aushänge, Termine und Abstimmungen sind per optionalem Clan-Webhook eingerichtet. Ein Admin hinterlegt die Kanal-Webhook-Adresse und aktiviert die gewünschten Kategorien. Die neue CI prüft main, Pull Requests und release-Zweige. Veröffentlichungen erfolgen erst nach erfolgreichen Prüfungen des Release-Zweigs.
+
+
+Ergänzung: Persönliche Hinweise und Schriftwahl sind speicherbar. Interne Claninfos, bearbeitbare Clanränge, mehrere Ämter pro Mitglied und geschützte Discord-Webhooks für Clanmeldungen sind integriert.

@@ -1,0 +1,26 @@
+.settings-form { min-width: 0; }
+.settings-form > h3 { overflow-wrap: anywhere; }
+.settings-actions { padding: .75rem 0; border-block: 1px solid var(--line); }
+.settings-actions .button { max-width: 100%; white-space: normal; }
+.settings-fields { display: grid; gap: 1rem; margin: 0; min-width: 0; padding: 1.2rem; border: 1px solid var(--line); }
+.settings-fields legend { padding: 0 .5rem; color: var(--gold-light); }
+.settings-subscriptions { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.settings-fields input[type="checkbox"] { width: auto; min-height: 22px; align-self: start; }
+.settings-fields .form-field:has(input[type="checkbox"]) { flex-direction: row; align-items: center; justify-content: space-between; gap: 1rem; }
+.settings-fields input[type="color"] { min-height: 48px; padding: .25rem; max-width: 200px; }
+.settings-preview { padding: 1rem; background: #101619; border: 1px solid var(--line); overflow-wrap: anywhere; }
+.settings-preview h4 { margin: 0 0 .5em; font: inherit; font-weight: 600; }
+.rank-directory-entry { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding-block: .75rem; border-bottom: 1px solid var(--line); }
+.rank-directory-entry p { flex: 1 1 260px; }
+.clan-office { font-size: .7rem; padding: .1rem .4rem; border: 1px solid #5a8077; border-radius: 20px; color: #acd1c3; }
+body.personal-appearance, body.personal-appearance .hub-body, body.personal-appearance .post-body,
+body.personal-appearance .field-note, body.personal-appearance .form-field, body.personal-appearance .account-name,
+body.personal-appearance .portal-heading p:not(.eyebrow) { color: var(--personal-color, var(--text)); }
+body.personal-appearance .form-field input:not([type="color"]), body.personal-appearance .form-field textarea,
+body.personal-appearance .form-field select { color: var(--personal-color, var(--text)); }
+@media(max-width:720px) {
+  .settings-form { padding: 1rem; }
+  .settings-fields { padding: .8rem; }
+  .settings-actions .button { width: 100%; }
+  .rank-directory-entry .button { flex: 1 1 auto; }
+}

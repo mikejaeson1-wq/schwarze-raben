@@ -1,14 +1,14 @@
 "use strict";
 const CACHE_PREFIX = "schwarze-raben-admin-shell-";
-const CACHE_NAME = CACHE_PREFIX + "v9";
+const CACHE_NAME = CACHE_PREFIX + "v10";
 const APP = new URL("./", self.location.href);
 // Only public, version-controlled UI files. No API, auth callback or user data.
 const ASSETS = [
-  "offline.html", "app.css?v=d91204f14160", "install.js?v=408e384acc86", "mobile.js?v=5be272988abf", "manifest.webmanifest", "qr.png",
+  "offline.html", "app.css?v=efc22394a88d", "install.js?v=0a04c8483701", "mobile.js?v=b5be8eb0cc47", "manifest.webmanifest", "qr.png",
   "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png",
-  "../style.css?v=1eeb475fb4e2", "../portal.css?v=ebc9f1a69173", "../config.js?v=910867e31876", "../default-content.js?v=62238572002b", "../app.js?v=575a86dcdb20",
-  "../pictures.js?v=2f818c378db0", "../calendar.js?v=cabdae501d66", "../profile-tools.js?v=5a6b201b7de3", "../expansion.js?v=cc1150ead64b", "../guide.js?v=f7b227c08e24", "../backup-tools.js?v=43a3f95854b9", "../expansion.css?v=54596bf6e892", "../media.js?v=2c34bf2a4b71", "../identity.js?v=48aa24440193", "../profiles.js?v=6ee3aaf1a2b1", "../history.js?v=20fad040a52a", "../vendor/tus-4.3.1.js?v=271385341110", "../vendor/fflate-0.8.3.js?v=df762372e3ff",
-  "../admin.js?v=cb61bc93ff75", "../community.js?v=cf06b8204628", "../community.css?v=7b03d888a7e2", "../effects.js?v=d5309fa0f19a", "../favicon.svg", "../vendor/supabase-2.117.2.js?v=b51e7b9e308e"
+  "../style.css?v=e1294113c8cb", "../portal.css?v=160fc595be42", "../config.js?v=a9cc7a500a2e", "../default-content.js?v=92cc7407f7a3", "../app.js?v=10052867750d",
+  "../clan-settings.js?v=ca825ca88b7c", "../clan-settings.css?v=b4e10b672c41", "../pictures.js?v=dd0aba0bbb99", "../calendar.js?v=aacd02630866", "../profile-tools.js?v=248a1656f639", "../expansion.js?v=9b7f16640c12", "../guide.js?v=f6cbb31a552e", "../backup-tools.js?v=7da2ead93887", "../expansion.css?v=f24dbc42ac06", "../media.js?v=cea9906cc26d", "../identity.js?v=19b12b8d712a", "../profiles.js?v=368817ac21dc", "../history.js?v=73ff77cd03ce", "../vendor/tus-4.3.1.js?v=8cbb1b63fccc", "../vendor/fflate-0.8.3.js?v=462ef8041fc9",
+  "../admin.js?v=517665a05a79", "../community.js?v=25656aa27d88", "../community.css?v=bb6febdeb7a6", "../effects.js?v=fc9950443d80", "../favicon.svg", "../vendor/supabase-2.117.2.js?v=59d39487c358"
 ].map(path => new URL(path, APP).href);
 const STATIC_URLS = new Set(ASSETS);
 self.addEventListener("install", event => {

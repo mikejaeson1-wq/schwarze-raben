@@ -318,8 +318,30 @@ Für eigene Installationen zusätzlich die Migration `supabase/migrations/202610
 - **Clanprofile:** Charakter bearbeiten und Dossierfelder, eigene Felder sowie zusätzliche Bilder ergänzen. Für einzelne Angaben mit anderen Freigaben eine eigene Infokarte anlegen. Beide Charaktere müssen für Betrachtende freigegeben sein, damit eine bestätigte Beziehung angezeigt wird.
 - **Eigene Daten und Freigaben:** im eigenen Profil Vorschau für eine Person auswählen, Freigaben prüfen oder eine persönliche ZIP-Sicherung erstellen. Alle ZIP-Teile aufbewahren. Das Löschen des Profils entfernt keine Discord-Anmeldung oder Clanmitgliedschaft.
 - **Lager & Materialien:** Materialien anlegen und Bewegungen mit Grund buchen. Negative Mengen lagern aus. Zusätzliche Inhaltsrechte erlauben die Zuordnung von Materialbedarf zu Bauprojekten.
-- **RP-Ränge & Rechte:** nur für tatsächliche Admins. Ränge betreffen RP, Berechtigungen die Website. Kalender- und Inhaltsrechte öffnen die Admin-App nicht.
-- **Öffentliche Seiten:** tatsächliche Lore, Regeln, FAQ, Bewerbung, Kontakt und Datenhinweise pflegen. Leere Kontaktangaben brauchen eure eigenen Angaben.
+- **Clanränge & Ämter:** nur für tatsächliche Admins. Ränge betreffen RP, Berechtigungen die Website. Kalender- und Inhaltsrechte öffnen die Admin-App nicht.
+- **Öffentliche Texte:** tatsächliche Lore, Regeln, FAQ, Bewerbung, Kontakt und Datenhinweise pflegen. Leere Kontaktangaben brauchen eure eigenen Angaben.
 - **Sicherung:** alle ZIP-Teile derselben neuen Sicherung auswählen und Prüfsummen prüfen. Fehlende Originaldateien zuerst zurückladen. Anschließend `backup.json` herunterladen, unten auswählen und einzelne Inhalte nach Vorschau wiederherstellen. Mitgliedsrechte und Konten werden nicht automatisch importiert. Lagerkorrekturen werden als neue Bewegungen protokolliert.
 
-Discord-Erinnerungen sind weiterhin als zusätzliche spätere Bot-Anbindung vorgesehen. Ohne eingerichteten Bot werden keine Discord-Nachrichten verschickt. Für Website-Hinweise ist kein Bot nötig.
+Discord-Meldungen für neue und geänderte Aushänge, Termine und Abstimmungen laufen über einen optionalen Clan-Webhook. Der Admin hinterlegt die Kanal-Webhook-Adresse. Persönliche Website-Hinweise bleiben davon getrennt.
+
+
+## Persönliche Einstellungen, Claninfos und Clanämter
+
+Im Clanbereich und in der Verwaltung finden alle aktiven Mitglieder **Meine Einstellungen**. Die Speicherknöpfe stehen oben und unten. Hinweise werden pro Konto gespeichert. Schriftart, Schriftfarbe und Größe (14–24 Pixel) gelten nur für den angemeldeten Nutzer und werden auch auf anderen Geräten geladen. Die lokale Schriftvorschau lässt sich vor dem Speichern ausprobieren. Abmelden setzt die Darstellung zurück. Animationen sind weiterhin eine Einstellung für das jeweilige Gerät.
+
+**Claninfos** ist für aktive Mitglieder lesbar. Website-Admins können direkt dort interne Regeln, Beschreibung, Spielzeiten und Ansprechpartner hinterlegen. Unter **Öffentliche Texte** werden die öffentlichen Seiten bearbeitet. Beide Bereiche sowie **Clanränge & Ämter** und **Discord-Webhook** sind für Admins auch direkt in der normalen Clanansicht erreichbar, auf dem Handy über die Bereichsauswahl.
+
+Die angelegten Clanränge sind Jarl (Clan-Owner), Hirdführer, Huskarl, Karl, Krieger & Jäger, Handwerker, Bauern & Handwerker sowie Neusiedler & Fremdlinge. Dazu kommen Völva, Hofschmied, Godi, Skalde/Barde, Dorfwache und Tavernwirt als besondere Ämter. Pro Mitglied kann ein Clanrang und können mehrere Ämter vergeben werden. Sie erscheinen neben dem Kontonamen. Admins können Namen und Beschreibungen bearbeiten und eigene Ränge oder Ämter hinzufügen. Die Website-Rolle und zusätzliche Kalender-/Inhaltsrechte werden separat verwaltet. Ein Jarl-Titel verleiht nicht automatisch Website-Adminrechte. Die Zuordnung wird in einer Datenbanktransaktion gespeichert.
+
+## Discord-Webhook
+
+1. In Discord den gewünschten Clankanal bearbeiten und **Integrationen → Webhooks → Neuer Webhook** wählen.
+2. **Webhook-URL kopieren** und unter **Discord-Webhook** in die Website eintragen.
+3. Gewünschte Kategorien auswählen: Hinweise/Aushänge, Termine, Abstimmungen. Versand aktivieren und **Webhook speichern** drücken.
+4. **Testnachricht senden** reiht eine Nachricht an den gewählten Kanal ein. Die Verwaltungsansicht zeigt nach dem Aktualisieren die letzten Zustellstatus.
+
+Die Adresse wird in Supabase Vault hinterlegt und nicht in Statusabfragen, öffentlichen Einstellungen, Sicherungen oder im App-Cache zurückgegeben. Ein leeres Adressfeld beim Speichern behält die bestehende Adresse. **Gespeicherten Webhook entfernen** entfernt die Adresse und stoppt wartende Meldungen.
+
+Der Server verarbeitet die Warteschlange einmal pro Minute, auch ohne offene Website. Meldungen enthalten einen Titel, bei Terminen Datum/Zeit und einen Link. Freigegebene Claninhalte werden angekündigt, Entwürfe und private Profile oder Plotgruppen nicht. Bei zurückgezogenen oder gelöschten Beiträgen werden wartende Meldungen verworfen. Automatische Erwähnungen sind ausgeschaltet. Verbindungsfehler und Discord-Ratenlimits werden mit begrenzten Wiederholungen behandelt; der letzte HTTP-Status erscheint in der Verwaltung. Es werden Änderungsankündigungen verschickt, keine zeitgesteuerten Erinnerungen vor Terminbeginn.
+
+Die Erweiterung nutzt die zusätzlichen Migrationen `personal_settings_clan_offices` und `discord_webhook_part_01` bis `discord_webhook_part_04`. Die persönliche Speicherfunktion aktualisiert nur erlaubte Datenfelder; das unveränderbare Konto-Feld bleibt geschützt.

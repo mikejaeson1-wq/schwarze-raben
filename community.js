@@ -68,7 +68,7 @@
     if(ctx.public)return null;
     const actor=await Raben.member();
     if(!actor||actor.status!=='active'||(ctx.admin&&actor.role!=='admin')||actor.user_id!==ctx.actor.user_id){clearScope(ctx);throw {code:'42501'};}
-    ctx.actor=actor;if(window.RabenExpansion){const previous=ctx.capabilities;ctx.capabilities=await check(Raben.client().rpc('raben_my_capabilities'));if(previous&&((previous.content&&!ctx.capabilities.content)||(previous.calendar&&!ctx.capabilities.calendar))){ctx.dirty=false;ctx.editor.replaceChildren();RabenMedia.release(ctx);ctx.list.replaceChildren();ctx.records=[];ctx.epoch++;}}return actor;
+    ctx.actor=actor;if(window.RabenExpansion){const previous=ctx.capabilities;ctx.capabilities=await check(Raben.client().rpc('raben_my_capabilities'));if(previous&&((previous.content&&!ctx.capabilities.content)||(previous.calendar&&!ctx.capabilities.calendar))){ctx.dirty=false;ctx.editor.replaceChildren();RabenMedia.release(ctx);ctx.list.replaceChildren();ctx.records=[];ctx.epoch++;}}if(window.RabenSettings)await RabenSettings.load(ctx);return actor;
   };
   const inform=(ctx,text,error=false)=>{if(ctx.disposed)return;ctx.status.textContent=text;ctx.status.hidden=!text;ctx.status.classList.toggle('is-error',error);};
   const run=async(ctx,b,action)=>{b.disabled=true;const epoch=ctx.epoch;try{await ensure(ctx);if(ctx.disposed)return;await action();}catch(error){if(epoch===ctx.epoch)inform(ctx,failure(error),true);}finally{b.disabled=false;}};
@@ -322,7 +322,7 @@
     ctx.status=el('p','status-message');ctx.status.setAttribute('role','status');ctx.status.hidden=true;
     const tabs=el('div','hub-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Gemeinschaftsbereiche');
     let kinds=ctx.public?[...publicKinds,'stories']:ctx.admin?['dashboard','profiles','applications','review',...Object.keys(definitions),'stories','history','storage','backup']:['profiles',...memberKinds,'stories'];
-    if(!ctx.public&&window.RabenExpansion)kinds=[...(ctx.admin?['home','searchAll','notices','requests','plots','stock','access','publicSettings','settings']:['home','searchAll','notices','requests','plots','stock','settings']),...kinds];
+    if(!ctx.public&&window.RabenExpansion)kinds=[...['home','clanInfo','searchAll','notices','requests','plots','stock','settings'],...(ctx.actor.role==='admin'?['access','publicSettings','webhook']:[]),...kinds];
     const uid=++sequence;ctx.uid=uid;
     kinds.forEach((kind,index)=>{const b=button(window.RabenExpansion?.labels[kind]||definitions[kind]?.label||({dashboard:'Übersicht',profiles:'Clanprofile',applications:'Bewerbungen',review:'Freigaben',stories:'Geschichten',history:'Versionen',storage:'Speicher',backup:'Sicherung'}[kind]),()=>selectKind(ctx,kind),'hub-tab');b.dataset.kind=kind;b.setAttribute('role','tab');b.setAttribute('aria-controls','hub-panel-'+uid);b.setAttribute('aria-selected',String(index===0));b.tabIndex=index===0?0:-1;b.id='hub-tab-'+uid+'-'+kind;ctx.tabs.push(b);tabs.append(b);});
     ctx.tabs.forEach((tab,index)=>tab.addEventListener('keydown',event=>{const n=event.key==='Home'?0:event.key==='End'?ctx.tabs.length-1:event.key==='ArrowRight'?(index+1)%ctx.tabs.length:event.key==='ArrowLeft'?(index+ctx.tabs.length-1)%ctx.tabs.length:null;if(n!==null){event.preventDefault();ctx.tabs[n].click();ctx.tabs[n].focus();}}));

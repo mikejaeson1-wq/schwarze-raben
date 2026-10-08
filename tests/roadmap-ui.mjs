@@ -23,8 +23,8 @@ async function setup(actor,mode='member',personalData=null,extension=false){
  Object.defineProperty(HTMLSelectElement.prototype,'value',{configurable:true,get(){return [...this.options].find(o=>o.hasAttribute('selected'))?.value||this.options[0]?.value||'';},set(value){for(const o of this.options)o.removeAttribute('selected');[...this.options].find(o=>o.value===String(value))?.setAttribute('selected','');}});
  let currentActor=actor;const calls=[],copies=[],transfers=[],downloads=[],exports=[],events=new Map();
  const data={raben_records:structuredClone(fixtures),raben_memberships:[lead,member],raben_site_content:[{id:1,revision:1,content:{name:'Schwarze Raben',extraInfos:[]}}],raben_content_versions:[{id:id(100),source_table:'raben_records',entity_key:characterId,kind:'character',title:'Alter Testcharakter',revision:1,operation:'insert',actor_name:'Test-Mitglied',changed_at:'2026-10-07T20:00:00Z',snapshot:{...fixtures[2],title:'Frühere Fassung'}}],raben_applications:[],raben_character_notes:[],raben_event_responses:[],raben_poll_votes:[],raben_task_claims:[],raben_clan_posts:[]};
- for(const table of ['raben_permissions','raben_ranks','raben_member_ranks','raben_preferences','raben_rp_requests','raben_plots','raben_plot_guests','raben_comments','raben_reactions','raben_notifications','raben_event_slots','raben_profile_gallery','raben_relationships','raben_stock_items','raben_stock_movements','raben_project_materials','raben_backup_runs'])data[table]=[];
- data.raben_memberships.push(friend);data.raben_profiles=[];data.raben_profile_items=[];data.raben_profile_grants=[];
+ for(const table of ['raben_clan_information','raben_member_offices','raben_permissions','raben_ranks','raben_member_ranks','raben_preferences','raben_rp_requests','raben_plots','raben_plot_guests','raben_comments','raben_reactions','raben_notifications','raben_event_slots','raben_profile_gallery','raben_relationships','raben_stock_items','raben_stock_movements','raben_project_materials','raben_backup_runs'])data[table]=[];
+ data.raben_clan_information=[{id:1,title:'Schwarze Raben',body:'',rules:'',playtimes:'',contact:'',revision:1}];data.raben_memberships.push(friend);data.raben_profiles=[];data.raben_profile_items=[];data.raben_profile_grants=[];
  if(personalData)for(const name of ['raben_profiles','raben_profile_items','raben_profile_grants'])data[name]=structuredClone(personalData[name]);
  const files=new Map([['raben-media/'+privateAudio,new Blob([new Uint8Array([73,68,51,0])],{type:'audio/mpeg'})],['raben-public/'+releasedAudio,new Blob([new Uint8Array([73,68,51,0])],{type:'audio/mpeg'})]]);
  const inventory=()=>[...files].map(([key,blob])=>({bucket:key.split('/')[0],name:key.slice(key.indexOf('/')+1),size:blob.size,type:blob.type,used:key.endsWith(privateAudio),records:key.endsWith(privateAudio)?[{id:audioId,title:'Interne Aufnahme',kind:'media'}]:[],historyCount:0,website:false}));
@@ -60,6 +60,19 @@ async function setup(actor,mode='member',personalData=null,extension=false){
    if(!row){row={user_id:currentActor.user_id,revision:0};data.raben_profiles.push(row);}
    Object.assign(row,{display_name:args.p_name,revision:row.revision+1,...(name==='raben_save_account'?{avatar_path:args.p_avatar_path}:{})});return {data:structuredClone(row),error:null};
   }
+  if(name==='raben_save_preferences'){
+   const values={user_id:currentActor.user_id,subscriptions:args.p_subscriptions,font_family:args.p_font_family,font_color:args.p_font_color,font_size:args.p_font_size};
+   const row=data.raben_preferences.find(r=>r.user_id===currentActor.user_id);if(row)Object.assign(row,values);else data.raben_preferences.push(values);return {data:structuredClone(values),error:null};
+  }
+  if(name==='raben_assign_clan_roles'){
+   if(currentActor.role!=='admin')return {error:{code:'42501'}};
+   data.raben_member_ranks=data.raben_member_ranks.filter(r=>r.user_id!==args.p_user);if(args.p_rank)data.raben_member_ranks.push({user_id:args.p_user,rank_id:args.p_rank});
+   data.raben_member_offices=data.raben_member_offices.filter(r=>r.user_id!==args.p_user);for(const office_id of args.p_offices)data.raben_member_offices.push({user_id:args.p_user,office_id});
+   return {data:null,error:null};
+  }
+  if(name==='raben_discord_status')return {data:{configured:false,enabled:false,scopes:['posts','event','poll'],pending:0,recent:[]},error:null};
+  if(name==='raben_save_discord_webhook')return {data:{configured:!args.p_clear,enabled:args.p_enabled,scopes:args.p_scopes,pending:0,recent:[]},error:null};
+  if(name==='raben_discord_test')return {data:null,error:null};
   if(name==='raben_my_capabilities')return {data:{calendar:currentActor.role==='admin',content:currentActor.role==='admin'},error:null};
   if(name==='raben_search')return {data:data.raben_records.filter(r=>(r.title+' '+r.body).includes(args.p_query)).map(r=>({type:'record',id:r.id,title:r.title,snippet:r.body})),error:null};
   if(name==='raben_event_respond_on'){const row=data.raben_event_slots.find(r=>r.record_id===args.p_record&&r.user_id===currentActor.user_id&&r.occurrence_date===args.p_date);if(row)row.choice=args.p_choice;else data.raben_event_slots.push({record_id:args.p_record,user_id:currentActor.user_id,occurrence_date:args.p_date,choice:args.p_choice});return {data:null,error:null};}
@@ -93,7 +106,7 @@ async function setup(actor,mode='member',personalData=null,extension=false){
    async abort(){this.aborted=true;}
   }}
  };context.window=context;const sandbox=vm.createContext(context);
- for(const name of ['vendor/fflate-0.8.3.js','media.js','identity.js','history.js','profiles.js',...(extension?['pictures.js','calendar.js','profile-tools.js','expansion.js','guide.js','backup-tools.js']:[]),'community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
+ for(const name of ['vendor/fflate-0.8.3.js','media.js','identity.js','history.js','profiles.js',...(extension?['pictures.js','calendar.js','profile-tools.js','expansion.js','clan-settings.js','guide.js','backup-tools.js']:[]),'community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
  const root=document.getElementById('root');const hubContext=await (mode==='public'?context.RabenHub.mountPublic(root):mode==='admin'?context.RabenHub.mountAdmin(root,actor):context.RabenHub.mountMember(root,actor));await wait();
  const click=async text=>{const b=[...root.querySelectorAll('button')].find(b=>b.textContent===text&&!b.disabled);assert.ok(b,'Button: '+text);b.click();await wait();return b;};
  return {context,sandbox,document,Event,root,hubContext,data,files,calls,copies,transfers,downloads,exports,click,setActor:value=>{currentActor=value;}};
@@ -217,7 +230,7 @@ console.log('PASS: account settings, own-character name choice, isolated private
 
 // Exercise the real clan page and both admin shells, rather than only the shared hub.
 for(const pageName of ['clan.html','admin.html','app/index.html']){
- const adminPage=pageName!=='clan.html',page=await setup(adminPage?lead:member,adminPage?'admin':'member',accounts.data);
+ const adminPage=pageName!=='clan.html',page=await setup(adminPage?lead:member,adminPage?'admin':'member',accounts.data,true);
  page.context.RabenHub.lock();
  const template=parseHTML(await readFile(pageName,'utf8')).document;
  page.document.body.replaceChildren(...template.body.childNodes);page.document.body.dataset.adminApp=pageName==='app/index.html'?'true':'false';
@@ -236,6 +249,10 @@ for(const pageName of ['clan.html','admin.html','app/index.html']){
  assert.ok(page.document.getElementById('account').textContent.includes(adminPage?'Jarl der Raben':'Hrafn aus dem Eis'));
  page.data.raben_profiles[0].display_name='Hrafn der Schwarze';page.context.dispatchEvent(new page.Event('raben-identity-updated'));await wait();await wait();
  assert.ok(manager.textContent.includes('Hrafn der Schwarze'),pageName+' existing roster refresh');assert.ok(posts.textContent.includes('Hrafn der Schwarze'),pageName+' existing author refresh');
+ const settingsTab=page.document.querySelector('[data-kind="settings"]');assert.ok(settingsTab,pageName+' personal settings available');settingsTab.click();await wait();await wait();
+ const personalForm=page.document.querySelector('.settings-form');assert.ok(personalForm,pageName+' settings form');assert.equal(personalForm.querySelectorAll('button[type="submit"]').length,2);
+ const fontSize=[...personalForm.querySelectorAll('label')].find(n=>n.firstChild?.textContent==='Schriftgröße in Pixeln').querySelector('input');fontSize.value='19';personalForm.dispatchEvent(new page.Event('submit',{cancelable:true}));await wait();
+ assert.equal(page.data.raben_preferences.find(r=>r.user_id===(adminPage?lead:member).user_id).font_size,19,pageName+' saved personal preferences');
  page.setActor({...adminPage?lead:member,status:'blocked'});page.context.dispatchEvent(new page.Event('raben-lock'));
  assert.equal(manager.querySelector('.account-person'),null);assert.equal(posts.querySelector('.account-person'),null);assert.equal(page.document.getElementById('account').childNodes.length,0);
 }
@@ -243,3 +260,6 @@ console.log('PASS: actual clan roster/header/post authors and desktop/mobile adm
 
 const {verifyExpansionUI}=await import('./expansion-ui-cases.mjs');
 await verifyExpansionUI({setup,wait,member,lead,id});
+
+const {verifySettingsUI}=await import('./settings-ui-cases.mjs');
+await verifySettingsUI({setup,wait,member,lead,id});
