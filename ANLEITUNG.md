@@ -306,3 +306,20 @@ Name und rundes Bild erscheinen bei Mitgliederlisten, dem angemeldeten Konto, Be
 **Sichtbarkeit:** Das Kontobild ist bewusst für den ganzen aktiven Clan sichtbar. Gäste, wartende und gesperrte Konten erhalten keinen Zugriff. Das getrennte persönliche Profilbild sowie Charaktere und Infokarten bleiben weiterhin privat, clanweit oder gezielt geteilt, entsprechend deiner Auswahl. Ein bisher privates Bild wird durch dieses Update nicht automatisch zum Kontobild. Andere Admins können deine Kontoeinstellungen nicht ändern.
 
 Für eigene Installationen zusätzlich die Migration `supabase/migrations/20261008105012_clan_account_identity.sql` nach den bisherigen Profilmigrationen anwenden. Die Veröffentlichungsdateien verwenden neue Dateihashes und die Admin-App den Cache **v8**. Tests prüfen zusätzlich Kontobildrechte, Eigentümersperre, fehlende Rechteausweitung, Namenswechsel, private Charakterauswahl, Autorenanzeigen und Vorschaubilder.
+
+
+## Das 20-Punkte-Update benutzen
+
+- **Mein Clanstart:** persönliche Übersicht. Auf dem Handy führt das gruppierte Menü zu allen Bereichen.
+- **Meine Einstellungen:** Hinweise abonnieren und Animationen auf dem Gerät ausschalten.
+- **Clansuche:** durchsucht ausschließlich für dich freigegebene Inhalte.
+- **RP-Gesuche / Plotgruppen:** Szene suchen oder gemeinsame Handlungsfäden planen. Private Plots haben keine Admin-Ausnahme.
+- **RP-Kalender:** im Termin Wiederholung, Enddatum, Plätze und einzelne Ausfälle einstellen. Die Teilnahme bezieht sich auf den ausgewählten Termin der Serie. Wartende rücken nach einem freien Platz automatisch nach. ICS-Dateien enthalten Zeitzone und Serienregeln.
+- **Clanprofile:** Charakter bearbeiten und Dossierfelder, eigene Felder sowie zusätzliche Bilder ergänzen. Für einzelne Angaben mit anderen Freigaben eine eigene Infokarte anlegen. Beide Charaktere müssen für Betrachtende freigegeben sein, damit eine bestätigte Beziehung angezeigt wird.
+- **Eigene Daten und Freigaben:** im eigenen Profil Vorschau für eine Person auswählen, Freigaben prüfen oder eine persönliche ZIP-Sicherung erstellen. Alle ZIP-Teile aufbewahren. Das Löschen des Profils entfernt keine Discord-Anmeldung oder Clanmitgliedschaft.
+- **Lager & Materialien:** Materialien anlegen und Bewegungen mit Grund buchen. Negative Mengen lagern aus. Zusätzliche Inhaltsrechte erlauben die Zuordnung von Materialbedarf zu Bauprojekten.
+- **RP-Ränge & Rechte:** nur für tatsächliche Admins. Ränge betreffen RP, Berechtigungen die Website. Kalender- und Inhaltsrechte öffnen die Admin-App nicht.
+- **Öffentliche Seiten:** tatsächliche Lore, Regeln, FAQ, Bewerbung, Kontakt und Datenhinweise pflegen. Leere Kontaktangaben brauchen eure eigenen Angaben.
+- **Sicherung:** alle ZIP-Teile derselben neuen Sicherung auswählen und Prüfsummen prüfen. Fehlende Originaldateien zuerst zurückladen. Anschließend `backup.json` herunterladen, unten auswählen und einzelne Inhalte nach Vorschau wiederherstellen. Mitgliedsrechte und Konten werden nicht automatisch importiert. Lagerkorrekturen werden als neue Bewegungen protokolliert.
+
+Discord-Erinnerungen sind weiterhin als zusätzliche spätere Bot-Anbindung vorgesehen. Ohne eingerichteten Bot werden keine Discord-Nachrichten verschickt. Für Website-Hinweise ist kein Bot nötig.

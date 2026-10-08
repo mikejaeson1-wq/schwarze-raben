@@ -1,5 +1,7 @@
 (() => {
   "use strict";
+  try{document.documentElement.classList.toggle("reduce-motion",localStorage.getItem("raben-reduced-motion")==="1");}catch(_){}
+  try{document.documentElement.classList.toggle("reduce-motion",localStorage.getItem("raben-reduced-motion")==="1");}catch(_){}
   const clamp = (value, min, max, fallback) => Number.isFinite(Number(value)) ? Math.min(max, Math.max(min, Number(value))) : fallback;
   const normalize = value => ({
     type: ["snow", "embers", "none"].includes(value?.type) ? value.type : "snow",
@@ -18,7 +20,7 @@
       const count = Math.round(Math.min(110, width / 14) * settings.intensity / 100);
       particles = Array.from({length: count}, () => ({x: Math.random()*width, y: Math.random()*height, r: .5+Math.random()*1.5, speed: 12+Math.random()*20, drift: 2+Math.random()*12}));
     };
-    const running = () => !destroyed && !motion.matches && visible && !document.hidden && settings.type !== "none" && settings.intensity > 0;
+    const running = () => !destroyed && !motion.matches && !document.documentElement.classList.contains('reduce-motion') && visible && !document.hidden && settings.type !== "none" && settings.intensity > 0;
     const draw = now => {
       frame = 0;
       if (!running()) return;
@@ -42,12 +44,12 @@
     const resize = () => {reset(); sync();};
     window.addEventListener("resize",resize);
     document.addEventListener("visibilitychange",sync);
-    motion.addEventListener("change",sync);
+    motion.addEventListener("change",sync);window.addEventListener("raben-motion-changed",sync);
     const observer = "IntersectionObserver" in window ? new IntersectionObserver(entries => {visible = entries[0].isIntersecting; sync();}) : null;
     observer?.observe(canvas); reset(); sync();
     return {
       update: value => {settings = normalize(value); reset(); sync();},
-      stop: () => {destroyed = true; sync(); observer?.disconnect(); window.removeEventListener("resize",resize); document.removeEventListener("visibilitychange",sync); motion.removeEventListener("change",sync);}
+      stop: () => {destroyed = true; sync(); observer?.disconnect(); window.removeEventListener("resize",resize); document.removeEventListener("visibilitychange",sync); motion.removeEventListener("change",sync);window.removeEventListener("raben-motion-changed",sync);}
     };
   };
   window.RabenEffects = {create, normalize};

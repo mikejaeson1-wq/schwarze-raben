@@ -254,3 +254,7 @@
       .village { grid-template-columns: 1fr; }
       .village-figure { min-height: 250px; }
     }
+
+.reduce-motion *,.reduce-motion *::before,.reduce-motion *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+
+.reduce-motion *,.reduce-motion *::before,.reduce-motion *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}

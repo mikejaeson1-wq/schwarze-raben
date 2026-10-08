@@ -137,10 +137,10 @@
       const ext={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"}[file.type];
       if(controls.file!==file){controls.file=file;controls.path=crypto.randomUUID()+"."+ext;}
       const path=controls.path;
-      await RabenMedia.upload(imageUploadContext,file,currentAdmin.user_id,controls,false,path,'raben-public');
+      let variants=null;if(window.RabenPictures)variants=await RabenPictures.background(imageUploadContext,file,controls,path);else await RabenMedia.upload(imageUploadContext,file,currentAdmin.user_id,controls,false,path,'raben-public');
       if(epoch !== ownEpoch || !draft) return;
       const {data}=Raben.client().storage.from("raben-public").getPublicUrl(path);
-      draft[key]=data.publicUrl;
+      draft[key]=data.publicUrl;if(variants){draft[key+'Small']=variants.small;draft[key+'Medium']=variants.medium;}else{delete draft[key+'Small'];delete draft[key+'Medium'];}
       document.getElementById(key === "heroImage" ? "hero-preview" : "village-preview").src=data.publicUrl;
       updatePreview(); markDirty();completed=true;message("Bild hochgeladen. Mit „Änderungen speichern“ übernimmst du es auf die Website.");
     } catch(error) {if(epoch===ownEpoch){message(window.RabenMedia?.errorMessage(error)||Raben.errorMessage(error),true);if(controls){controls.wrap.hidden=false;controls.retry.hidden=false;}}} finally {imageUploadContext=null;busy=false;input.disabled=false;if(completed)input.value="";}
@@ -176,10 +176,12 @@
       actions.append(select,save); row.append(info,actions); root.append(row);
     });
   };
+  let postSpeaker=null,postAudience=null;
   const loadPosts = async () => {
     const ownEpoch=epoch; await ensureAdmin();
-    const posts=await check(Raben.client().from("raben_clan_posts").select("id,title,body,category,event_date,updated_at,created_by").order("created_at",{ascending:false}));
+    const posts=await check(Raben.client().from("raben_clan_posts").select("id,title,body,category,event_date,updated_at,created_by,audience,speaker_id,speaker_name").order("created_at",{ascending:false}));
     if(!accountContext)await loadAccounts();
+    if(window.RabenExpansion&&!postAudience){const form=document.getElementById('post-form');postAudience=RabenExpansion.field('RP-Ebene','select','ooc',[['ic','IC'],['ooc','OOC'],['mixed','IC / OOC']]);form.append(postAudience.wrap);postSpeaker=await RabenExpansion.characters(accountContext,form);}
     if(ownEpoch !== epoch) return;
     const root=document.getElementById("internal-posts"); root.replaceChildren();
     posts.forEach(post => {
@@ -187,7 +189,7 @@
       const buttons=el("div","member-actions");
       const edit=el("button","button outline small-button","Bearbeiten");
       edit.addEventListener("click",() => {
-        editingPost=post;
+        editingPost=post;if(postAudience)postAudience.input.value=post.audience||'ooc';if(postSpeaker){if(post.speaker_id&&!Array.from(postSpeaker.input.options).some(o=>o.value===post.speaker_id)){const o=el('option','',post.speaker_name||'Bisheriger Charakter');o.value=post.speaker_id;postSpeaker.input.append(o);}postSpeaker.input.value=post.speaker_id||'';}
         const form=document.getElementById("post-form");
         ["title","body","category","event_date"].forEach(key => {form.elements[key].value=post[key] || "";});
         document.getElementById("post-save").textContent="Beitrag speichern"; document.getElementById("post-cancel").hidden=false; form.elements.title.focus();
@@ -205,6 +207,7 @@
   document.getElementById("post-form").addEventListener("submit",async event => {
     event.preventDefault(); const form=event.currentTarget,button=document.getElementById("post-save");
     const content={title:form.elements.title.value.trim(),body:form.elements.body.value.trim(),category:form.elements.category.value,event_date:form.elements.event_date.value || null};
+    if(postAudience){content.audience=postAudience.input.value;content.speaker_id=postSpeaker?.input.value||null;}
     if(!content.title) return;
     try {button.disabled=true; await ensureAdmin();
       const query=editingPost ? Raben.client().from("raben_clan_posts").update(content).eq("id",editingPost.id).eq("updated_at",editingPost.updated_at) : Raben.client().from("raben_clan_posts").insert(content);
@@ -218,7 +221,7 @@
   document.querySelectorAll("[data-save-public]").forEach(button => button.addEventListener("click",savePublic));
   document.querySelectorAll("[data-image]").forEach(input => input.addEventListener("change",() => upload(input)));
   document.querySelectorAll("[data-reset-image]").forEach(button => button.addEventListener("click",() => {
-    if(!draft) return; const key=button.dataset.resetImage; draft[key]="";
+    if(!draft) return; const key=button.dataset.resetImage; draft[key]="";delete draft[key+"Small"];delete draft[key+"Medium"];
     document.getElementById(key === "heroImage" ? "hero-preview" : "village-preview").src=asset(key === "heroImage"?"assets/nord-dorf.webp":"assets/raben-langhaus.webp");
     updatePreview(); markDirty();
   }));

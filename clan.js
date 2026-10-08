@@ -5,7 +5,7 @@
   let accountContext=null;
   const gate = document.getElementById("gate");
   const lock = () => {
-    if(accountContext){accountContext.disposed=true;RabenIdentity.release(accountContext);accountContext=null;}
+    if(accountContext){accountContext.editor?.replaceChildren();accountContext.disposed=true;RabenIdentity.release(accountContext);accountContext=null;}
     epoch++; identity = null; hubIdentity = null; window.RabenHub?.lock();
     gate.hidden = false; document.getElementById("member-content").hidden = true;
     document.getElementById("clan-posts").replaceChildren(); document.getElementById("roster").replaceChildren();
@@ -31,22 +31,23 @@
       }
       const sb = Raben.client();
       const [posts, roster] = await Promise.all([
-        check(sb.from("raben_clan_posts").select("id,title,body,category,event_date,created_at,created_by").order("created_at",{ascending:false})),
+        check(sb.from("raben_clan_posts").select("id,title,body,category,event_date,created_at,created_by,audience,speaker_name").order("created_at",{ascending:false})),
         check(sb.from("raben_memberships").select("user_id,display_name,role").eq("status","active").order("display_name"))
       ]);
       if (epoch !== ownEpoch) return;
       if(!accountContext)accountContext={actor:member,epoch:0,disposed:false,public:false,urls:new Set(),authorize:async()=>{
         const current=await Raben.member();if(!current||current.status!=='active'||current.user_id!==accountContext?.actor.user_id){lock();throw {code:'42501'};}return current;
       }};
-      accountContext.actor=member;await RabenIdentity.load(accountContext,roster);if(epoch!==ownEpoch)return;
-      const root = document.getElementById("clan-posts"); root.replaceChildren();
+      accountContext.editor ||=document.createElement('div');if(!accountContext.editor.isConnected)document.getElementById('clan-posts').before(accountContext.editor);accountContext.report=(text,error=false)=>status('portal-status',text,error);accountContext.actor=member;await RabenIdentity.load(accountContext,roster);if(epoch!==ownEpoch)return;
+      const root = document.getElementById("clan-posts");if(window.RabenExpansion&&root.querySelector(".clan-discussion[open]")){const ids=new Set(posts.map(p=>p.id));for(const card of root.querySelectorAll('[data-post-id]'))if(!ids.has(card.dataset.postId))card.remove();}else root.replaceChildren();
       if (!posts.length) {const empty = el("article","clan-post"); empty.append(el("p","eyebrow","Der erste Aushang kommt noch"),el("h2","","Willkommen im Clanbereich."),el("p","post-body","Hier erscheinen die internen Informationen, Termine und Aushänge eurer Admins.")); root.append(empty);}
       posts.forEach(post => {
-        const article = el("article","clan-post");
+        if(root.querySelector('[data-post-id="'+post.id+'"]'))return;
+        const article = el("article","clan-post");article.dataset.postId=post.id;article.id="post-"+post.id;
         const category = {info:"Clan-Information",aushang:"Interner Aushang",termin:"Clan-Termin"}[post.category] || "Clan-Information";
         const meta = el("p","post-meta",category + (post.event_date ? " · " + new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"UTC"}).format(new Date(post.event_date+"T12:00:00Z")) : ""));
         const by=el('p','field-note');by.append(RabenIdentity.person(accountContext,post.created_by,{prefix:'Veröffentlicht von '}));
-        article.append(meta,el("h2","",post.title),by,el("p","post-body",post.body)); root.append(article);
+        article.append(meta,el("h2","",post.title),by,el("p","post-body",post.body)); root.append(article);window.RabenExpansion?.marker(post,article);window.RabenExpansion?.comments(accountContext,'post',post.id,article,post.created_by);
       });
       const list = document.getElementById("roster"); list.replaceChildren();
       roster.forEach(person => {const li = el("li","");li.append(RabenIdentity.person(accountContext,person.user_id));if(person.role === "admin") li.append(el("small","","Admin"));list.append(li);});

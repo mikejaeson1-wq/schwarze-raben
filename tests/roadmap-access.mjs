@@ -1,7 +1,7 @@
 import {fileURLToPath} from 'node:url';
 process.chdir(fileURLToPath(new URL('../',import.meta.url)));
 import {PGlite} from '@electric-sql/pglite';
-import {readFile} from 'node:fs/promises';
+import {readFile,readdir} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 process.on('uncaughtException',error=>{console.error({message:error.message,code:error.code,query:error.query});process.exit(1);});
 const db=new PGlite();
@@ -27,6 +27,7 @@ await db.exec(await readFile(path+'migrations/20261008081126_repair_uploads_and_
 await db.exec(await readFile(path+'migrations/20261008094929_private_clan_profiles.sql','utf8'));
 await db.exec(await readFile(path+'migrations/20261008095414_profile_grant_index.sql','utf8'));
 await db.exec(await readFile(path+'migrations/20261008105012_clan_account_identity.sql','utf8'));
+for(const migration of (await readdir(path+'migrations')).filter(n=>n.includes('twenty_update_part')).sort())await db.exec(await readFile(path+'migrations/'+migration,'utf8'));
 assert.equal(Number((await db.query("select file_size_limit from storage.buckets where id='raben-media'")).rows[0].file_size_limit),50*1024*1024);
 assert.equal(Number((await db.query("select file_size_limit from storage.buckets where id='raben-public'")).rows[0].file_size_limit),50*1024*1024);
 const admin='00000000-0000-4000-a000-000000000001';
@@ -120,4 +121,6 @@ const {verifyProfiles}=await import('./profile-access-cases.mjs');
 await verifyProfiles(db,{as,denied,scalar,admin,member,other,blocked});
 const {verifyAccounts}=await import('./account-access-cases.mjs');
 await verifyAccounts(db,{as,denied,scalar,admin,member,other,blocked});
+const {verifyExpansion}=await import('./expansion-access-cases.mjs');
+await verifyExpansion(db,{as,denied,scalar,admin,member,other,blocked});
 await db.close();

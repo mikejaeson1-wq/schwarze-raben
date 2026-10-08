@@ -26,13 +26,13 @@
   const paint=(ctx,node)=>{
     const spec=specs.get(node);if(!spec)return;
     const person=ctx.identities?.get(spec.id),label=name(ctx,spec.id,spec.fallback),path=person?.avatar_path||null;
-    const key=JSON.stringify([label,path,ctx.epoch,ctx.identityImageEpoch]);if(node.dataset.identityKey===key)return;
+    const key=JSON.stringify([label,path,ctx.epoch,ctx.identityImageEpoch,ctx.rankLabels?.get(spec.id)]);if(node.dataset.identityKey===key)return;
     node.dataset.identityKey=key;node.replaceChildren();
     if(spec.prefix)node.append(el('span','',spec.prefix));
     const face=el('span','account-avatar',Array.from(label.trim())[0]?.toLocaleUpperCase('de')||'R');face.setAttribute('aria-hidden','true');
     const text=el(spec.link&&person?'a':'span','account-name',label);
     if(text.tagName==='A')text.href=new URL('clan.html?profil='+encodeURIComponent(spec.id),Raben.config.siteUrl).href;
-    node.append(face,text);if(spec.suffix)node.append(el('span','',spec.suffix));
+    node.append(face,text);if(spec.suffix)node.append(el('span','',spec.suffix));if(ctx.rankLabels?.get(spec.id))node.append(el('span','rp-rank',ctx.rankLabels.get(spec.id)));
     if(path){const epoch=ctx.epoch;Promise.resolve().then(()=>picture(ctx,path)).then(url=>{
       if(!url||!valid(ctx,epoch)||!node.isConnected||node.dataset.identityKey!==key)return;
       const img=el('img','');img.src=url;img.alt='';img.loading='lazy';face.replaceChildren(img);
@@ -52,6 +52,7 @@
     ]);
     if(!valid(ctx,epoch))return;const cores=new Map(profiles.map(p=>[p.user_id,p]));
     ctx.identities=new Map(members.filter(m=>!m.status||m.status==='active').map(m=>[m.user_id,{...m,...(cores.get(m.user_id)||{})}]));
+    if(window.RabenExpansion)await RabenExpansion.rankLabels(ctx);if(!valid(ctx,epoch))return;
     ctx.names||=new Map();ctx.names.clear();ctx.identities.forEach(p=>ctx.names.set(p.user_id,p.display_name));
     const own=ctx.identities.get(ctx.actor.user_id);if(own)ctx.actor={...ctx.actor,display_name:own.display_name,avatar_path:own.avatar_path||null};
     const used=new Set([...ctx.identities.values()].map(p=>p.avatar_path).filter(Boolean));

@@ -1,49 +1,45 @@
-# Roadmap der Schwarzen Raben
+# Schwarze Raben · Gesamtupdate mit 20 Punkten
 
-Stand: **8. Oktober 2026**. [Lesbare Roadmap auf der Website](https://mikejaeson1-wq.github.io/schwarze-raben/roadmap.html).
+Die neue Ausbaustufe ist in Website, Clanbereich und Admin-App umgesetzt. Alle privaten Freigaben gelten auch für Suche, Medien, Kommentare und Hinweise.
 
-## Bereits umgesetzt
+1. **Bilder optimieren.** Originalbilder bleiben erhalten. Neue Uploads erzeugen kleine WebP-Vorschauen und responsive Hintergrundvarianten. Bestehende Hintergründe können Admins unter „Öffentliche Seiten“ optimieren.
 
-- Öffentliche Clanvorstellung im nordischen Schnee-Setting, bearbeitbare Inhalte und Hintergründe, animierte Effekte.
-- Discord-Anmeldung, Bewerbungen, Mitglieder- und Adminfreigabe, geschlossener Clanbereich und installierbare mobile Admin-App.
-- Galerie, Dorfkarte, Chronik, Handel, RP-Kalender, Charakterbuch, Aufträge, Bauprojekte, Wissen, Abstimmungen und Tagebuch.
-- Bilder, YouTube und echte MP3-Uploads, geordnete Medienanhänge, gemeinsame RP-Geschichten und angeheftetes Wissen.
-- Inhaltsversionen und Wiederherstellung, Dateiverwendung, Speicherübersicht sowie JSON- und mehrteilige ZIP-Sicherungen.
-- Reparierte fortsetzbare Uploads: Bilder und Hintergründe bis 50 MB, MP3 bis 20 MB.
-- **Neu: persönliche Clanprofile** mit Profilbild, mehreren Charakteren und Infokarten. Sichtbarkeit pro Eintrag: nur Besitzer, ganzer Clan oder ausgewählte aktive Mitglieder. Bilder folgen der jeweiligen Freigabe; neue Einträge sind privat. Kein Sonderzugriff anderer Clanadmins.
+2. **Mobil einfacher navigieren.** Gruppierte Bereichsauswahl, Schnellzugriffe, große Schaltflächen und Tastaturbedienung. Animationen lassen sich auf dem eigenen Gerät abschalten.
 
-- **Neu: Kontoname und rundes Kontobild** selbst ändern, eigenen Charakternamen übernehmen und Namen/Bild bei Mitgliederlisten, Beiträgen, Terminantworten, Aufträgen und Bearbeiterhinweisen anzeigen. Das Kontobild ist ausschließlich im aktiven Clan sichtbar und wird getrennt von privat freigegebenen Profilbildern gespeichert.
+3. **Persönlicher Clanstart.** Nächster RP-Termin, neue Aushänge, offene Aufgaben, eigene Charaktere und zuletzt besuchte Bereiche.
 
-## Nächste Schritte
+4. **Geschützte Clansuche.** Beiträge, Termine, Medien, Wissen, Profile, Charaktere, Gesuche und Plots gemeinsam durchsuchen. Jede Quelle behält ihre Freigaben.
 
-Diese Punkte sind die bestätigte Roadmap für den nächsten Ausbau und **noch nicht umgesetzt**. Die Reihenfolge ist eine Priorisierung, kein zugesagter Terminplan.
+5. **Hinweise und Abonnements.** Glocke, ungelesene Hinweise, Antworten, Erwähnungen und Änderungen an abonnierten Bereichen. Entzogene Freigaben blenden frühere Hinweise aus.
 
-| Reihenfolge | Bereich | Aktuelle Lücke | Verbesserung und Abnahmeziel |
-| --- | --- | --- | --- |
-| 1 / P1 | Öffentlich + Clan | Große Hintergrund- und Medienoriginale werden noch ohne automatische Vorschauen geladen; neue Kontobilder werden bereits verkleinert. | WebP-Vorschauen und responsive Hintergründe kostenlos im Browser erzeugen. Originale erhalten; Übersichten laden kleine Varianten statt vollständiger 30-MB-Dateien. |
-| 2 / P1 | Clan + Admin-App | Viele nebeneinander liegende Reiter erschweren den Einstieg am Handy. | Clan-Startseite mit nächstem Termin, offenen Aufträgen, eigenen Charakteren und freigegebenen Neuigkeiten; häufige Bereiche direkt erreichbar. |
-| 3 / P1 | Öffentlich | Die Funktionen für Galerie, Karte, Chronik und Vorstellungen brauchen eure tatsächlichen Dorfinhalte. | Eure Bilder und Lore ergänzen, Bewerbung und RP-Einstieg erklären. Serverangaben nur im bearbeitbaren Infobereich; keine automatische Veröffentlichung persönlicher Profile. |
-| 4 / P2 | Clan | Termine bleiben bisher im Website-Kalender; Export und Erinnerungen fehlen. | ICS-Export, wiederkehrende Termine und Absagen. Später freiwillige Discord-Erinnerungen mit gesondert aktivierter Bot-Anbindung; keine privaten Profile in Nachrichten. |
-| 5 / P2 | Mitglieder + Verwaltung | Sicherungen sind manuell und bei größeren Beständen mehrteilig; persönliche Profile sind bewusst ausgeschlossen. | Persönlicher Profil-Export samt Bildern für den Besitzer, Sicherungsteile verständlich zusammenfassen und Wiederherstellung führen. Kein privater Profil-Export durch andere Admins. |
-| 6 / P2 | Öffentlich + Mitglieder | Eigene Kontakt-/Datenseite und vollständige Profilbereinigung fehlen. | Anmeldung, Speicherung und Freigaben verständlich beschreiben; eigenes Gesamtprofil mit Bestätigung löschen und ungenutzte Profilbilder aufräumen. Einzelne Einträge können schon gelöscht werden. |
-| 7 / P3 | Öffentlich + Betrieb | Vollständige Linkvorschauen, Sitemap und automatische Prüfungen vor Veröffentlichungen fehlen. | Open-Graph-Vorschauen, öffentliche Metadaten und Sitemap ergänzen. Bestehende Rechte-, UI- und Uploadtests bei jeder Veröffentlichung automatisch ausführen. |
+6. **Kommentare und Reaktionen.** Antworten bearbeiten oder löschen und mit Rabe, Herz oder Zustimmung reagieren. Namen und runde Kontobilder zeigen die Beteiligten.
 
-## Profilrechte im aktuellen Update
+7. **RP-Gesuche.** Gewünschte Spielzeit, eigener Charakter und Ablaufdatum. Mitglieder können antworten; abgelaufene oder geschlossene Gesuche verschwinden für andere Mitglieder.
 
-Der frei änderbare **Kontoname und das runde Kontobild** sind innerhalb des aktiven Clans sichtbar, auch bei älteren Beiträgen. Ein gewählter Charaktername wird nur als Name übernommen; das gibt weder Charakterinfos noch dessen Bild frei. Discord-Konto, Anmeldung und Rollen bleiben unverändert.
+8. **Kalender mit Serien und Warteliste.** Wöchentliche, zweiwöchentliche und monatliche Serien, Einzelabsagen, Teilnehmerlimit, automatisches Nachrücken und ICS-Export. Discord-Erinnerungen benötigen später eine gesonderte Bot-Anbindung.
 
-Für das getrennte persönliche Profilbild, jeden Charakter und jede Infokarte wird separat gewählt:
+9. **IC und OOC unterscheiden.** Beiträge und Einträge mit IC, OOC oder gemischter Ebene kennzeichnen.
 
-| Auswahl | Wer kann den Eintrag und dessen Bild sehen? |
-| --- | --- |
-| Nur du (Standard) | Ausschließlich der Besitzer; andere Clanadmins haben keinen Sonderzugriff. |
-| Ganzer Clan | Alle aktiven Clanmitglieder. Gäste, wartende und gesperrte Konten bleiben ausgeschlossen. |
-| Ausgewählte Mitglieder | Besitzer und die ausgewählten aktiven Mitglieder; höchstens 20 Empfänger je Eintrag. |
+10. **Als eigener Charakter schreiben.** Beim Schreiben einen eigenen Charakter auswählen. Der Beitrag bewahrt dessen damaligen Namen, während die Kontoanzeige weiterhin aktuell bleibt.
 
-Freigaben und Änderungen werden zusammen gespeichert. Eine Sperrung oder entzogene Freigabe gilt auch für Bildabrufe. Geöffnete Profilansichten prüfen Veränderungen regelmäßig und beim Zurückkehren zum Fenster. Bereits rechtmäßig gelesene Informationen können von Empfängern natürlich behalten werden.
+11. **Charakterdossiers und Galerien.** Volk, Alter, Herkunft, Aussehen, Fähigkeiten, Ziele und eigene Felder. Bis zu zwölf zusätzliche Bilder pro Charakter. Anders freigegebene Angaben lassen sich als eigene Infokarten führen.
 
-Die persönlichen Profile verwenden eigene Daten- und Bildrechte. Die allgemeinen Admin-Sicherungen, Inhaltsversionen und Speicherübersichten enthalten keine persönlichen Profile oder Profilbilder. Ein eigener Profil-Export steht deshalb ausdrücklich in der neuen Roadmap.
+12. **Bestätigte Charakterbeziehungen.** Beziehungen anfragen und von der anderen Person bestätigen lassen. Betrachtende Personen müssen beide Charaktere sehen dürfen.
 
-Das bisherige Charakterbuch bleibt ein eigener, moderierter Bereich: dessen Entwürfe und Geheimnotizen sind weiterhin für Besitzer und Admins sichtbar. Die neue Profil-Privatsphäre ändert keine bereits bestehenden oder veröffentlichten Charakterbucheinträge.
+13. **Plotgruppen.** Teilnehmende, geschützte Freigaben, Kapitel, nächste Szenen, offene Fäden und Spielberichte. Andere Admins erhalten keinen Sonderzugriff auf private Plots.
 
-Bedienung und technische Einrichtung: [ANLEITUNG.md](ANLEITUNG.md). Website: [Schwarze Raben](https://mikejaeson1-wq.github.io/schwarze-raben/).
+14. **Lager und Bauprojekte.** Materialien anlegen, Ein- und Auslagerungen mit Grund protokollieren und Bauprojekten zuordnen. Fehlmengen ergeben sich aus Bedarf und eingetragenem Bestand.
+
+15. **RP-Ränge und zusätzliche Rechte.** RP-Ränge sind unabhängig von tatsächlichen Adminrollen. Kalender- und Inhaltsrechte können gezielt vergeben werden; die Admin-App bleibt für Admins.
+
+16. **Eigene Daten kontrollieren.** Freigaben prüfen, Vorschau für ein ausgewähltes Mitglied, persönlicher Export mit Bildern und bestätigtes Löschen des eigenen Profils. Discord-Konto und Clanmitgliedschaft bleiben bestehen.
+
+17. **Sicherungen prüfen und wiederherstellen.** ZIP-Teile mit Manifest, SHA-256-Prüfsummen und fehlenden Dateien prüfen. Originaldateien und einzelne Inhalte nach Vorschau wiederherstellen; Lagerkorrekturen bleiben protokolliert.
+
+18. **Öffentlicher RP-Einstieg.** Bearbeitbare Dorfvorstellung, Regeln, FAQ, Bewerbungsablauf, Kontakt und Datenhinweise. Öffentliche Linkvorschau und Sitemap.
+
+19. **Interaktive Dorfführung.** Dorfplan zoomen und verschieben, Orte auswählen und ihre öffentlich freigegebenen Beschreibungen, Medien und verknüpften Geschichten öffnen.
+
+20. **Geprüfte Updates und Betriebsübersicht.** Automatische Tests für Rechte, Bedienung, Profile, Kalender und Uploads. Admins sehen Dateiverwendung, Speicherverbrauch, unbenutzte Dateien und die letzte Mediensicherung.
+
+Discord-Bot-Erinnerungen sind als spätere optionale Anbindung vorgesehen und werden ohne Bot-Konfiguration nicht verschickt. Die neue CI prüft main, Pull Requests und release-Zweige. Veröffentlichungen erfolgen erst nach erfolgreichen Prüfungen des Release-Zweigs.

@@ -33,3 +33,12 @@ Prüfungen für Rechte und Bedienung: `npm ci --prefix tests` und `npm test --pr
 
 
 Mit **Kontoname & Bild** pflegt jedes aktive Mitglied seinen frei änderbaren Website-Namen und ein rundes, clanweit sichtbares Kontobild. Ein eigener Charaktername kann übernommen werden. Mitgliederlisten, Autoren von Beiträgen, Zusagen, Auftragsübernahmen und Bearbeiterhinweise verwenden die aktuelle Kontoanzeige. Private persönliche Profilbilder und Charakterinfos behalten ihre getrennten Freigaben. Die Discord-Anmeldung und Rollen ändern sich nicht. Neue Kontobilder erhalten in aktuellen Browsern vor dem Upload eine 256×256-Vorschau.
+
+
+Das neue **20-Punkte-Gesamtupdate** ergänzt den persönlichen Clanstart, gruppierte mobile Navigation, eine geschützte Clansuche und abonnierbare Hinweise. RP-Gesuche, Plotgruppen, Kommentare, Reaktionen, wiederkehrende Termine mit Warteliste und ICS-Export sowie ein protokolliertes Materiallager sind über die Bereichsauswahl erreichbar. Charakterdossiers und Bildergalerien befinden sich in den eigenen Clanprofilen; Beziehungen brauchen die Bestätigung der anderen Person. Persönliche Exporte und Freigabevorschau stehen im eigenen Profil.
+
+Admins vergeben unter **RP-Ränge & Rechte** zusätzlich Kalender- oder Inhaltsrechte. Diese gewähren weder öffentliche Veröffentlichung noch Zutritt zur Admin-App. Unter **Öffentliche Seiten** werden RP-Einstieg, Lore, Regeln, FAQ, Bewerbungsablauf und Kontaktangaben gepflegt. Neue Bilder bekommen WebP-Vorschauen; vorhandene Hintergründe lassen sich dort ebenfalls optimieren. Die Originale bleiben erhalten.
+
+Die ZIP-Sicherung enthält ein Manifest pro Teil mit SHA-256-Prüfsummen. Der Assistent prüft alle ausgewählten Teile, zeigt fehlende Dateien und lässt eine gezielte Wiederherstellung zu. Persönliche Profile und private Plotgruppen anderer Personen sind von Admin-Sicherungen ausgeschlossen. Lagerwiederherstellungen erzeugen eine nachvollziehbare Korrekturbewegung. Die Speicheransicht zeigt außerdem die letzte abgeschlossene Mediensicherung.
+
+GitHub Actions prüft `main`, Pull Requests und `release/**`. Vor einer Veröffentlichung einen Release-Zweig erstellen, die Workflow-Prüfung abwarten und erst danach den getesteten Stand nach `main` übernehmen. GitHub Pages veröffentlicht die statischen Dateien von `main`. Die Mitgliederdaten bleiben in Supabase und werden nicht im Repository oder Service Worker gespeichert.

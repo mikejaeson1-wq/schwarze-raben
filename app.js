@@ -83,7 +83,8 @@
   };
   const applyImages = (data, scope = document.documentElement) => {
     [["--hero-image", data.heroImage], ["--village-image", data.villageImage]].forEach(([key, value]) => {
-      const url = imageUrl(value);
+      const contentKey=key==="--hero-image"?"heroImage":"villageImage";const responsive=window.matchMedia?.("(max-width: 720px)").matches?data[contentKey+"Small"]:data[contentKey+"Medium"];
+      const url = imageUrl(responsive)||imageUrl(value);
       if (url) scope.style.setProperty(key, "url(" + JSON.stringify(url) + ")"); else scope.style.removeProperty(key);
     });
   };

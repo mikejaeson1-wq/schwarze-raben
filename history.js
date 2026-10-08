@@ -85,6 +85,7 @@
   const storage=async ctx=>{
     const epoch=ctx.epoch,data=await inventory(ctx);if(ctx.disposed||epoch!==ctx.epoch)return;
     ctx.list.append(el('article','hub-card'));const summary=ctx.list.lastChild;summary.append(el('h3','',RabenMedia.bytes(data.bytes)+' in '+data.files.length+' Clan-Dateien'),note('Gezählt werden die internen und öffentlichen Beitragsdateien. Persönliche Clanprofile und ihre Bilder sind hier nicht enthalten. Bereits verwendete Dateien und Dateien in gespeicherten Versionen werden beim Aufräumen geschützt.'),note('Bilder: bis 50 MB · MP3: bis 20 MB · '+data.unused.length+' unbenutzte Dateien · '+data.missing.length+' Hinweise zu fehlenden Medien.'));
+    if(window.RabenBackup)await RabenBackup.status(ctx,summary);
     if(data.missing.length){const card=el('article','hub-card');card.append(el('h3','','Fehlende Medien prüfen'));data.missing.forEach(item=>{const line=el('p','hub-body',item.title+' · '+item.reason);if(item.id){const a=el('a','hub-related-link','Beitrag öffnen'),url=new URL('admin.html',Raben.config.siteUrl);url.searchParams.set('eintrag',item.id);a.href=url.href;line.append(a);}card.append(line);});ctx.list.append(card);}
     const select=document.createElement('select');[['','Alle Dateien'],['unused','Nur unbenutzte Dateien'],['private','Nur private Dateien'],['public','Nur öffentliche Dateien']].forEach(([value,label])=>{const option=el('option','',label);option.value=value;select.append(option);});select.setAttribute('aria-label','Dateien filtern');const list=el('div','hub-list');ctx.list.append(select,list);
     const draw=()=>{
@@ -113,16 +114,17 @@
       cancelled=false;cancel.hidden=false;
       try{
         const data=await check(Raben.client().rpc('raben_export_content')),day=new Date().toISOString().slice(0,10);let part=1,total=0,entries={'backup.json':fflate.strToU8(JSON.stringify(data,null,2))};
-        const flush=()=>{download(ctx,'schwarze-raben-'+day+'-teil-'+part+'.zip',new Blob([fflate.zipSync(entries,{level:0})],{type:'application/zip'}));part++;total=0;entries={'backup.json':fflate.strToU8(JSON.stringify(data,null,2))};};
+        const flush=async(complete=false)=>{if(window.RabenBackup)entries['manifest.json']=fflate.strToU8(JSON.stringify(await RabenBackup.manifest(data,entries,part,complete),null,2));download(ctx,'schwarze-raben-'+day+'-teil-'+part+'.zip',new Blob([fflate.zipSync(entries,{level:0})],{type:'application/zip'}));part++;total=0;entries={'backup.json':fflate.strToU8(JSON.stringify(data,null,2))};};
         for(let i=0;i<data.files.length;i++){
           await admin(ctx);if(cancelled||ctx.disposed)throw new Error('Bitte starte die Sicherung erneut, um alle Teile zu erhalten.');
           const file=data.files[i];if(!['raben-media','raben-public'].includes(file.bucket)||!(file.bucket==='raben-media'?/^[a-f0-9-]{36}\/[a-f0-9-]{36}\.(jpg|png|webp|mp3)$/:/^[a-f0-9-]{36}\.(jpg|png|webp|mp3)$/).test(file.name))throw new Error('Bitte prüfe unter Speicher eine nicht regulär benannte Datei, bevor du die ZIP-Sicherung wiederholst.');progress.textContent='Datei '+(i+1)+' von '+data.files.length+' · '+RabenMedia.bytes(file.size);
           const blob=await check(Raben.client().storage.from(file.bucket).download(file.name));await admin(ctx);if(cancelled||ctx.disposed)throw new Error('Bitte starte die Sicherung erneut, um alle Teile zu erhalten.');
-          if(total+blob.size>40*1024*1024&&total)flush();entries['files/'+file.bucket+'/'+file.name]=new Uint8Array(await blob.arrayBuffer());total+=blob.size;
+          if(total+blob.size>40*1024*1024&&total)await flush();entries['files/'+file.bucket+'/'+file.name]=new Uint8Array(await blob.arrayBuffer());total+=blob.size;
         }
-        if(!ctx.disposed){flush();progress.textContent='Sicherung fertig · '+(part-1)+' ZIP-Teil(e). Bewahre alle Teile auf.';ctx.report('Inhalte und Mediendateien gesichert.');}
+        if(!ctx.disposed){await flush(true);if(window.RabenBackup)await RabenBackup.finish(ctx,data.files.length);progress.textContent='Sicherung fertig · '+(part-1)+' ZIP-Teil(e). Bewahre alle Teile auf.';ctx.report('Inhalte und Mediendateien gesichert.');}
       }finally{cancel.hidden=true;}
     }));card.append(el('div','hub-inline-actions'));card.lastChild.append(exportJson,exportZip,cancel);card.append(progress,note('Große Sicherungen werden in mehrere ZIP-Dateien aufgeteilt. Für umfangreiche Sicherungen eignet sich ein Computer am besten.'));
+    if(window.RabenBackup){RabenBackup.wizard(ctx);await RabenBackup.status(ctx,card);}
     const restoreCard=el('article','hub-card'),fileLabel=el('label','form-field','Inhaltssicherung zur Prüfung auswählen'),file=document.createElement('input');file.type='file';file.accept='.json,application/json';fileLabel.append(file);
     const choices=document.createElement('select');choices.setAttribute('aria-label','Inhalt zur Wiederherstellung auswählen');choices.hidden=true;const body=el('div','history-preview'),restore=btn('Ausgewählten Inhalt wiederherstellen');restore.hidden=true;
     restoreCard.append(el('h3','','Inhalte aus einer Sicherung wiederherstellen.'),note('Wähle eine exportierte JSON-Datei und prüfe einzelne Inhalte vor der Wiederherstellung. Mitgliedsrechte, Discord-Konten, Bewerbungen und Abstimmungen werden dadurch nicht überschrieben. Clan- und Medienbeiträge werden als Entwürfe wiederhergestellt.'),fileLabel,choices,body,restore);ctx.list.append(restoreCard);

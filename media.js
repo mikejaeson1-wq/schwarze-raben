@@ -115,7 +115,7 @@
   const publish=async(ctx,details)=>{
     const actor=await authorize(ctx);if(actor.role!=='admin')throw {code:'42501'};
     const data={...details};
-    for(const [privateKey,publicKey] of [['imagePath','publicImage'],['audioPath','publicAudio']]){
+    for(const [privateKey,publicKey] of [['imagePath','publicImage'],['thumbPath','publicThumb'],['audioPath','publicAudio']]){
       if(!data[privateKey]||data[publicKey])continue;
       const path=crypto.randomUUID()+'.'+data[privateKey].split('.').pop();
       await check(Raben.client().storage.from('raben-media').copy(data[privateKey],path,{destinationBucket:'raben-public'}));
@@ -135,13 +135,13 @@
     let removeCover=false;
     if(details.imagePath){const remove=btn('Cover entfernen',()=>{removeCover=true;remove.disabled=true;remove.textContent='Cover wird beim Speichern entfernt';grid.dispatchEvent(new Event('change',{bubbles:true}));});grid.append(remove);}
     return {controls,committed:data=>{audio.value='';Object.assign(details,data);existing.textContent=data.fileName?'Aktuelle Datei: '+data.fileName:'';removeCover=false;},collect:async data=>{
-      if(removeCover){delete data.imagePath;delete data.publicImage;}
+      if(removeCover){delete data.imagePath;delete data.publicImage;delete data.thumbPath;delete data.publicThumb;}
       const type=data.mediaType;
       if(type!=='youtube')delete data.youtubeId;
       if(type!=='mp3'){delete data.audioPath;delete data.publicAudio;delete data.fileName;}
       if(type==='youtube'){const id=youtubeId(yt.value);if(!id)throw new Error('invalid_youtube');data.youtubeId=id;}
       if(type==='mp3'){
-        if(audio.files?.[0]){data.audioPath=await upload(ctx,audio.files[0],row?.created_by,controls,true);data.fileName=audio.files[0].name.slice(0,255);delete data.publicAudio;}
+        if(audio.files?.[0]){data.audioPath=await upload(ctx,audio.files[0],ctx.actor.user_id,controls,true);data.fileName=audio.files[0].name.slice(0,255);delete data.publicAudio;}
         else if(!data.audioPath)throw new Error('audio_file_required');
       }
       if(type==='image'&&!data.imagePath&&!inputs.image?.files?.[0])throw new Error('image_required');
@@ -206,8 +206,8 @@
       const card=el('article','media-attachment');card.append(el('p','eyebrow',mediaNames[row.details?.mediaType]||'Medium'),el('h4','',row.title));
       if(row.body)card.append(el('p','hub-body',row.body));host.append(card);
       if(row.details?.imagePath||row.details?.publicImage){
-        let src=publicAsset(row.details.publicImage);
-        if(!src&&!ctx.public){try{const blob=await check(Raben.client().storage.from('raben-media').download(row.details.imagePath));if(ctx.disposed||ctx.epoch!==epoch)return;src=URL.createObjectURL(blob);ctx.urls ||=new Set();ctx.urls.add(src);}catch(_){}}
+        let src=publicAsset(row.details.publicThumb||row.details.publicImage);
+        if(!src&&!ctx.public){try{const blob=await check(Raben.client().storage.from('raben-media').download(row.details.thumbPath||row.details.imagePath));if(ctx.disposed||ctx.epoch!==epoch)return;src=URL.createObjectURL(blob);ctx.urls ||=new Set();ctx.urls.add(src);}catch(_){}}
         if(src&&ctx.epoch===epoch&&card.isConnected){const image=document.createElement('img');image.src=src;image.alt=row.title;image.loading='lazy';image.className='hub-image';card.prepend(image);}
       }
       await render(ctx,row,card);
