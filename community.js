@@ -59,7 +59,7 @@
   };
   const note=(text,classes='field-note')=>el('p',classes,text);
   const clearScope=ctx=>{
-    window.RabenMedia?.release(ctx);ctx.epoch++;ctx.disposed=true;ctx.dirty=false;
+    window.RabenMedia?.release(ctx);window.RabenProfiles?.release(ctx);ctx.epoch++;ctx.disposed=true;ctx.dirty=false;
     ctx.urls.forEach(url=>URL.revokeObjectURL(url));ctx.urls.clear();ctx.records=[];ctx.names.clear();
     ctx.root.replaceChildren();ctx.root.append(note('Dein Zugang ist nicht mehr aktiv. Bitte melde dich erneut an.','status-message'));
     scopes.delete(ctx);
@@ -294,18 +294,18 @@
     const specs=[['applications','Bewerbungen',()=>Raben.client().from('raben_applications').select('user_id',{count:'exact',head:true}).eq('status','waiting')],['review','Einträge zur Freigabe',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('visibility','review')],['event','Anstehende Termine',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('kind','event').in('visibility',['clan','public']).gte('details->>date',today())],['media','Medienbeiträge',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('kind','media')],['history','Inhaltsversionen',()=>Raben.client().from('raben_content_versions').select('id',{count:'exact',head:true})],['task','Clan-Aufträge',()=>Raben.client().from('raben_records').select('id',{count:'exact',head:true}).eq('kind','task').eq('visibility','clan')]];
     const result=await Promise.all(specs.map(async([key,label,query])=>{const r=await query();if(r.error)throw r.error;return {key,label,count:r.count};}));if(epoch!==ctx.epoch)return;
     const grid=el('div','hub-dashboard');result.forEach(item=>{const b=button('',()=>selectKind(ctx,item.key),'hub-stat');b.append(el('strong','',String(item.count)),el('span','',item.label));grid.append(b);});ctx.list.append(grid,el('article','hub-card'));window.RabenHistory?.dashboard(ctx,grid).catch(error=>inform(ctx,failure(error),true));
-    const intro=ctx.list.lastChild;intro.append(el('h3','','Euer Dorfleben verwalten.'),note('Wähle einen Bereich, um Inhalte anzulegen oder zu bearbeiten. Mitglieder erstellen eigene Charaktere, Aufträge, Wissenseinträge, Handelsanfragen und Tagebuchberichte. „Öffentlich“ wird ausschließlich durch Admins freigegeben.'),note('Für den Dorfplan zuerst eine Karte in der Galerie veröffentlichen und als Dorfplankarte festlegen. Danach Orte mit Positionen ergänzen.'));inform(ctx,'');
+    const intro=ctx.list.lastChild;intro.append(el('h3','','Euer Dorfleben verwalten.'),note('Wähle einen Bereich, um Inhalte anzulegen oder zu bearbeiten. Mitglieder erstellen eigene Charaktere, Aufträge, Wissenseinträge, Handelsanfragen und Tagebuchberichte. „Öffentlich“ wird ausschließlich durch Admins freigegeben.'),note('Für den Dorfplan zuerst eine Karte in der Galerie veröffentlichen und als Dorfplankarte festlegen. Danach Orte mit Positionen ergänzen.'));intro.append(note('Unter „Clanprofile“ pflegt jedes Mitglied sein eigenes Profil mit persönlichen Freigaben.'),link('Neue Roadmap ansehen','roadmap.html'));inform(ctx,'');
   };
   const selectKind=(ctx,kind)=>{
-    if(!discard(ctx))return;window.RabenMedia?.release(ctx);if(kind!==ctx.targetKind)ctx.targetId=null;ctx.kind=kind;ctx.offset=0;ctx.dirty=false;ctx.editor.replaceChildren();ctx.records=[];
+    if(!discard(ctx))return;window.RabenMedia?.release(ctx);if(kind!=='profiles')window.RabenProfiles?.release(ctx);ctx.epoch++;if(kind!==ctx.targetKind)ctx.targetId=null;ctx.kind=kind;ctx.offset=0;ctx.dirty=false;ctx.editor.replaceChildren();ctx.records=[];
     ctx.tabs.forEach(tab=>{const active=tab.dataset.kind===kind;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;});
     if(kind==='applications')ctx.applications=[];
-    const special=['dashboard','applications','review','history','storage','backup'].includes(kind);
+    const special=['dashboard','applications','review','history','storage','backup','profiles'].includes(kind);
     ctx.create.hidden=special||kind==='stories'||ctx.public||(!definitions[kind]?.member&&ctx.actor.role!=='admin');ctx.searchWrap.hidden=special;ctx.archiveWrap.hidden=ctx.public||special;ctx.pastWrap.hidden=kind!=='event';ctx.typeWrap.hidden=kind!=='media';ctx.visibilityWrap.hidden=ctx.public||special;ctx.categoryWrap.hidden=kind!=='knowledge';ctx.storyWrap.hidden=kind!=='stories';
-    ctx.heading.textContent=definitions[kind]?.label||({dashboard:'Alles im Blick',applications:'Bewerbungen',review:'Einträge zur Freigabe',stories:'Gemeinsame RP-Geschichten',history:'Änderungen & Versionen',storage:'Dateien & Speicher',backup:'Sicherung & Wiederherstellung'}[kind]);
+    ctx.heading.textContent=definitions[kind]?.label||({dashboard:'Alles im Blick',applications:'Bewerbungen',review:'Einträge zur Freigabe',stories:'Gemeinsame RP-Geschichten',history:'Änderungen & Versionen',storage:'Dateien & Speicher',backup:'Sicherung & Wiederherstellung',profiles:'Clanprofile'}[kind]);
     ctx.panel.setAttribute('aria-labelledby','hub-tab-'+ctx.uid+'-'+kind);
     ctx.list.classList.toggle('hub-gallery',kind==='gallery');ctx.list.classList.toggle('hub-characters',kind==='character');ctx.list.classList.toggle('hub-chronicle',kind==='chronicle');
-    const action=kind==='dashboard'?dashboard(ctx):kind==='applications'?applications(ctx):['history','storage','backup'].includes(kind)?RabenHistory.mount(ctx,kind):loadList(ctx,true);action.catch(error=>inform(ctx,failure(error),true));
+    const action=kind==='profiles'?RabenProfiles.mount(ctx):kind==='dashboard'?dashboard(ctx):kind==='applications'?applications(ctx):['history','storage','backup'].includes(kind)?RabenHistory.mount(ctx,kind):loadList(ctx,true);action.catch(error=>inform(ctx,kind==='profiles'?RabenProfiles.errorMessage(error):failure(error),true));
   };
   const mount=async(root,actor,mode)=>{
     if(!root)return;for(const old of scopes)if(old.root===root){clearScope(old);break;}
@@ -315,12 +315,12 @@
     scopes.add(ctx);root.replaceChildren();root.classList.add('hub');
     ctx.status=el('p','status-message');ctx.status.setAttribute('role','status');ctx.status.hidden=true;
     const tabs=el('div','hub-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Gemeinschaftsbereiche');
-    const kinds=ctx.public?[...publicKinds,'stories']:ctx.admin?['dashboard','applications','review',...Object.keys(definitions),'stories','history','storage','backup']:[...memberKinds,'stories'];
+    const kinds=ctx.public?[...publicKinds,'stories']:ctx.admin?['dashboard','profiles','applications','review',...Object.keys(definitions),'stories','history','storage','backup']:['profiles',...memberKinds,'stories'];
     const uid=++sequence;ctx.uid=uid;
-    kinds.forEach((kind,index)=>{const b=button(definitions[kind]?.label||({dashboard:'Übersicht',applications:'Bewerbungen',review:'Freigaben',stories:'Geschichten',history:'Versionen',storage:'Speicher',backup:'Sicherung'}[kind]),()=>selectKind(ctx,kind),'hub-tab');b.dataset.kind=kind;b.setAttribute('role','tab');b.setAttribute('aria-controls','hub-panel-'+uid);b.setAttribute('aria-selected',String(index===0));b.tabIndex=index===0?0:-1;b.id='hub-tab-'+uid+'-'+kind;ctx.tabs.push(b);tabs.append(b);});
+    kinds.forEach((kind,index)=>{const b=button(definitions[kind]?.label||({dashboard:'Übersicht',profiles:'Clanprofile',applications:'Bewerbungen',review:'Freigaben',stories:'Geschichten',history:'Versionen',storage:'Speicher',backup:'Sicherung'}[kind]),()=>selectKind(ctx,kind),'hub-tab');b.dataset.kind=kind;b.setAttribute('role','tab');b.setAttribute('aria-controls','hub-panel-'+uid);b.setAttribute('aria-selected',String(index===0));b.tabIndex=index===0?0:-1;b.id='hub-tab-'+uid+'-'+kind;ctx.tabs.push(b);tabs.append(b);});
     ctx.tabs.forEach((tab,index)=>tab.addEventListener('keydown',event=>{const n=event.key==='Home'?0:event.key==='End'?ctx.tabs.length-1:event.key==='ArrowRight'?(index+1)%ctx.tabs.length:event.key==='ArrowLeft'?(index+ctx.tabs.length-1)%ctx.tabs.length:null;if(n!==null){event.preventDefault();ctx.tabs[n].click();ctx.tabs[n].focus();}}));
     const panel=el('div','hub-panel');ctx.panel=panel;panel.id='hub-panel-'+uid;panel.setAttribute('role','tabpanel');panel.tabIndex=0;
-    ctx.heading=el('h2','');ctx.create=button('Neu erstellen',()=>openEditor(ctx,ctx.kind),'button small-button');ctx.refresh=button('Aktualisieren',()=>{const f=ctx.kind==='applications'?(ctx.offset=0,applications(ctx)):ctx.kind==='dashboard'?dashboard(ctx):['history','storage','backup'].includes(ctx.kind)?RabenHistory.mount(ctx,ctx.kind):loadList(ctx,true);f.catch(error=>inform(ctx,failure(error),true));});
+    ctx.heading=el('h2','');ctx.create=button('Neu erstellen',()=>openEditor(ctx,ctx.kind),'button small-button');ctx.refresh=button('Aktualisieren',()=>{if(ctx.kind==='profiles'&&!discard(ctx))return;const f=ctx.kind==='profiles'?RabenProfiles.mount(ctx):ctx.kind==='applications'?(ctx.offset=0,applications(ctx)):ctx.kind==='dashboard'?dashboard(ctx):['history','storage','backup'].includes(ctx.kind)?RabenHistory.mount(ctx,ctx.kind):loadList(ctx,true);f.catch(error=>inform(ctx,ctx.kind==='profiles'?RabenProfiles.errorMessage(error):failure(error),true));});
     const bar=el('div','hub-toolbar'),titles=el('div','hub-title-row');titles.append(ctx.heading,ctx.create,ctx.refresh);bar.append(titles);
     const sf=field('Suchen','search');ctx.search=sf.input;ctx.searchWrap=sf.wrap;ctx.search.placeholder='Titel, Text oder Schlagwörter';const searchForm=el('form','hub-search');ctx.searchWrap=searchForm;searchForm.append(sf.wrap,button('Suchen',null));searchForm.lastChild.type='submit';searchForm.addEventListener('submit',event=>{event.preventDefault();ctx.targetId=null;loadList(ctx,true);});bar.append(searchForm);
     const af=field('Archivierte Einträge anzeigen','checkbox',false);ctx.archive=af.input;ctx.archiveWrap=af.wrap;ctx.archive.addEventListener('change',()=>loadList(ctx,true));
@@ -334,7 +334,7 @@
     ctx.editor=el('div','hub-editor-host');ctx.list=el('div','hub-list');ctx.more=button('Weitere laden',()=>{ctx.offset=ctx.kind==='applications'?(ctx.applications||[]).length:ctx.records.length;const f=ctx.kind==='applications'?applications(ctx):loadList(ctx,false);f.catch(error=>inform(ctx,failure(error),true));});ctx.more.hidden=true;
     panel.append(bar,ctx.status,ctx.editor,ctx.list,ctx.more);root.append(tabs,panel);
     if(!ctx.public)await loadNames(ctx);if(ctx.disposed)return;
-    let initial=kinds[0];const target=new URL(location.href).searchParams.get('eintrag');if(window.RabenMedia?.UUID.test(target||'')){let q=Raben.client().from('raben_records').select('id,kind').eq('id',target);if(ctx.public)q=q.eq('visibility','public');const found=await check(q.limit(1));if(found[0]&&kinds.includes(found[0].kind)){ctx.targetId=target;ctx.targetKind=found[0].kind;initial=found[0].kind;}}
+    let initial=kinds[0];const profileTarget=new URL(location.href).searchParams.get('profil');if(!ctx.public&&window.RabenMedia?.UUID.test(profileTarget||'')){ctx.profileId=profileTarget;initial='profiles';}const target=new URL(location.href).searchParams.get('eintrag');if(window.RabenMedia?.UUID.test(target||'')){let q=Raben.client().from('raben_records').select('id,kind').eq('id',target);if(ctx.public)q=q.eq('visibility','public');const found=await check(q.limit(1));if(found[0]&&kinds.includes(found[0].kind)){ctx.targetId=target;ctx.targetKind=found[0].kind;initial=found[0].kind;}}
     selectKind(ctx,initial);return ctx;
   };
   const mountApplication=async root=>{
@@ -358,7 +358,7 @@
     }catch(error){status.textContent=failure(error);status.classList.add('is-error');}finally{status.hidden=false;save.disabled=false;}});
     root.append(form,button('Entscheidung aktualisieren',()=>{if(!dirty||confirm('Ungespeicherte Eingaben verwerfen?'))mountApplication(root).catch(error=>{status.textContent=failure(error);status.hidden=false;});}));
   };
-  const audit=async()=>{for(const ctx of [...scopes])if(!ctx.public&&!ctx.disposed){try{await ensure(ctx);}catch(_){}}};
+  const audit=async()=>{for(const ctx of [...scopes])if(!ctx.public&&!ctx.disposed){try{await ensure(ctx);if(ctx.kind==='profiles')await window.RabenProfiles?.audit(ctx);}catch(_){}}};
   window.addEventListener('focus',audit);window.addEventListener('visibilitychange',()=>{if(!document.hidden)audit();});setInterval(()=>{if(!document.hidden)audit();},30000);
   window.addEventListener('beforeunload',event=>{if([...scopes].some(ctx=>ctx.dirty)){event.preventDefault();event.returnValue='';}});
   window.addEventListener('raben-lock',()=>{applicationEpoch++;for(const root of applicationRoots){root.replaceChildren();root.append(note('Du bist abgemeldet. Lade die Seite neu, um dich wieder anzumelden.'));}for(const ctx of [...scopes])if(!ctx.public)clearScope(ctx);});

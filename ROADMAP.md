@@ -1,75 +1,45 @@
 # Roadmap der Schwarzen Raben
 
-Stand: 7. Oktober 2026. Die Schwarzen Raben sind ein Roleplay-Clan in Conan Exiles mit einem nordischen Dorf im Schnee. Serverangaben stehen im bearbeitbaren Infobereich, damit die Website bei einem Serverwechsel weiterverwendet werden kann.
+Stand: **8. Oktober 2026**. [Lesbare Roadmap auf der Website](https://mikejaeson1-wq.github.io/schwarze-raben/roadmap.html).
 
-Die vier Ausbauschritte sind umgesetzt. Die Übersicht beschreibt die verfügbaren Funktionen der Website, des Clanbereichs und der Admin-App.
+## Bereits umgesetzt
 
-| Schritt | Status | Schwerpunkt | Ergebnis |
+- Öffentliche Clanvorstellung im nordischen Schnee-Setting, bearbeitbare Inhalte und Hintergründe, animierte Effekte.
+- Discord-Anmeldung, Bewerbungen, Mitglieder- und Adminfreigabe, geschlossener Clanbereich und installierbare mobile Admin-App.
+- Galerie, Dorfkarte, Chronik, Handel, RP-Kalender, Charakterbuch, Aufträge, Bauprojekte, Wissen, Abstimmungen und Tagebuch.
+- Bilder, YouTube und echte MP3-Uploads, geordnete Medienanhänge, gemeinsame RP-Geschichten und angeheftetes Wissen.
+- Inhaltsversionen und Wiederherstellung, Dateiverwendung, Speicherübersicht sowie JSON- und mehrteilige ZIP-Sicherungen.
+- Reparierte fortsetzbare Uploads: Bilder und Hintergründe bis 50 MB, MP3 bis 20 MB.
+- **Neu: persönliche Clanprofile** mit Profilbild, mehreren Charakteren und Infokarten. Sichtbarkeit pro Eintrag: nur Besitzer, ganzer Clan oder ausgewählte aktive Mitglieder. Bilder folgen der jeweiligen Freigabe; neue Einträge sind privat. Kein Sonderzugriff anderer Clanadmins.
+
+## Nächste Schritte
+
+Diese Punkte sind Empfehlungen für den nächsten Ausbau und **noch nicht umgesetzt**. Die Reihenfolge ist eine Priorisierung, kein zugesagter Terminplan.
+
+| Reihenfolge | Bereich | Aktuelle Lücke | Verbesserung und Abnahmeziel |
 | --- | --- | --- | --- |
-| Grundlage | Fertig | Öffentliche Website, geschlossener Clanbereich und Admin-App | Discord-Anmeldung, Rollen und Freigaben, bearbeitbare Texte und Bilder, Effekte, Galerie, Dorfkarte, Chronik, Bewerbungen, Kalender, Charaktere, Aufträge, Bauprojekte, Wissen, Abstimmungen und Tagebuch |
-| 1 | Fertig | YouTube und echte MP3-Dateien | Videos per Link einbetten und Audiodateien direkt hochladen und abspielen |
-| 2 | Fertig | Gemeinsame Medienverwaltung | Bilder, Videos und Audio finden, zuordnen und bequem am Handy verwalten |
-| 3 | Fertig | RP-Geschichten verbinden | Charaktere, Tagebucheinträge, Chronik und Ereignisse miteinander verknüpfen |
-| 4 | Fertig | Verwaltung und Wiederherstellung | Änderungen nachvollziehen, frühere Inhaltsversionen wiederherstellen und Daten exportieren |
+| 1 / P1 | Öffentlich + Clan | Große Originalbilder werden ohne automatische Vorschauen geladen. | WebP-Vorschauen und responsive Hintergründe kostenlos im Browser erzeugen. Originale erhalten; Übersichten laden kleine Varianten statt vollständiger 30-MB-Dateien. |
+| 2 / P1 | Clan + Admin-App | Viele nebeneinander liegende Reiter erschweren den Einstieg am Handy. | Clan-Startseite mit nächstem Termin, offenen Aufträgen, eigenen Charakteren und freigegebenen Neuigkeiten; häufige Bereiche direkt erreichbar. |
+| 3 / P1 | Öffentlich | Die Funktionen für Galerie, Karte, Chronik und Vorstellungen brauchen eure tatsächlichen Dorfinhalte. | Eure Bilder und Lore ergänzen, Bewerbung und RP-Einstieg erklären. Serverangaben nur im bearbeitbaren Infobereich; keine automatische Veröffentlichung persönlicher Profile. |
+| 4 / P2 | Clan | Termine bleiben bisher im Website-Kalender; Export und Erinnerungen fehlen. | ICS-Export, wiederkehrende Termine und Absagen. Später freiwillige Discord-Erinnerungen mit gesondert aktivierter Bot-Anbindung; keine privaten Profile in Nachrichten. |
+| 5 / P2 | Mitglieder + Verwaltung | Sicherungen sind manuell und bei größeren Beständen mehrteilig; persönliche Profile sind bewusst ausgeschlossen. | Persönlicher Profil-Export samt Bildern für den Besitzer, Sicherungsteile verständlich zusammenfassen und Wiederherstellung führen. Kein privater Profil-Export durch andere Admins. |
+| 6 / P2 | Öffentlich + Mitglieder | Eigene Kontakt-/Datenseite und vollständige Profilbereinigung fehlen. | Anmeldung, Speicherung und Freigaben verständlich beschreiben; eigenes Gesamtprofil mit Bestätigung löschen und ungenutzte Profilbilder aufräumen. Einzelne Einträge können schon gelöscht werden. |
+| 7 / P3 | Öffentlich + Betrieb | Vollständige Linkvorschauen, Sitemap und automatische Prüfungen vor Veröffentlichungen fehlen. | Open-Graph-Vorschauen, öffentliche Metadaten und Sitemap ergänzen. Bestehende Rechte-, UI- und Uploadtests bei jeder Veröffentlichung automatisch ausführen. |
 
-## 1. Medienupdate: YouTube und MP3
+## Profilrechte im aktuellen Update
 
-### YouTube-Links
+Der Profilname ist innerhalb des aktiven Clans sichtbar. Für Profilbild, jeden Charakter und jede Infokarte wird separat gewählt:
 
-- Einen YouTube-Link in der Desktop-Verwaltung oder Admin-App einfügen, zum Beispiel einen normalen Videolink oder einen `youtu.be`-Link.
-- Titel, Beschreibung und optional ein vorhandenes Bild als Vorschaubild vergeben.
-- Den Videoplayer erst auf Wunsch laden; die Wiedergabe startet durch eine bewusste Aktion.
-- Links bearbeiten, ersetzen und entfernen. Ungültige Links werden verständlich angezeigt.
-- Videos in Medienbeiträgen, Chronikeinträgen, Charakteren, Tagebuch und zusätzlichen Informationen einbinden.
-- Die Sichtbarkeit folgt dem jeweiligen Eintrag: intern oder nach Admin-Freigabe öffentlich. Der Zugriff auf das Video selbst richtet sich nach den YouTube-Einstellungen.
+| Auswahl | Wer kann den Eintrag und dessen Bild sehen? |
+| --- | --- |
+| Nur du (Standard) | Ausschließlich der Besitzer; andere Clanadmins haben keinen Sonderzugriff. |
+| Ganzer Clan | Alle aktiven Clanmitglieder. Gäste, wartende und gesperrte Konten bleiben ausgeschlossen. |
+| Ausgewählte Mitglieder | Besitzer und die ausgewählten aktiven Mitglieder; höchstens 20 Empfänger je Eintrag. |
 
-### Echte MP3-Dateien
+Freigaben und Änderungen werden zusammen gespeichert. Eine Sperrung oder entzogene Freigabe gilt auch für Bildabrufe. Geöffnete Profilansichten prüfen Veränderungen regelmäßig und beim Zurückkehren zum Fenster. Bereits rechtmäßig gelesene Informationen können von Empfängern natürlich behalten werden.
 
-- Eine `.mp3`-Datei direkt vom Computer oder Handy hochladen, statt lediglich eine externe Audioadresse einzutragen.
-- Einen Audioplayer mit Start, Pause und Springen innerhalb der Aufnahme anzeigen.
-- Titel, Beschreibung und optional ein Cover aus den vorhandenen Bildern hinzufügen.
-- Eigene Lieder, erzählte Sagen oder RP-Aufnahmen zu Medienbeiträgen, Charakteren und Geschichten zuordnen.
-- Dateien ersetzen oder entfernen; Uploadfortschritt und verständliche Fehlermeldungen anzeigen.
-- MP3-Dateien bis 20 MB und Bilder bis 50 MB hochladen. MP3-Dateien liegen im Medienspeicher und werden nicht ins öffentliche GitHub-Repository geschrieben.
+Die persönlichen Profile verwenden eigene Daten- und Bildrechte. Die allgemeinen Admin-Sicherungen, Inhaltsversionen und Speicherübersichten enthalten keine persönlichen Profile oder Profilbilder. Ein eigener Profil-Export steht deshalb ausdrücklich in der neuen Roadmap.
 
-### Sichtbarkeit und Freigaben
+Das bisherige Charakterbuch bleibt ein eigener, moderierter Bereich: dessen Entwürfe und Geheimnotizen sind weiterhin für Besitzer und Admins sichtbar. Die neue Profil-Privatsphäre ändert keine bereits bestehenden oder veröffentlichten Charakterbucheinträge.
 
-Admins verwalten die neuen Medien auch über die bestehende Admin-App. Interne MP3-Dateien bleiben im geschützten Medienspeicher. Ein öffentlicher Beitrag erhält erst nach einer ausdrücklichen Admin-Freigabe eine öffentlich abrufbare Datei. Geheimnotizen behalten ihre getrennten Rechte. Mitglieder dürfen Anhänge nur dort bearbeiten, wo sie bereits ihren eigenen Eintrag bearbeiten dürfen.
-
-Die Medienverwaltung steht auf Computer und Handy bereit. Gäste und gesperrte Mitglieder erhalten keinen Zugriff auf interne Audiodateien; Veröffentlichungen bleiben eine gesonderte Admin-Entscheidung.
-
-## 2. Medien im Alltag verwalten
-
-- Eine gemeinsame Übersicht mit Filtern für Bilder, YouTube-Videos und Audio sowie für öffentliche und interne Einträge.
-- Mehrere Medien je Beitrag anordnen und ihre Titel, Beschreibungen und Cover bearbeiten.
-- Anzeigen, in welchen Beiträgen eine Datei verwendet wird, bevor sie entfernt wird.
-- Speicherverbrauch anzeigen und nicht mehr verwendete Dateien gezielt aufräumen.
-- Die Bedienung am Handy für längere Uploads und mehrere Anhänge verbessern.
-
-## 3. RP-Geschichten verbinden
-
-- Aus einem Tagebucheintrag auf beteiligte Charaktere und den passenden RP-Termin verweisen.
-- Chronikeinträge mit zugehörigen Bildern, Videos und Aufnahmen verbinden.
-- Eine gemeinsame Geschichte über mehrere Einträge verfolgen, etwa eine Reise oder den Bau eines Langhauses.
-- Wissenseinträge nach Themen ordnen und häufig benötigte Informationen anheften.
-
-Die vorhandenen Kalender, Charakterbücher und Tagebücher bilden dafür die Grundlage. Interne Geschichten werden weiterhin einzeln zur öffentlichen Chronik freigegeben.
-
-## 4. Verwaltung und Wiederherstellung
-
-- Nachvollziehbar anzeigen, wer einen Inhalt wann geändert hat.
-- Frühere Inhaltsversionen ansehen und bei Bedarf wiederherstellen.
-- Inhalte exportieren und eine verständliche Anleitung für Sicherung und Wiederherstellung anbieten.
-- Freigaben, fehlende Medien und Speicherverbrauch in der Admin-Übersicht zusammenführen.
-
-## Technische Grundlage des Medienupdates
-
-Die vorhandene Website und Admin-App bleiben der Ausgangspunkt. YouTube stellt einen einbettbaren Player bereit; MP3-Dateien lassen sich über den HTML-Audioplayer abspielen. Die Umsetzung verwendet die bestehenden Inhaltsrechte und Admin-Freigaben für Bilder und Clanbeiträge.
-
-- [YouTube: Videos einbetten](https://support.google.com/youtube/answer/171780?hl=de)
-- [YouTube: Einbettbarer Player und Parameter](https://developers.google.com/youtube/player_parameters)
-- [MDN: HTML-Audioplayer und MP3-Quellen](https://developer.mozilla.org/de/docs/Web/HTML/Reference/Elements/audio)
-
-Zur aktuellen Website: [Schwarze Raben](https://mikejaeson1-wq.github.io/schwarze-raben/). Bedienung und Einrichtung stehen in [ANLEITUNG.md](ANLEITUNG.md).
-
-Die Sicherung umfasst JSON-Inhalte sowie Bilder und MP3-Dateien in ZIP-Teilen. Inhalte lassen sich einzeln nach Vorschau importieren. Clan- und Medienbeiträge werden bei der Wiederherstellung zunächst Entwürfe. Discord-Konten und Mitgliedsrechte werden dabei nicht automatisch übernommen. Die genaue Bedienung steht in [ANLEITUNG.md](ANLEITUNG.md).
+Bedienung und technische Einrichtung: [ANLEITUNG.md](ANLEITUNG.md). Website: [Schwarze Raben](https://mikejaeson1-wq.github.io/schwarze-raben/).

@@ -30,7 +30,7 @@
       const sb = Raben.client();
       const [posts, roster] = await Promise.all([
         check(sb.from("raben_clan_posts").select("id,title,body,category,event_date,created_at").order("created_at",{ascending:false})),
-        check(sb.from("raben_memberships").select("display_name,role").eq("status","active").order("display_name"))
+        check(sb.from("raben_memberships").select("user_id,display_name,role").eq("status","active").order("display_name"))
       ]);
       if (epoch !== ownEpoch) return;
       const root = document.getElementById("clan-posts"); root.replaceChildren();
@@ -42,7 +42,7 @@
         article.append(meta,el("h2","",post.title),el("p","post-body",post.body)); root.append(article);
       });
       const list = document.getElementById("roster"); list.replaceChildren();
-      roster.forEach(person => {const li = el("li","",person.display_name); if(person.role === "admin") li.append(el("small","","Admin")); list.append(li);});
+      roster.forEach(person => {const li = el("li",""),a=el("a","",person.display_name);a.href="clan.html?profil="+encodeURIComponent(person.user_id);li.append(a);if(person.role === "admin") li.append(el("small","","Admin"));list.append(li);});
       document.getElementById("account").textContent = member.display_name;
       document.getElementById("account").hidden = false;
       document.getElementById("admin-link").hidden = member.role !== "admin";

@@ -268,3 +268,28 @@ Bilder, Cover und Hintergrundbilder dürfen bis **50 MB** groß sein, MP3-Dateie
 Wenn eine Verbindung abbricht, bleiben die gewählte Datei und die Eingaben auf der geöffneten Seite erhalten. Im Medienformular erneut **Speichern** anklicken; bei einem Hintergrundbild **Upload erneut versuchen**. Mit **Upload abbrechen** lässt sich die Übertragung pausieren. Nach dem Schließen oder Neuladen muss die Datei erneut ausgewählt werden. Fehlende Anmeldung, fehlende Rechte, Dateigröße und Format werden getrennt gemeldet.
 
 Für bestehende eigene Installationen außerdem `supabase/migrations/20261008081126_repair_uploads_and_large_images.sql` anwenden. Das veröffentlichte Clan-Projekt ist bereits aktualisiert. Bei einer Neueinrichtung diese Migration nach der Medien-Migration anwenden.
+
+
+## Persönliche Clanprofile
+
+1. Mit Discord im **Clanbereich** anmelden. Ein Admin muss die Mitgliedschaft angenommen beziehungsweise auf **aktiv** gesetzt haben.
+2. Im ersten Reiter **Clanprofile** auf **Mein Profil erstellen** klicken. Der Profilname ist für aktive Clanmitglieder sichtbar; er kann später geändert werden.
+3. **Profilbild hinzufügen**, **Charakter hinzufügen** oder **Infokarte hinzufügen** wählen. Mehrere Charaktere und Infokarten sind möglich, beispielsweise für Herkunft und Beruf, RP-Vorlieben oder Spielzeiten.
+4. Pro Eintrag die Sichtbarkeit wählen: **Nur du** (Standard), **Ganzer Clan** oder **Ausgewählte Mitglieder**. Bei gezielter Freigabe mindestens eine, höchstens 20 aktive Personen markieren. Das zugehörige Bild erhält automatisch dieselben Rechte.
+5. Speichern. Zum Ändern oder Entfernen den eigenen Eintrag über **Bearbeiten** beziehungsweise **Löschen** öffnen. Eine neue Freigabe ersetzt die vorige. Das gilt auch für das Profilbild.
+
+Andere Profile sind über die Übersicht, die Suche oder einen Namen in der Mitgliederliste erreichbar. Andere Mitglieder sehen ausschließlich ihre freigegebenen Angaben, ohne Zähler versteckter Inhalte. Nur der Profilbesitzer bearbeitet sein Profil; andere Clanadmins haben keinen Sonderzugriff. Die Admin-Oberfläche und mobile Admin-App bieten denselben Reiter mit denselben Profilrechten. Normale Mitglieder verwenden weiterhin den Clanbereich.
+
+Bilder werden als JPG, PNG oder WebP bis **50 MB** im eigenen privaten Profilspeicher hochgeladen. Fortsetzbare Uploads verwenden denselben reparierten Uploadablauf wie die Medienverwaltung. Bilder werden authentifiziert abgerufen; es entstehen keine öffentlichen Kopien. Bei Logout werden Profilansichten und lokale Bildadressen entfernt. Freigaben werden serverseitig bei jedem Abruf geprüft; geöffnete Profilansichten werden ohne laufende Bearbeitung regelmäßig sowie beim Zurückkehren zum Fenster aktualisiert. Schon gelesene Inhalte können von Empfängern behalten werden.
+
+**Charakterbuch und Profil sind getrennte Bereiche.** Bereits vorhandene Charakterbucheinträge behalten ihre bisherige Sichtbarkeit; dort können Besitzer und Admins Entwürfe und Geheimnotizen lesen. Für Angaben, die ausschließlich bei dir oder bestimmten Mitgliedern bleiben sollen, die neuen persönlichen Profile verwenden.
+
+**Sicherungen:** Persönliche Profile und Profilbilder sind nicht Bestandteil der allgemeinen Admin-Sicherungen, Inhaltsversionen oder Speicherübersichten. Ein eigener Profil-Export für Mitglieder ist als nächster Ausbau in der [neuen Roadmap](https://mikejaeson1-wq.github.io/schwarze-raben/roadmap.html) vorgesehen.
+
+### Einrichtung und Prüfung des Profilupdates
+
+Bei einer eigenen bestehenden Installation zusätzlich `supabase/migrations/20261008094929_private_clan_profiles.sql` nach der Upload-Migration anwenden. Für eine neue Installation zuerst `schema.sql` und `seed.sql`, dann sämtliche Migrationen in Dateireihenfolge. Das veröffentlichte Clan-Projekt ist bereits aktualisiert.
+
+Die Migration ergänzt ausschließlich eigene Tabellen und einen privaten Bucket: `raben_profiles`, `raben_profile_items`, `raben_profile_grants` und `raben-profile-media`. Alle Tabellen verwenden RLS und Besitzerrechte. Die neuen RPC- und Bildprüffunktionen laufen als **SECURITY INVOKER**. Restriktive Storage-Regeln schützen Profilbilder auch gegen fremde allgemeine Freigaberichtlinien; Dateien lassen sich nicht überschreiben oder verschieben, solange sie als Profilbilder gespeichert sind. Verwendete Bilder sind vor Löschung geschützt.
+
+Prüfung: `npm test --prefix tests`. Die tatsächliche Migration wird in PostgreSQL mit Besitzer, ausgewähltem Mitglied, unbeteiligtem Mitglied, Admin, wartendem, gesperrtem und anonymem Konto geprüft. Tests decken Profil- und Bildrechte, Freigabeentzug, Besitzer- und Empfängersperre, Versionskonflikte, fehlende Admin-Sonderrechte und den Ausschluss aus Sicherungen ab. UI-Tests prüfen Profilanlage, mehrere Einträge, sichere Standardwerte, Empfängerauswahl, private Bild-Uploads, unveränderte Portraits beim Bearbeiten, aktualisierte Freigaben und Logout.

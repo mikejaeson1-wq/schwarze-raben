@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 const id=n=>'00000000-0000-4000-a000-'+String(n).padStart(12,'0');
 const lead={user_id:id(1),status:'active',role:'admin',display_name:'Test-Admin'};
 const member={user_id:id(2),status:'active',role:'member',display_name:'Test-Mitglied'};
+const friend={user_id:id(3),status:'active',role:'member',display_name:'Test-Freund'};
 const videoId=id(20),audioId=id(21),characterId=id(22),journalId=id(23);
 const privateAudio=member.user_id+'/'+id(90)+'.mp3',releasedAudio=id(91)+'.mp3';
 const fixtures=[
@@ -17,17 +18,24 @@ const fixtures=[
  {id:id(24),kind:'knowledge',title:'Wichtige Absprachen',body:'Angeheftet',details:{category:'RP',pinned:true},visibility:'clan',created_by:lead.user_id,revision:1}
 ];
 const wait=async()=>{for(let i=0;i<12;i++)await new Promise(resolve=>setTimeout(resolve,0));};
-async function setup(actor,mode='member'){
+async function setup(actor,mode='member',personalData=null){
  const {document,Event,CustomEvent,HTMLSelectElement}=parseHTML('<html><body><main id="root"></main></body></html>');
  Object.defineProperty(HTMLSelectElement.prototype,'value',{configurable:true,get(){return [...this.options].find(o=>o.hasAttribute('selected'))?.value||this.options[0]?.value||'';},set(value){for(const o of this.options)o.removeAttribute('selected');[...this.options].find(o=>o.value===String(value))?.setAttribute('selected','');}});
  let currentActor=actor;const calls=[],copies=[],transfers=[],downloads=[],exports=[],events=new Map();
  const data={raben_records:structuredClone(fixtures),raben_memberships:[lead,member],raben_site_content:[{id:1,revision:1,content:{name:'Schwarze Raben',extraInfos:[]}}],raben_content_versions:[{id:id(100),source_table:'raben_records',entity_key:characterId,kind:'character',title:'Alter Testcharakter',revision:1,operation:'insert',actor_name:'Test-Mitglied',changed_at:'2026-10-07T20:00:00Z',snapshot:{...fixtures[2],title:'Frühere Fassung'}}],raben_applications:[],raben_character_notes:[],raben_event_responses:[],raben_poll_votes:[],raben_task_claims:[],raben_clan_posts:[]};
+ data.raben_memberships.push(friend);data.raben_profiles=[];data.raben_profile_items=[];data.raben_profile_grants=[];
+ if(personalData)for(const name of ['raben_profiles','raben_profile_items','raben_profile_grants'])data[name]=structuredClone(personalData[name]);
  const files=new Map([['raben-media/'+privateAudio,new Blob([new Uint8Array([73,68,51,0])],{type:'audio/mpeg'})],['raben-public/'+releasedAudio,new Blob([new Uint8Array([73,68,51,0])],{type:'audio/mpeg'})]]);
  const inventory=()=>[...files].map(([key,blob])=>({bucket:key.split('/')[0],name:key.slice(key.indexOf('/')+1),size:blob.size,type:blob.type,used:key.endsWith(privateAudio),records:key.endsWith(privateAudio)?[{id:audioId,title:'Interne Aufnahme',kind:'media'}]:[],historyCount:0,website:false}));
  const value=(r,key)=>key.includes('->')?r.details?.[key.split(/->>?/)[1]]:r[key];
  const sb={auth:{getSession:async()=>({data:{session:currentActor?{access_token:'test-token'}:null},error:null})},from(table){
   const filters=[],orders=[];let operation='read',payload,offset=0,end=999,head=false,columns='*';
-  const visible=r=>table!=='raben_records'||r.visibility==='public'||currentActor?.status==='active'&&(currentActor.role==='admin'||r.visibility==='clan'||r.created_by===currentActor.user_id);
+  const visible=r=>{
+   if(table==='raben_profiles')return currentActor?.status==='active';
+   if(table==='raben_profile_grants')return currentActor?.status==='active'&&(r.owner_id===currentActor.user_id||r.grantee_id===currentActor.user_id);
+   if(table==='raben_profile_items')return currentActor?.status==='active'&&(r.owner_id===currentActor.user_id||r.visibility==='clan'||r.visibility==='selected'&&data.raben_profile_grants.some(g=>g.item_id===r.id&&g.grantee_id===currentActor.user_id));
+   return table!=='raben_records'||r.visibility==='public'||currentActor?.status==='active'&&(currentActor.role==='admin'||r.visibility==='clan'||r.created_by===currentActor.user_id);
+  };
   const query={
    select(c='*',options={}){columns=c;head=options.head;return query;},eq(k,v){filters.push(r=>value(r,k)===v);return query;},neq(k,v){filters.push(r=>value(r,k)!==v);return query;},in(k,values){filters.push(r=>values.includes(value(r,k)));return query;},not(k,_op,v){filters.push(r=>value(r,k)!=null);return query;},gte(k,v){filters.push(r=>value(r,k)>=v);return query;},lt(k,v){filters.push(r=>value(r,k)<v);return query;},contains(k,values){filters.push(r=>values.every(v=>value(r,k)?.includes(v)));return query;},ilike(k,text){filters.push(r=>String(value(r,k)||'').toLowerCase().includes(text.replaceAll('%','').toLowerCase()));return query;},textSearch(_k,text){filters.push(r=>(r.title+' '+r.body).toLowerCase().includes(text.toLowerCase()));return query;},order(k,options={}){orders.push([k,options]);return query;},range(a,b){offset=a;end=b;return query;},limit(n){end=n-1;return query;},insert(v){operation='insert';payload=v;return query;},update(v){operation='update';payload=v;return query;},delete(){operation='delete';return query;},single:async()=>{const r=await execute();return {...r,data:r.data?.[0]||null};},then(resolve,reject){return execute().then(resolve,reject);}
   };
@@ -45,6 +53,19 @@ async function setup(actor,mode='member'){
  },async rpc(name,args={}){
   calls.push({rpc:name,args});if(['raben_storage_inventory','raben_export_content','raben_restore_version','raben_restore_backup_item'].includes(name)&&currentActor?.role!=='admin')return {error:{code:'42501'}};
   if(name==='raben_storage_inventory')return {data:inventory(),error:null};
+  if(name==='raben_save_profile'){
+   let row=data.raben_profiles.find(p=>p.user_id===currentActor.user_id);
+   if(!row){row={user_id:currentActor.user_id,revision:0};data.raben_profiles.push(row);}
+   Object.assign(row,{display_name:args.p_name,revision:row.revision+1});return {data:structuredClone(row),error:null};
+  }
+  if(name==='raben_save_profile_item'){
+   let row=data.raben_profile_items.find(p=>p.id===args.p_id);
+   if(!row){row={id:id(500+data.raben_profile_items.length),owner_id:currentActor.user_id,revision:0,created_at:'2026-10-08T09:00:00Z'};data.raben_profile_items.push(row);}
+   Object.assign(row,{kind:args.p_kind,title:args.p_title,body:args.p_body,image_path:args.p_image_path,visibility:args.p_visibility,revision:row.revision+1});
+   data.raben_profile_grants=data.raben_profile_grants.filter(g=>g.item_id!==row.id);
+   if(args.p_visibility==='selected')for(const grantee_id of args.p_recipients)data.raben_profile_grants.push({item_id:row.id,owner_id:row.owner_id,grantee_id});
+   return {data:structuredClone(row),error:null};
+  }
   if(name==='raben_export_content')return {data:{application:'schwarze-raben',schemaVersion:1,siteContent:data.raben_site_content[0],records:data.raben_records,posts:[],notes:[],versions:data.raben_content_versions,files:inventory()},error:null};
   if(name==='raben_restore_version'){const version=data.raben_content_versions.find(v=>v.id===args.p_version),row=data.raben_records.find(r=>r.id===version.entity_key);if(String(row.revision)!==args.p_expected)return {error:{message:'record_conflict'}};Object.assign(row,version.snapshot,{revision:row.revision+1,visibility:'draft'});return {data:{source:version.source_table},error:null};}
   return {data:[],error:null};
@@ -65,10 +86,10 @@ async function setup(actor,mode='member'){
    async abort(){this.aborted=true;}
   }}
  };context.window=context;const sandbox=vm.createContext(context);
- for(const name of ['vendor/fflate-0.8.3.js','media.js','history.js','community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
- const root=document.getElementById('root');await (mode==='public'?context.RabenHub.mountPublic(root):mode==='admin'?context.RabenHub.mountAdmin(root,actor):context.RabenHub.mountMember(root,actor));await wait();
+ for(const name of ['vendor/fflate-0.8.3.js','media.js','history.js','profiles.js','community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
+ const root=document.getElementById('root');const hubContext=await (mode==='public'?context.RabenHub.mountPublic(root):mode==='admin'?context.RabenHub.mountAdmin(root,actor):context.RabenHub.mountMember(root,actor));await wait();
  const click=async text=>{const b=[...root.querySelectorAll('button')].find(b=>b.textContent===text&&!b.disabled);assert.ok(b,'Button: '+text);b.click();await wait();return b;};
- return {context,sandbox,document,Event,root,data,files,calls,copies,transfers,downloads,exports,click,setActor:value=>{currentActor=value;}};
+ return {context,sandbox,document,Event,root,hubContext,data,files,calls,copies,transfers,downloads,exports,click,setActor:value=>{currentActor=value;}};
 }
 const visitor=await setup(null,'public');
 assert.equal(visitor.root.querySelector('iframe'),null);assert.equal(visitor.root.querySelector('img'),null,'Text is never interpreted as HTML');
@@ -76,7 +97,7 @@ await visitor.click('Video laden');assert.match(visitor.root.querySelector('ifra
 assert.equal(visitor.root.querySelector('audio'),null);assert.ok(!visitor.root.textContent.includes('Interne Aufnahme'));assert.ok(!visitor.calls.some(c=>c.table==='raben_content_versions'||c.rpc==='raben_export_content'));
 assert.equal(visitor.context.RabenMedia.youtubeId('https://youtu.be/M7lc1UVf-VE?t=5'),'M7lc1UVf-VE');
 for(const link of ['javascript:alert(1)','https://youtube.com.evil.test/watch?v=M7lc1UVf-VE','https://example.com/M7lc1UVf-VE','https://user:pass@youtube.com/watch?v=M7lc1UVf-VE'])assert.equal(visitor.context.RabenMedia.youtubeId(link),'');
-const own=await setup(member);await own.click('Aufnahme laden');assert.equal(own.downloads[0].path,privateAudio);assert.match(own.root.querySelector('audio').src,/^blob:/);
+const own=await setup(member);await own.click('Medien');await own.click('Aufnahme laden');assert.equal(own.downloads[0].path,privateAudio);assert.match(own.root.querySelector('audio').src,/^blob:/);
 await own.click('Charakterbuch');assert.ok(own.root.textContent.includes('Video aus dem Norden'));assert.ok(own.root.textContent.includes('Interne Aufnahme'));
 await own.click('Bearbeiten');await wait();const selected=own.root.querySelector('.reference-order');assert.equal(selected.children.length,2);
 const down=[...selected.querySelectorAll('button')].find(b=>b.textContent==='↓'&&!b.disabled);down.click();
@@ -108,3 +129,33 @@ fixtures.push({id:id(25),kind:'media',title:'Öffentliche Aufnahme',body:'',deta
 const publicAudio=await setup(null,'public');assert.match(publicAudio.root.querySelector('audio').src,/\/object\/public\/raben-public\//);assert.equal(publicAudio.downloads.length,0);
 const ordinary=await setup(member);assert.equal(ordinary.root.querySelector('[data-kind="history"]'),null);assert.equal(ordinary.root.querySelector('[data-kind="backup"]'),null);
 console.log('PASS: click-to-load YouTube, safe URLs/text, private MP3 playback, ordered attachments, RP story links, MP3 upload/progress, admin publication, history restore, storage, backup UI and logout clearing.');
+const personal=await setup(member);assert.equal(personal.root.querySelector('[data-kind="profiles"]').getAttribute('aria-selected'),'true');
+await personal.click('Mein Profil erstellen');let profileForm=personal.root.querySelector('.profile-editor');profileForm.querySelector('input').value='Mein Rabenprofil';profileForm.dispatchEvent(new personal.Event('submit'));await wait();
+assert.equal(personal.data.raben_profiles[0].display_name,'Mein Rabenprofil');assert.ok(personal.root.textContent.includes('Charakter hinzufügen'));
+await personal.click('Infokarte hinzufügen');profileForm=personal.root.querySelector('.profile-editor');
+assert.equal(profileForm.querySelector('[data-profile-field="visibility"]').value,'private','Safe private default');
+profileForm.querySelector('input[type="text"]').value='Private Infos';profileForm.querySelector('textarea').value='<img src=x onerror=evil()> Persönliche Notiz';profileForm.dispatchEvent(new personal.Event('submit'));await wait();
+assert.equal(personal.data.raben_profile_items[0].visibility,'private');assert.equal(personal.root.querySelector('img'),null,'Profile info is plain text');
+await personal.click('Infokarte hinzufügen');profileForm=personal.root.querySelector('.profile-editor');profileForm.querySelector('input[type="text"]').value='Spielzeiten für den Clan';profileForm.querySelector('textarea').value='Ein abgesprochener RP-Abend';profileForm.querySelector('[data-profile-field="visibility"]').value='clan';profileForm.dispatchEvent(new personal.Event('submit'));await wait();
+await personal.click('Charakter hinzufügen');profileForm=personal.root.querySelector('.profile-editor');profileForm.querySelector('input[type="text"]').value='Geteilter Testcharakter';profileForm.querySelector('textarea').value='Nur für einen RP-Partner';const profileVisibility=profileForm.querySelector('[data-profile-field="visibility"]');profileVisibility.value='selected';profileVisibility.dispatchEvent(new personal.Event('change'));
+assert.equal(profileForm.querySelector('.profile-recipients').hidden,false);profileForm.dispatchEvent(new personal.Event('submit'));await wait();
+assert.ok(personal.root.textContent.includes('mindestens ein aktives Clanmitglied'),'Selected visibility needs recipients');assert.equal(personal.data.raben_profile_items.length,2);
+const recipient=[...profileForm.querySelectorAll('.profile-recipient-options input')].find(i=>i.value===friend.user_id);recipient.checked=true;recipient.dispatchEvent(new personal.Event('change'));
+const profilePic=new File([new Uint8Array([137,80,78,71])],'charakter.png',{type:'image/png'});Object.defineProperty(profileForm.querySelector('input[type="file"]'),'files',{value:[profilePic],configurable:true});profileForm.dispatchEvent(new personal.Event('submit'));await wait();
+const personalCharacter=personal.data.raben_profile_items.find(i=>i.kind==='character');assert.equal(personalCharacter.visibility,'selected');assert.equal(personal.data.raben_profile_grants[0].grantee_id,friend.user_id);
+const profileSave=personal.calls.find(c=>c.rpc==='raben_save_profile_item'&&c.args.p_kind==='character');assert.deepEqual([...profileSave.args.p_recipients],[friend.user_id]);
+assert.equal(personal.transfers[0].options.metadata.bucketName,'raben-profile-media');assert.equal(personal.transfers[0].options.storeFingerprintForResuming,false);
+assert.ok(personal.downloads.some(d=>d.bucket==='raben-profile-media'&&d.path===personalCharacter.image_path));assert.equal(personal.copies.length,0,'Profile images are never copied publicly');
+await personal.click('Profilbild hinzufügen');profileForm=personal.root.querySelector('.profile-editor');Object.defineProperty(profileForm.querySelector('input[type="file"]'),'files',{value:[new File([profilePic],'avatar.png',{type:'image/png'})],configurable:true});profileForm.dispatchEvent(new personal.Event('submit'));await wait();
+const avatarRow=personal.data.raben_profile_items.find(i=>i.kind==='avatar');assert.equal(avatarRow.visibility,'private');assert.equal(personal.root.querySelector('.profile-avatar').getAttribute('alt'),'Profilbild');
+// Editing an info item keeps the already downloaded portrait intact.
+const portraitUrl=personal.root.querySelector('.profile-avatar').src;const infoCard=personal.root.querySelector('[data-profile-item="'+personal.data.raben_profile_items[0].id+'"]');[...infoCard.querySelectorAll('button')].find(b=>b.textContent==='Bearbeiten').click();await wait();assert.equal(personal.root.querySelector('.profile-avatar').src,portraitUrl);await personal.click('Schließen');
+const adminProfiles=await setup(lead,'admin',personal.data);await adminProfiles.click('Clanprofile');adminProfiles.root.querySelector('.profile-directory-card').click();await wait();
+assert.ok(adminProfiles.root.textContent.includes('Spielzeiten für den Clan'));assert.ok(!adminProfiles.root.textContent.includes('Private Infos'));assert.ok(!adminProfiles.root.textContent.includes('Geteilter Testcharakter'));
+assert.equal(adminProfiles.root.querySelector('.profile-avatar'),null);assert.ok(![...adminProfiles.root.querySelectorAll('button')].some(b=>['Bearbeiten','Löschen','Profilname ändern','Charakter hinzufügen'].includes(b.textContent)),'Another admin has no profile editing controls');
+const friendProfiles=await setup(friend,'member',personal.data);friendProfiles.files.set('raben-profile-media/'+personalCharacter.image_path,profilePic);friendProfiles.root.querySelector('.profile-directory-card').click();await wait();
+assert.ok(friendProfiles.root.textContent.includes('Geteilter Testcharakter'));assert.ok(!friendProfiles.root.textContent.includes('Private Infos'));assert.equal(friendProfiles.root.querySelector('.profile-avatar'),null);
+friendProfiles.data.raben_profile_grants=[];await friendProfiles.context.RabenProfiles.audit(friendProfiles.hubContext);await wait();assert.ok(!friendProfiles.root.textContent.includes('Geteilter Testcharakter'),'Periodic audit removes revoked information');assert.equal(friendProfiles.root.querySelector('img'),null);
+personal.setActor({...member,status:'blocked'});personal.context.dispatchEvent(new personal.Event('raben-lock'));assert.ok(!personal.root.textContent.includes('Persönliche Notiz'));assert.equal(personal.root.querySelector('.profile-avatar'),null);
+assert.equal(visitor.root.querySelector('[data-kind="profiles"]'),null,'Profiles have no public tab');
+console.log('PASS: member profile creation, private default, multiple info/character entries, selected recipient validation, private resumable image uploads, avatar rendering, plain text, no admin controls/visibility override, revoked-grant refresh and logout clearing.');

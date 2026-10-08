@@ -89,6 +89,14 @@ try{
  const image=new File([new Uint8Array(13*1024*1024)],'hintergrund.png',{type:'image/png'});
  const imagePath=await t.context.RabenMedia.upload(t.ctx,image,null,controls);
  assert.equal([...uploads.values()].find(u=>u.metadata.objectName===imagePath).offset,image.size);
+ t.setMember({...actor,role:'member'});
+ const profileCtx={...t.ctx,admin:false};
+ const profilePath=await t.context.RabenMedia.upload(profileCtx,image,actor.user_id,controls,false,null,'raben-profile-media');
+ const profileTransfer=[...uploads.values()].find(u=>u.metadata.objectName===profilePath);
+ assert.equal(profileTransfer.metadata.bucketName,'raben-profile-media');assert.equal(profileTransfer.offset,image.size);
+ await assert.rejects(()=>t.context.RabenMedia.upload(profileCtx,audio,actor.user_id,controls,true,null,'raben-profile-media'),error=>error.code==='42501');
+ await assert.rejects(()=>t.context.RabenMedia.upload(profileCtx,image,'00000000-0000-4000-a000-000000000999',controls,false,null,'raben-profile-media'),error=>error.code==='42501');
+ t.setMember(actor);
  await t.context.RabenMedia.validateFile({name:'gross.png',type:'image/png',size:50*1024*1024},false);
  await assert.rejects(()=>t.context.RabenMedia.validateFile({name:'zu-gross.png',type:'image/png',size:50*1024*1024+1},false));
  await assert.rejects(()=>t.context.RabenMedia.validateFile({name:'zu-gross.mp3',size:20*1024*1024+1},true));
@@ -127,5 +135,5 @@ try{
  }
  t.setMember({...actor,status:'blocked'});
  await assert.rejects(()=>t.context.RabenMedia.upload(t.ctx,image,null,controls));
- console.log('PASS: real TUS/XHR authorization, multi-chunk MP3/images, network retry, pause/resume, 50 MB image limit, denied uploads, and desktop/mobile backgrounds.');
+ console.log('PASS: real TUS/XHR authorization, multi-chunk MP3/images/private member profile uploads, network retry, pause/resume, 50 MB image limit, denied uploads, and desktop/mobile backgrounds.');
 }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
