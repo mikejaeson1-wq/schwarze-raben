@@ -6,6 +6,7 @@
   let draft = null, revision = null, currentAdmin = null, editingPost = null, dirty = false, busy = false, epoch = 0;
   const effects = RabenEffects.create(document.getElementById("preview-canvas"), {type:"none"});
   let siteMediaPicker=null;const infoPickers=new WeakMap();
+  let imageUploadContext=null;const imageUploads=new WeakMap();
   const mediaContext=()=>({admin:true,public:false,actor:currentAdmin,epoch,disposed:false,authorize:ensureAdmin});
   const listSchemas = {
     mitglieder: {title:"Öffentliche Charaktervorstellungen", item:"Charakter", fields:[['name','Name'],['rolle','Rolle'],['beschreibung','Beschreibung','textarea']]},
@@ -16,6 +17,7 @@
   const message = (value,error=false) => status("admin-status",value,error);
   const markDirty = () => {dirty = true; document.querySelectorAll("[data-save-note]").forEach(n => n.textContent = "Noch nicht gespeichert");};
   const lock = () => {
+    if(imageUploadContext){imageUploadContext.disposed=true;window.RabenMedia?.release(imageUploadContext);imageUploadContext=null;}
     epoch++; currentAdmin = null; draft = null; revision = null; window.RabenHub?.lock();
     document.getElementById("admin-content").hidden = true; document.getElementById("admin-gate").hidden = false;
     document.getElementById("account").hidden = true; effects.update({type:"none"});
@@ -23,6 +25,7 @@
     document.getElementById("site-media-picker")?.replaceChildren();siteMediaPicker=null;
     document.getElementById("public-lists").replaceChildren(); document.querySelectorAll("#clan-form input, #clan-form textarea").forEach(n => n.value = "");
     document.getElementById("post-form").reset(); dirty = false;
+    document.querySelectorAll('[data-image]').forEach(input=>{input.value='';const controls=imageUploads.get(input);if(controls)controls.wrap.hidden=true;});
     const badge=document.getElementById("pending-count"); if(badge) badge.hidden=true;
   };
   const ensureAdmin = async () => {
@@ -111,19 +114,25 @@
   const upload = async input => {
     if (!draft || busy || !input.files?.length) return;
     const file=input.files[0], key=input.dataset.image, ownEpoch=epoch;
-    if(!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 8388608) {message("Bitte wähle ein JPG-, PNG- oder WebP-Bild mit maximal 8 MB.",true); input.value=""; return;}
+    if(!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 50*1024*1024) {message("Bitte wähle ein JPG-, PNG- oder WebP-Bild mit maximal 50 MB.",true); input.value=""; return;}
+    let controls=imageUploads.get(input);
+    if(!controls&&window.RabenMedia){controls=RabenMedia.progressControls();controls.retry=el('button','button outline small-button','Upload erneut versuchen');controls.retry.type='button';controls.retry.hidden=true;controls.retry.addEventListener('click',()=>upload(input));controls.wrap.append(controls.retry);input.closest('.image-editor').append(controls.wrap);imageUploads.set(input,controls);}
+    let completed=false;
     try {
       busy=true; input.disabled=true; message("Das Bild wird hochgeladen …");
       await ensureAdmin();
+      if(!window.RabenMedia)throw new Error('upload_unavailable');
+      imageUploadContext=mediaContext();controls.retry.hidden=true;
       const ext={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"}[file.type];
-      const path=crypto.randomUUID()+"."+ext;
-      await check(Raben.client().storage.from("raben-public").upload(path,file,{contentType:file.type,upsert:false}));
+      if(controls.file!==file){controls.file=file;controls.path=crypto.randomUUID()+"."+ext;}
+      const path=controls.path;
+      await RabenMedia.upload(imageUploadContext,file,currentAdmin.user_id,controls,false,path,'raben-public');
       if(epoch !== ownEpoch || !draft) return;
       const {data}=Raben.client().storage.from("raben-public").getPublicUrl(path);
       draft[key]=data.publicUrl;
       document.getElementById(key === "heroImage" ? "hero-preview" : "village-preview").src=data.publicUrl;
-      updatePreview(); markDirty(); message("Bild hochgeladen. Mit „Änderungen speichern“ übernimmst du es auf die Website.");
-    } catch(error) {message(Raben.errorMessage(error),true);} finally {busy=false; input.disabled=false; input.value="";}
+      updatePreview(); markDirty();completed=true;message("Bild hochgeladen. Mit „Änderungen speichern“ übernimmst du es auf die Website.");
+    } catch(error) {if(epoch===ownEpoch){message(window.RabenMedia?.errorMessage(error)||Raben.errorMessage(error),true);if(controls){controls.wrap.hidden=false;controls.retry.hidden=false;}}} finally {imageUploadContext=null;busy=false;input.disabled=false;if(completed)input.value="";}
   };
   const loadMembers = async () => {
     const ownEpoch=epoch; await ensureAdmin();

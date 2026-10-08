@@ -1,14 +1,14 @@
 "use strict";
 const CACHE_PREFIX = "schwarze-raben-admin-shell-";
-const CACHE_NAME = CACHE_PREFIX + "v5";
+const CACHE_NAME = CACHE_PREFIX + "v6";
 const APP = new URL("./", self.location.href);
 // Only public, version-controlled UI files. No API, auth callback or user data.
 const ASSETS = [
   "offline.html", "app.css?v=d91204f14160", "install.js?v=408e384acc86", "mobile.js?v=5be272988abf", "manifest.webmanifest", "qr.png",
   "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png",
   "../style.css?v=ac5de8590758", "../portal.css?v=ebc9f1a69173", "../config.js?v=910867e31876", "../default-content.js?v=62238572002b", "../app.js?v=3d3d13153bc3",
-  "../media.js?v=052d51216718", "../history.js?v=761284e479f1", "../vendor/tus-4.3.1.js?v=271385341110", "../vendor/fflate-0.8.3.js?v=df762372e3ff",
-  "../admin.js?v=fddd5fd2937c", "../community.js?v=092bb4618fea", "../community.css?v=bae273f19586", "../effects.js?v=e6386250d97b", "../favicon.svg", "../vendor/supabase-2.117.2.js?v=b51e7b9e308e"
+  "../media.js?v=2d300b2a7319", "../history.js?v=c0ccd844e374", "../vendor/tus-4.3.1.js?v=271385341110", "../vendor/fflate-0.8.3.js?v=df762372e3ff",
+  "../admin.js?v=78734934d50e", "../community.js?v=1c33a200764e", "../community.css?v=bae273f19586", "../effects.js?v=e6386250d97b", "../favicon.svg", "../vendor/supabase-2.117.2.js?v=b51e7b9e308e"
 ].map(path => new URL(path, APP).href);
 const STATIC_URLS = new Set(ASSETS);
 self.addEventListener("install", event => {

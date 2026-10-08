@@ -30,7 +30,7 @@ Die vier Ausbauschritte sind umgesetzt. Die Übersicht beschreibt die verfügbar
 - Titel, Beschreibung und optional ein Cover aus den vorhandenen Bildern hinzufügen.
 - Eigene Lieder, erzählte Sagen oder RP-Aufnahmen zu Medienbeiträgen, Charakteren und Geschichten zuordnen.
 - Dateien ersetzen oder entfernen; Uploadfortschritt und verständliche Fehlermeldungen anzeigen.
-- MP3-Dateien bis 20 MB und Bilder bis 8 MB hochladen. MP3-Dateien liegen im Medienspeicher und werden nicht ins öffentliche GitHub-Repository geschrieben.
+- MP3-Dateien bis 20 MB und Bilder bis 50 MB hochladen. MP3-Dateien liegen im Medienspeicher und werden nicht ins öffentliche GitHub-Repository geschrieben.
 
 ### Sichtbarkeit und Freigaben
 

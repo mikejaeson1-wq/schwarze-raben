@@ -10,7 +10,7 @@ Die öffentliche Website wird über GitHub Pages bereitgestellt. Supabase speich
 - **clan.html:** geschlossener Clanbereich mit RP-Kalender, Charakterbuch, Aufträgen, Bauprojekten, Wissen, Abstimmungen, Tagebuch und Handel.
 - **admin.html:** Verwaltung für freigegebene Admins.
 - **app/:** installierbare mobile Admin-App mit Discord-Anmeldung, eigenem App-Symbol und QR-Code zur Installationsanleitung.
-- **Bilder:** Startseiten-Hintergrund und Dorfbild austauschen; JPG, PNG, WebP bis 8 MB.
+- **Bilder:** Startseiten-Hintergrund und Dorfbild austauschen; JPG, PNG, WebP bis 50 MB.
 - **Effekte:** Schneefall, Glutpartikel oder keine Animation; Stärke und Geschwindigkeit einstellen.
 - **Inhalte:** Clanangaben, Dorfname, Geschichte, Charaktervorstellungen, öffentliche Aushänge, RP-Hinweise und zusätzliche Infos bearbeiten.
 - **Geschlossene Beiträge:** Informationen, Aushänge und Termine nur für Clanmitglieder.
@@ -206,7 +206,7 @@ Das Roadmap-Update ist in der Desktop-Verwaltung und in der installierten Admin-
 
 1. Öffne **Medien → Neu erstellen** und trage Titel und Beschreibung ein.
 2. Wähle **Bild**, **YouTube-Video** oder **MP3-Aufnahme**. Für YouTube einen HTTPS-Videolink einfügen, für MP3 eine echte Datei vom Computer oder Handy auswählen.
-3. Bei Video und Audio kannst du zusätzlich ein Cover hochladen. Bilder dürfen bis 8 MB, MP3-Dateien bis 20 MB groß sein.
+3. Bei Video und Audio kannst du zusätzlich ein Cover hochladen. Bilder dürfen bis 50 MB, MP3-Dateien bis 20 MB groß sein.
 4. Wähle die Sichtbarkeit und speichere. Mitglieder können einen Entwurf, einen Clanbeitrag oder einen Eintrag zur Freigabe erstellen. Nur Admins können **Öffentlich** wählen.
 5. Im Editor eines Charakters, Tagebuchberichts, Chronikeintrags oder anderen Beitrags unter **Medienanhänge** das Medium auswählen und **Hinzufügen** drücken. Mit den Pfeilen die Reihenfolge verändern. Eine Entfernung des Anhangs löscht die Originaldatei nicht.
 
@@ -260,3 +260,11 @@ Für umfangreiche Mediensicherungen am besten einen Computer verwenden. Wird ein
 Bestehende Installation: Zusätzlich die Migration `supabase/migrations/20261007205601_media_history_roadmap.sql` anwenden. Das veröffentlichte Clan-Projekt ist bereits aktualisiert. Bei einer neuen Installation zuerst `schema.sql` und `seed.sql`, anschließend die Gemeinschafts-Migration und danach diese Medien-Migration einrichten. Alle Tabellen und Funktionen gehören zum Namensraum `raben_`; andere Anwendungen werden nicht geändert.
 
 Die zusätzlichen Browser-Bibliotheken liegen lokal und fest versioniert im Repository. Die Admin-App aktualisiert ihre öffentlichen Oberflächendateien über den Service Worker. Interne Daten, Audiodateien, Bilder aus dem geschützten Speicher, Sicherungen und Discord-Rückkehradressen werden weiterhin nicht in dessen Cache aufgenommen. Falls die App nach dem Update noch offen war, einmal schließen und erneut öffnen.
+
+### Uploads und große Hintergrundbilder
+
+Bilder, Cover und Hintergrundbilder dürfen bis **50 MB** groß sein, MP3-Dateien weiterhin bis **20 MB**. Auch die Hintergrundbilder werden in fortsetzbaren Abschnitten übertragen. Der Fortschritt zeigt die übertragenen Bytes; bei 100 % wird noch die erfolgreiche Speicherung bestätigt.
+
+Wenn eine Verbindung abbricht, bleiben die gewählte Datei und die Eingaben auf der geöffneten Seite erhalten. Im Medienformular erneut **Speichern** anklicken; bei einem Hintergrundbild **Upload erneut versuchen**. Mit **Upload abbrechen** lässt sich die Übertragung pausieren. Nach dem Schließen oder Neuladen muss die Datei erneut ausgewählt werden. Fehlende Anmeldung, fehlende Rechte, Dateigröße und Format werden getrennt gemeldet.
+
+Für bestehende eigene Installationen außerdem `supabase/migrations/20261008081126_repair_uploads_and_large_images.sql` anwenden. Das veröffentlichte Clan-Projekt ist bereits aktualisiert. Bei einer Neueinrichtung diese Migration nach der Medien-Migration anwenden.

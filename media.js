@@ -5,14 +5,31 @@
   const mediaNames={image:'Bild',youtube:'YouTube',mp3:'MP3'};
   const states={draft:'Entwurf',clan:'Clanintern',review:'Zur Freigabe',public:'Öffentlich',archived:'Archiviert'};
   const uploads=new WeakMap();
+  const IMAGE_LIMIT=50*1024*1024,MP3_LIMIT=20*1024*1024;
   const btn=(text,fn,style='button outline small-button')=>{const b=el('button',style,text);b.type='button';if(fn)b.addEventListener('click',fn);return b;};
   const message=text=>el('p','field-note',text);
   const authorize=async ctx=>{
-    if(ctx.public)throw {code:'42501'};
-    if(ctx.authorize)return ctx.authorize();
-    const actor=await Raben.member();
-    if(!actor||actor.status!=='active'||(ctx.admin&&actor.role!=='admin')||(ctx.actor&&actor.user_id!==ctx.actor.user_id))throw {code:'42501'};
+    if(ctx.public||ctx.disposed)throw {code:'42501'};
+    const actor=ctx.authorize?await ctx.authorize():await Raben.member();
+    if(ctx.disposed||!actor||actor.status!=='active'||(ctx.admin&&actor.role!=='admin')||(ctx.actor&&actor.user_id!==ctx.actor.user_id))throw {code:'42501'};
     return actor;
+  };
+  const uploadMessage=error=>({
+    invalid_image:'Bitte wähle ein JPG-, PNG- oder WebP-Bild mit maximal 50 MB.',
+    invalid_mp3:'Bitte wähle eine echte MP3-Datei mit maximal 20 MB.',
+    upload_auth_required:'Die Upload-Anmeldung wurde abgelehnt. Melde dich erneut mit Discord an und versuche es noch einmal.',
+    upload_forbidden:'Die Zugriffsrechte erlauben diesen Upload nicht. Prüfe deine Clan- oder Admin-Freigabe.',
+    upload_size_limit:'Der Medienspeicher hat die Dateigröße abgelehnt. Bilder dürfen bis 50 MB, MP3-Dateien bis 20 MB groß sein.',
+    upload_type_rejected:'Der Medienspeicher hat das Dateiformat abgelehnt. Erlaubt sind JPG, PNG, WebP und MP3.',
+    upload_conflict:'Eine Datei liegt bereits an diesem Speicherplatz. Wähle die Datei neu aus und versuche es erneut.',
+    upload_interrupted:'Der Upload wurde unterbrochen. Deine Eingaben bleiben erhalten. Mit Speichern kannst du ihn fortsetzen.',
+    upload_unavailable:'Der Upload konnte nicht geladen werden. Bitte lade die Seite neu.'
+  })[error?.message]||'';
+  const uploadError=error=>{
+    const status=Number(error?.originalResponse?.getStatus?.()||0);
+    let body='';try{body=error?.originalResponse?.getBody?.()||'';}catch(_){}
+    const code=status===401||/Invalid Compact JWS|invalid.?jwt|expired.?token/i.test(body)?'upload_auth_required':status===403?'upload_forbidden':status===413||/EntityTooLarge|PayloadTooLarge|exceeded.*size/i.test(body)?'upload_size_limit':status===415||/InvalidMimeType|mime.*not.*allowed/i.test(body)?'upload_type_rejected':status===409||/Duplicate|already exists/i.test(body)?'upload_conflict':'upload_interrupted';
+    return new Error(code);
   };
   const youtubeId=value=>{
     try{
@@ -34,13 +51,13 @@
   const validateFile=async(file,audio)=>{
     if(!file||file.size===0)throw new Error('file_required');
     if(audio){
-      if(!/\.mp3$/i.test(file.name||'')||file.size>20971520)throw new Error('invalid_mp3');
+      if(!/\.mp3$/i.test(file.name||'')||file.size>MP3_LIMIT)throw new Error('invalid_mp3');
       const h=new Uint8Array(await file.slice(0,4).arrayBuffer());
       if(!(h[0]===73&&h[1]===68&&h[2]===51)&&!(h[0]===255&&(h[1]&224)===224))throw new Error('invalid_mp3');
       return {type:'audio/mpeg',extension:'mp3'};
     }
     const extension={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[file.type];
-    if(!extension||file.size>8388608)throw new Error('invalid_image');
+    if(!extension||file.size>IMAGE_LIMIT)throw new Error('invalid_image');
     return {type:file.type,extension};
   };
   const progressControls=()=>{
@@ -57,8 +74,6 @@
     let saved=uploads.get(file);
     if(!saved||saved.prefix!==prefix||(targetPath&&saved.path!==targetPath)||saved.bucket!==bucket){saved={prefix,bucket,path:targetPath||prefix+'/'+crypto.randomUUID()+'.'+format.extension,transfer:null};uploads.set(file,saved);}
     if(saved.complete)return saved.path;
-    const {data,error}=await Raben.client().auth.getSession();
-    if(error||!data.session?.access_token)throw {code:'42501'};
     ctx.transfers ||=new Set();
     const endpoint=new URL(Raben.config.supabaseUrl);endpoint.hostname=endpoint.hostname.replace('.supabase.co','.storage.supabase.co');
     if(controls){controls.wrap.hidden=false;controls.label.textContent='Upload wird vorbereitet …';controls.cancel.disabled=false;}
@@ -67,26 +82,28 @@
       if(!saved.transfer){
         saved.transfer=new tus.Upload(file,{
           endpoint:endpoint.origin+'/storage/v1/upload/resumable',
-          headers:{authorization:'Bearer '+data.session.access_token,apikey:Raben.config.supabasePublishableKey},
           metadata:{bucketName:bucket,objectName:saved.path,contentType:format.type,cacheControl:'0'},
-          chunkSize:6*1024*1024,retryDelays:[0,1500,3000,5000],uploadDataDuringCreation:true,
+          chunkSize:6*1024*1024,retryDelays:[0,3000,5000,10000,20000],uploadDataDuringCreation:true,
           storeFingerprintForResuming:false,removeFingerprintOnSuccess:true,
-          onBeforeRequest:async request=>{
-            await authorize(ctx);if(ctx.disposed)throw {code:'42501'};
-            const session=await Raben.client().auth.getSession();
-            if(session.error||!session.data.session)throw {code:'42501'};
-            request.setHeader('Authorization','Bearer '+session.data.session.access_token);
-          }
         });
       }
       // Retry reuses only this in-memory upload, never credentials in a file cache.
+      saved.transfer.options.onShouldRetry=error=>{const status=Number(error?.originalResponse?.getStatus?.()||0);return !ctx.disposed&&(!status||status>=500||[408,409,423,429].includes(status));};
+      saved.transfer.options.onBeforeRequest=async request=>{
+        await authorize(ctx);if(ctx.disposed)throw {code:'42501'};
+        const session=await Raben.client().auth.getSession();
+        if(session.error||!session.data.session?.access_token)throw new Error('upload_auth_required');
+        // XHR appends repeated headers, even with different capitalization.
+        // Set Authorization exactly once, using the current session token.
+        request.setHeader('Authorization','Bearer '+session.data.session.access_token);
+      };
       saved.transfer.options.onProgress=(loaded,total)=>{
         if(!controls||ctx.disposed)return;
         const percent=Math.round(loaded/Math.max(1,total)*100);controls.progress.value=percent;
-        controls.label.textContent=percent+' % · '+bytes(loaded)+' / '+bytes(total);
+        controls.label.textContent=percent>=100?'Datei übertragen. Speicherung wird bestätigt …':percent+' % · '+bytes(loaded)+' / '+bytes(total);
       };
       saved.transfer.options.onSuccess=()=>{saved.complete=true;done();if(controls){controls.progress.value=100;controls.label.textContent='Datei hochgeladen.';}resolve();};
-      saved.transfer.options.onError=()=>{done();if(controls)controls.label.textContent='Upload unterbrochen. Mit „Speichern“ erneut versuchen.';reject(new Error('upload_interrupted'));};
+      saved.transfer.options.onError=error=>{done();const issue=error?.message==='upload_auth_required'?error:uploadError(error);if(controls)controls.label.textContent=uploadMessage(issue);reject(issue);};
       saved.transfer.cancel=()=>{saved.transfer.abort().catch(()=>{});done();if(controls)controls.label.textContent='Upload pausiert. Mit „Speichern“ fortsetzen.';reject(new Error('upload_interrupted'));};
       if(controls)controls.cancel.onclick=saved.transfer.cancel;
       ctx.transfers.add(saved.transfer);saved.transfer.start();
@@ -109,7 +126,7 @@
     yt.type='url';yt.placeholder='https://youtu.be/…';yt.value=details.youtubeId?'https://www.youtube.com/watch?v='+details.youtubeId:'';yt.maxLength=1000;ytWrap.append(yt);
     const audioWrap=el('label','form-field full','MP3-Datei · maximal 20 MB'),audio=document.createElement('input');audio.type='file';audio.accept='.mp3,audio/mpeg';audioWrap.append(audio);
     const existing=message(details.fileName?'Aktuelle Datei: '+details.fileName:''),controls=progressControls();
-    const coverWrap=inputs.image?.parentNode;if(coverWrap)coverWrap.firstChild.textContent='Bild oder optionales Cover · JPG, PNG, WebP · maximal 8 MB';
+    const coverWrap=inputs.image?.parentNode;if(coverWrap)coverWrap.firstChild.textContent='Bild oder optionales Cover · JPG, PNG, WebP · maximal 50 MB';
     grid.append(ytWrap,audioWrap,existing,controls.wrap);
     const toggle=()=>{const type=inputs.mediaType.value;ytWrap.hidden=type!=='youtube';audioWrap.hidden=type!=='mp3';existing.hidden=type!=='mp3'||!details.fileName;};
     inputs.mediaType.addEventListener('change',toggle);toggle();
@@ -251,5 +268,5 @@
     const format=await validateFile(file,path.endsWith('.mp3'));if(!path.endsWith('.'+format.extension))throw new Error('invalid_media_path');
     return upload(ctx,file,path.split('/')[0],controls,path.endsWith('.mp3'),path,bucket);
   };
-  window.RabenMedia={uploadOriginal,youtubeId,publicAsset,validateFile,upload,publish,editSource,progressControls,release,releasePlayers,render,references,relations,picker,bytes,usage,UUID};
+  window.RabenMedia={uploadOriginal,youtubeId,publicAsset,validateFile,upload,publish,editSource,progressControls,release,releasePlayers,render,references,relations,picker,bytes,usage,UUID,errorMessage:uploadMessage};
 })();

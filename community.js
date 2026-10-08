@@ -25,6 +25,7 @@
   const formatDate=value=>/^\d{4}-\d{2}-\d{2}$/.test(value||'')?new Intl.DateTimeFormat('de-DE',{timeZone:'UTC',dateStyle:'medium'}).format(new Date(value+'T12:00:00Z')):'';
   const failure=error=>{
     const m=error?.message||'';
+    const uploadMessage=window.RabenMedia?.errorMessage(error);if(uploadMessage)return uploadMessage;
     if(m.includes('audio_file_required'))return 'Bitte wähle eine MP3-Datei für diese Aufnahme aus.';
     if(m.includes('image_required'))return 'Bitte lade ein Bild für diesen Medienbeitrag hoch.';
     if(m.includes('invalid_mp3'))return 'Bitte wähle eine echte MP3-Datei mit maximal 20 MB.';
@@ -85,7 +86,7 @@
   const upload=async(ctx,file,owner,controls)=>{
     if(window.RabenMedia)return RabenMedia.upload(ctx,file,owner,controls);
     await ensure(ctx);
-    if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>8388608)throw new Error('invalid_image');
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>50*1024*1024)throw new Error('invalid_image');
     const path=(owner||ctx.actor.user_id)+'/'+crypto.randomUUID()+'.'+({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[file.type]);
     await check(Raben.client().storage.from('raben-media').upload(path,file,{contentType:file.type,cacheControl:'0',upsert:false}));return path;
   };
@@ -130,7 +131,7 @@
     });
     const admin=ctx.actor.role==='admin',choices=admin?[['draft','Entwurf'],['clan','Clanintern'],['review','Zur Freigabe'],...(schema.public?[['public','Öffentlich']]:[]),['archived','Archiviert']]:[['draft','Mein Entwurf'],['clan','Im Clan teilen'],['review',schema.public?'Öffentliche Freigabe anfragen':'Admin-Prüfung anfragen'],['archived','Archivieren']];
     const visibility=field('Sichtbarkeit','select',row?.visibility==='public'&&!admin?'review':row?.visibility||'clan',choices);inputs.visibility=visibility.input;grid.append(visibility.wrap);
-    if(schema.image){const f=field('Bild, optional (JPG, PNG, WebP · maximal 8 MB)','file');f.input.accept='image/jpeg,image/png,image/webp';inputs.image=f.input;grid.append(f.wrap);}
+    if(schema.image){const f=field('Bild, optional (JPG, PNG, WebP · maximal 50 MB)','file');f.input.accept='image/jpeg,image/png,image/webp';inputs.image=f.input;grid.append(f.wrap);}
     const controls=kind==='media'?null:window.RabenMedia?.progressControls();if(controls)grid.append(controls.wrap);
     const source=kind==='media'?window.RabenMedia?.editSource(ctx,row,grid,inputs):null;
     const mediaPicker=window.RabenMedia?.picker(ctx,details.mediaIds||[],'Medienanhänge',{media:true,exclude:row?.id});
