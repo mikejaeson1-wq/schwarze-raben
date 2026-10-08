@@ -13,10 +13,20 @@ export async function prepareSettings(db,path) {
     create function net.http_post(url text,body jsonb default '{}',params jsonb default '{}',headers jsonb default '{}',timeout_milliseconds integer default 2000) returns bigint language sql as $$insert into net.http_request_queue(method,url,headers,body,timeout_milliseconds) values('POST',url,headers,body,timeout_milliseconds) returning id$$;
     create schema cron;create table cron.job(jobname text,schedule text,command text);
     create function cron.schedule(p_name text,p_schedule text,p_command text) returns bigint language sql as $$insert into cron.job values(p_name,p_schedule,p_command) returning 1::bigint$$;
+    create schema if not exists extensions;
+    create table raben_private.http_test_response(status integer,content text);
+    insert into raben_private.http_test_response values(200,'{}');
+    create table raben_private.http_test_calls(url text,body jsonb,content_type text);
+    create function extensions.http_set_curlopt(p_option text,p_value text) returns boolean language sql as $$select true$$;
+    create function extensions.http_post(p_url text,p_body text,p_content_type text) returns table(status integer,content text) language plpgsql as $$begin insert into raben_private.http_test_calls values(p_url,p_body::jsonb,p_content_type);return query select r.status,r.content from raben_private.http_test_response r;end;$$;
   `);
   for(const filename of (await readdir(path+'migrations')).filter(name=>name.includes('discord_webhook_part')).sort()) {
     const hosted=await readFile(path+'migrations/'+filename,'utf8');
     await db.exec(hosted.replace(/^create extension if not exists pg_(net|cron);$/gm,''));
+  }
+  for(const filename of (await readdir(path+'migrations')).filter(name=>name.includes('private_discord_http_')).sort()) {
+    const hosted=await readFile(path+'migrations/'+filename,'utf8');
+    await db.exec(hosted.replace(/^create extension if not exists http with schema extensions;$/gm,'').replace(/^drop extension if exists pg_net;$/gm,'drop schema net cascade;'));
   }
 }
 export async function verifySettingsAccess({db,as,denied,scalar,admin,member,other,blocked}) {
@@ -34,8 +44,8 @@ export async function verifySettingsAccess({db,as,denied,scalar,admin,member,oth
   await denied('select public.raben_assign_clan_roles($1,null,$2,false,false)',[member,[]]);
   await denied('select public.raben_discord_status()');
   await denied('select * from raben_private.discord_config');
-  await denied('select * from net.http_request_queue');
-  await denied('select * from net._http_response');
+  await denied('select * from raben_private.discord_outbox');
+  await denied('select * from vault.decrypted_secrets');
   await denied('select raben_private.dispatch_discord()');
   await as('authenticated',admin);
   assert.equal(Number(await scalar('select count(*) from public.raben_preferences')),0,'Admins cannot read other members preferences');
@@ -59,20 +69,21 @@ export async function verifySettingsAccess({db,as,denied,scalar,admin,member,oth
   const draft=await scalar("insert into public.raben_records(kind,title,body,visibility,details) values('poll','Geheime Abstimmung','Privater Text','draft',$1) returning id",[{options:['A','B']}]);
   await as('postgres',admin);
   assert.equal(Number(await scalar("select count(*) from raben_private.discord_outbox where source_key=$1",[draft])),0);
-  await db.query('select raben_private.dispatch_discord()');assert.equal(Number(await scalar('select count(*) from net.http_request_queue')),1);
-  const request=(await db.query('select * from net.http_request_queue')).rows[0];assert.equal(request.url,address);assert.equal(request.body.allowed_mentions.parse.length,0);assert.ok(!JSON.stringify(request.body).includes('Interner Text'));
-  await db.query('insert into net._http_response(id,status_code,content) values($1,429,$2)',[request.id,'{"retry_after":120}']);await db.query('select raben_private.dispatch_discord()');
+  await db.query("update raben_private.http_test_response set status=429,content='{"+'"retry_after":120'+"}'");
+  await db.query("set timezone='Europe/Berlin'");await db.query('select raben_private.dispatch_discord()');assert.equal(Number(await scalar('select count(*) from raben_private.http_test_calls')),1);
+  const request=(await db.query('select * from raben_private.http_test_calls')).rows[0];assert.equal(request.url,address+'?wait=true');assert.equal(request.content_type,'application/json');assert.equal(request.body.allowed_mentions.parse.length,0);assert.ok(!JSON.stringify(request.body).includes('Interner Text'));
   assert.equal(await scalar('select status from raben_private.discord_outbox where source_key=$1',[post]),'pending');
-  await db.query('delete from net._http_response');await db.query('update raben_private.discord_outbox set next_attempt=now()');await db.query('select raben_private.dispatch_discord()');
-  const retryId=await scalar('select request_id from raben_private.discord_outbox where source_key=$1',[post]);await db.query('insert into net._http_response(id,status_code,content) values($1,200,$2)',[retryId,'{}']);await db.query('select raben_private.dispatch_discord()');assert.equal(await scalar('select status from raben_private.discord_outbox where source_key=$1',[post]),'sent');
+  assert.ok(Number(await scalar('select extract(epoch from next_attempt-now()) from raben_private.discord_outbox where source_key=$1',[post]))>=119);
+  await db.query("update raben_private.http_test_response set status=200,content='{}'");await db.query('update raben_private.discord_outbox set next_attempt=now()');await db.query('select raben_private.dispatch_discord()');assert.equal(await scalar('select status from raben_private.discord_outbox where source_key=$1',[post]),'sent');
+  assert.equal(await scalar('select attempts from raben_private.discord_outbox where source_key=$1',[post]),2);
+  assert.ok(!JSON.stringify((await db.query('select * from raben_private.discord_outbox')).rows).includes(address));
   await as('authenticated',admin);await db.query("update public.raben_records set visibility='clan' where id=$1",[draft]);
   await as('postgres',admin);assert.equal(Number(await scalar("select count(*) from raben_private.discord_outbox where source_key=$1 and status='pending'",[draft])),1);
   await as('authenticated',admin);await db.query("update public.raben_records set visibility='draft' where id=$1",[draft]);
   await as('postgres',admin);assert.equal(Number(await scalar("select count(*) from raben_private.discord_outbox where source_key=$1 and status='pending'",[draft])),0);
   await as('authenticated',admin);await db.query('select public.raben_save_discord_webhook(null,false,$1,true)',[[]]);const cleared=await scalar('select public.raben_discord_status()');assert.equal(cleared.configured,false);
   await as('postgres',admin);assert.equal(Number(await scalar('select count(*) from vault.secrets')),0);
-  assert.equal(await scalar("select has_table_privilege('authenticated','net.http_request_queue','select')"),false);
-  assert.equal(await scalar("select has_table_privilege('anon','net.http_request_queue','select')"),false);
+  assert.equal(await scalar("select to_regnamespace('net')"),null);
   for(const actor of [blocked,other]) {await as('authenticated',actor);await denied('select public.raben_save_discord_webhook($1,true,$2,false)',[address,['posts']]);if(actor===blocked){await denied(save,[[],'system','#ffffff',16]);assert.equal(Number(await scalar('select count(*) from public.raben_clan_information')),0);}}
   await as('anon');await denied('select public.raben_save_preferences($1,$2,$3,$4)',[[],'system','#ffffff',16]);await denied('select public.raben_discord_status()');
   console.log('PASS: repeated self-only preference saves, validated typography, private admin preferences, read/edit clan info boundaries, atomic rank/office assignments, no privilege escalation, secret webhook protection, publish-only delivery, withdrawal, HTTP 429 retry and success.');
