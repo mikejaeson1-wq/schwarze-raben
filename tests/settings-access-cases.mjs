@@ -34,6 +34,8 @@ export async function verifySettingsAccess({db,as,denied,scalar,admin,member,oth
   await denied('select public.raben_assign_clan_roles($1,null,$2,false,false)',[member,[]]);
   await denied('select public.raben_discord_status()');
   await denied('select * from raben_private.discord_config');
+  await denied('select * from net.http_request_queue');
+  await denied('select * from net._http_response');
   await denied('select raben_private.dispatch_discord()');
   await as('authenticated',admin);
   assert.equal(Number(await scalar('select count(*) from public.raben_preferences')),0,'Admins cannot read other members preferences');
@@ -69,6 +71,8 @@ export async function verifySettingsAccess({db,as,denied,scalar,admin,member,oth
   await as('postgres',admin);assert.equal(Number(await scalar("select count(*) from raben_private.discord_outbox where source_key=$1 and status='pending'",[draft])),0);
   await as('authenticated',admin);await db.query('select public.raben_save_discord_webhook(null,false,$1,true)',[[]]);const cleared=await scalar('select public.raben_discord_status()');assert.equal(cleared.configured,false);
   await as('postgres',admin);assert.equal(Number(await scalar('select count(*) from vault.secrets')),0);
+  assert.equal(await scalar("select has_table_privilege('authenticated','net.http_request_queue','select')"),false);
+  assert.equal(await scalar("select has_table_privilege('anon','net.http_request_queue','select')"),false);
   for(const actor of [blocked,other]) {await as('authenticated',actor);await denied('select public.raben_save_discord_webhook($1,true,$2,false)',[address,['posts']]);if(actor===blocked){await denied(save,[[],'system','#ffffff',16]);assert.equal(Number(await scalar('select count(*) from public.raben_clan_information')),0);}}
   await as('anon');await denied('select public.raben_save_preferences($1,$2,$3,$4)',[[],'system','#ffffff',16]);await denied('select public.raben_discord_status()');
   console.log('PASS: repeated self-only preference saves, validated typography, private admin preferences, read/edit clan info boundaries, atomic rank/office assignments, no privilege escalation, secret webhook protection, publish-only delivery, withdrawal, HTTP 429 retry and success.');
