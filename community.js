@@ -155,7 +155,7 @@
       if(source)data=await source.collect(data);
       if(inputs.image?.files?.[0]){if(window.RabenPictures){const picture=await RabenPictures.upload(ctx,inputs.image.files[0],source?.controls||controls);data.imagePath=picture.imagePath;if(picture.thumbPath)data.thumbPath=picture.thumbPath;else delete data.thumbPath;}else data.imagePath=await upload(ctx,inputs.image.files[0],ctx.actor.user_id,source?.controls||controls);delete data.publicImage;delete data.publicThumb;details.imagePath=data.imagePath;delete details.publicImage;inputs.image.value='';}
       Object.keys(details).forEach(key=>delete details[key]);Object.assign(details,data);
-      if(inputs.visibility.value==='public'){if(kind==='media'&&(current?.visibility!=='public'||data.audioPath!==current?.details.audioPath||data.imagePath!==current?.details.imagePath||data.youtubeId!==current?.details.youtubeId)&&!confirm('Dieses Medium einschließlich Bild, Video oder MP3-Aufnahme öffentlich freigeben?'))return;data=await publishImage(ctx,data);}
+      if(inputs.visibility.value==='public'){if(kind==='media'&&(current?.visibility!=='public'||data.audioPath!==current?.details.audioPath||data.imagePath!==current?.details.imagePath||data.youtubeId!==current?.details.youtubeId||data.spotifyId!==current?.details.spotifyId||data.spotifyType!==current?.details.spotifyType)&&!confirm('Dieses Medium einschließlich Bild, Video, Spotify oder MP3-Aufnahme öffentlich freigeben?'))return;data=await publishImage(ctx,data);}
       if(ctx.disposed||!form.isConnected)return;
       const payload={title:inputs.title.value.trim(),body:inputs.body.value.trim(),details:data,visibility:inputs.visibility.value};
       const result=current?await check(Raben.client().from('raben_records').update(payload).eq('id',current.id).eq('revision',current.revision).select('id,kind,title,body,details,visibility,created_by,revision,updated_at')):await check(Raben.client().from('raben_records').insert({...payload,kind}).select('id,kind,title,body,details,visibility,created_by,revision,updated_at'));
@@ -334,7 +334,7 @@
     const af=field('Archivierte Einträge anzeigen','checkbox',false);ctx.archive=af.input;ctx.archiveWrap=af.wrap;ctx.archive.addEventListener('change',()=>loadList(ctx,true));
     const pf=field('Vergangene Termine anzeigen','checkbox',false);ctx.past=pf.input;ctx.pastWrap=pf.wrap;ctx.past.addEventListener('change',()=>loadList(ctx,true));bar.append(af.wrap,pf.wrap);
     const filters=el('div','hub-filters');
-    const type=field('Medienart','select','',[['','Alle Medien'],['image','Bilder'],['youtube','YouTube'],['mp3','MP3']]);ctx.typeFilter=type.input;ctx.typeWrap=type.wrap;
+    const type=field('Medienart','select','',[['','Alle Medien'],['image','Bilder'],['youtube','YouTube'],['spotify','Spotify'],['mp3','MP3']]);ctx.typeFilter=type.input;ctx.typeWrap=type.wrap;
     const visible=field('Sichtbarkeit','select','',[['','Alle sichtbaren Einträge'],['draft','Entwürfe'],['clan','Clanintern'],['review','Zur Freigabe'],['public','Öffentlich'],['archived','Archiviert']]);ctx.visibilityFilter=visible.input;ctx.visibilityWrap=visible.wrap;
     const category=field('Kategorie genau filtern','search');ctx.categoryFilter=category.input;ctx.categoryWrap=category.wrap;
     const story=field('Geschichte genau filtern','search');ctx.storyFilter=story.input;ctx.storyWrap=story.wrap;
