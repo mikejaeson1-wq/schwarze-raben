@@ -1,0 +1,28 @@
+.qol-list { display: grid; gap: 1rem; }
+.qol-card,.qol-panel { padding: 1rem; border: 1px solid var(--line); border-radius: 7px; background: #142027bb; margin-block: .75rem; min-width: 0; }
+.qol-card h4,.qol-panel h4 { margin-top: 0; }
+.qol-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,220px),1fr)); gap: .75rem; }
+.qol-actions,.theme-template-tools,.album-toolbar { display: flex; align-items: end; flex-wrap: wrap; gap: .65rem; margin-block: .75rem; }
+.theme-template-tools .form-field { flex: 1 1 220px; }
+.draft-recovery:not(:empty) { padding: .75rem; border: 1px solid var(--gold); border-radius: 5px; }
+.field-error,.contrast-warning { color: #ffc5b3 !important; }
+[aria-invalid=true] { outline: 2px solid #ffc5b3; outline-offset: 2px; }
+:focus-visible { outline: 2px solid #f2cf8e; outline-offset: 3px; }
+[aria-busy=true] { cursor: progress; }
+.album-image-order { padding-block: .5rem; display: flex; flex-wrap: wrap; gap: .35rem; }
+.timeline-list { list-style: none; padding-left: 1.25rem; border-left: 2px solid var(--gold); }
+.timeline-list li { position: relative; padding: .75rem 0 .75rem .75rem; }
+.timeline-list li::before { content: ''; position: absolute; left: -1.65rem; top: 1.2rem; width: .65rem; height: .65rem; background: var(--gold); border-radius: 50%; }
+.qol-table-wrap { overflow-x: auto; max-width: 100%; }
+.qol-table { width: 100%; border-collapse: collapse; }
+.qol-table th,.qol-table td { padding: .6rem; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.qol-table caption { text-align: left; padding-block: .5rem; color: var(--muted); }
+.availability-best { background: #244834; }
+.profile-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.calendar-feed-url { width: 100%; word-break: break-all; }
+.map-layer-controls { display: flex; flex-wrap: wrap; gap: .75rem; }
+.qol-map { position: relative; aspect-ratio: 16/10; overflow: hidden; touch-action: pan-x pan-y; background: #10191f; border: 1px solid var(--line); border-radius: 5px; }
+.qol-map > img { width: 100%; height: 100%; object-fit: fill; }
+.qol-map-marker { position: absolute; transform: translate(-50%,-50%); border: 1px solid #f1d49d; border-radius: 999px; min-width: 32px; min-height: 32px; background: #162127eb; color: #fff3d3; font-weight: bold; }
+.discord-preview { white-space: pre-wrap; overflow-wrap: anywhere; padding: 1rem; background: #1c2431; border-left: 3px solid var(--gold); }
+@media(max-width:720px) { .profile-compare { grid-template-columns: 1fr; } .qol-actions .button { min-height: 42px; } .qol-table th,.qol-table td { padding: .4rem; } }

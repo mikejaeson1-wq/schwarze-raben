@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 process.on('uncaughtException',error=>{console.error({message:error.message,code:error.code,query:error.query});process.exit(1);});
 const db=new PGlite();
 await db.exec(`
- create role anon; create role authenticated;
+ create role anon; create role authenticated; create role service_role bypassrls;
  create schema auth; create schema storage;
  create table auth.users(id uuid primary key);
  create table auth.identities(id uuid primary key default gen_random_uuid(),user_id uuid references auth.users,provider text,provider_id text,identity_data jsonb);
@@ -131,4 +131,6 @@ const {verifyImprovements}=await import('./improvement-access-cases.mjs');
 await verifyImprovements({db,as,denied,scalar,admin,member,other,blocked});
 const {verifyPresentationAccess}=await import('./presentation-access-cases.mjs');
 await verifyPresentationAccess({db,as,denied,scalar,admin,member,other,blocked});
+const {verifyQolAccess}=await import('./qol-access-cases.mjs');
+await verifyQolAccess({db,as,denied,scalar,admin,member,other,blocked});
 await db.close();

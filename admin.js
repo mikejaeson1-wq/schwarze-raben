@@ -3,7 +3,7 @@
   const {el,status,check} = Raben;
   const mobileApp = document.body.dataset.adminApp === "true";
   const asset = path => (mobileApp ? "../" : "") + path;
-  let draft = null, revision = null, currentAdmin = null, editingPost = null, dirty = false, busy = false, epoch = 0;
+  let postPreviewInstalled=false;let draft = null, revision = null, currentAdmin = null, editingPost = null, dirty = false, busy = false, epoch = 0;
   const effects = RabenEffects.create(document.getElementById("preview-canvas"), {type:"none"});
   let siteMediaPicker=null;const infoPickers=new WeakMap();
   let imageUploadContext=null;const imageUploads=new WeakMap();
@@ -181,6 +181,7 @@
     const ownEpoch=epoch; await ensureAdmin();
     const posts=await check(Raben.client().from("raben_clan_posts").select("id,title,body,category,event_date,updated_at,created_by,audience,speaker_id,speaker_name").order("created_at",{ascending:false}));
     if(!accountContext)await loadAccounts();
+    if(window.RabenDiscordChannels&&!postPreviewInstalled){postPreviewInstalled=true;const form=document.getElementById('post-form');RabenDiscordChannels.editorPreview({...accountContext,report:message},form,()=>({kind:'posts',title:form.querySelector('[name="title"]').value}));}
     if(window.RabenExpansion&&!postAudience){const form=document.getElementById('post-form');postAudience=RabenExpansion.field('RP-Ebene','select','ooc',[['ic','IC'],['ooc','OOC'],['mixed','IC / OOC']]);form.append(postAudience.wrap);postSpeaker=await RabenExpansion.characters(accountContext,form);}
     if(ownEpoch !== epoch) return;
     const root=document.getElementById("internal-posts"); root.replaceChildren();
@@ -206,7 +207,7 @@
   const resetPost = () => {editingPost=null; document.getElementById("post-form").reset(); document.getElementById("post-save").textContent="Beitrag veröffentlichen"; document.getElementById("post-cancel").hidden=true;};
   document.getElementById("post-form").addEventListener("submit",async event => {
     event.preventDefault(); const form=event.currentTarget,button=document.getElementById("post-save");
-    const content={title:form.elements.title.value.trim(),body:form.elements.body.value.trim(),category:form.elements.category.value,event_date:form.elements.event_date.value || null};
+    const content={title:form.querySelector('[name="title"]').value.trim(),body:form.elements.body.value.trim(),category:form.elements.category.value,event_date:form.elements.event_date.value || null};
     if(postAudience){content.audience=postAudience.input.value;content.speaker_id=postSpeaker?.input.value||null;}
     if(!content.title) return;
     try {button.disabled=true; await ensureAdmin();

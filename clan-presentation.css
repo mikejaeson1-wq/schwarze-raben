@@ -13,3 +13,11 @@
 .clan-info-image-fields { display: grid; gap: .8rem; padding: 1rem; border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
 .clan-info-preview { display: grid; gap: .8rem; border: 1px dashed var(--gold); padding: 1rem; border-radius: 8px; }
 @media(max-width:540px) { .clan-info-image { min-width: 45%; }.clan-info-image[data-position="left"] { margin-right: .75rem; }.clan-info-image[data-position="right"] { margin-left: .75rem; }.clan-info-preview { padding: .5rem; } }
+.clan-info-flow { column-count: var(--info-columns,1); column-gap: var(--info-column-gap,24px); }
+.clan-info-flow > p,.clan-info-flow > figure { break-inside: avoid; }
+.clan-info-flow .clan-info-image { margin-top: var(--info-image-spacing,16px); margin-bottom: var(--info-image-spacing,16px); }
+.clan-info-flow .clan-info-image[data-position=left] { margin-right: var(--info-image-spacing,16px); }
+.clan-info-flow .clan-info-image[data-position=right] { margin-left: var(--info-image-spacing,16px); }
+.clan-info-draggable { position: relative; cursor: grab; outline: 1px dashed var(--line); outline-offset: 3px; padding-bottom: 2.25rem; }
+.block-order-controls { position: absolute; right: .2rem; bottom: .2rem; display: flex; gap: .25rem; }
+@media(max-width:720px) { .clan-info-flow { column-count: 1; } }

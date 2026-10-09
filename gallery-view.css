@@ -28,3 +28,10 @@
 @media(max-width:720px) { .image-lightbox { padding: .6rem; height: 94dvh; max-height: 94dvh; } .lightbox-toolbar { flex-wrap: wrap; } .lightbox-toolbar h2 { flex-basis: 100%; } .lightbox-content { padding-inline: 2.7rem; } .lightbox-arrow { width: 36px; height: 56px; } .character-gallery { grid-template-columns: repeat(auto-fit,minmax(min(100%,160px),1fr)); } }
 @media(prefers-reduced-motion:reduce) { .lightbox-image.is-ready { animation: none; } }
 .reduce-motion .lightbox-image.is-ready { animation: none; }
+.lightbox-playback { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; padding: .5rem 1rem; }
+.lightbox-playback .form-field { display: flex; align-items: center; gap: .5rem; margin: 0; }
+.lightbox-playback input[type=number] { width: 4.5rem; }
+.lightbox-playback input[type=checkbox] { width: auto; }
+.lightbox-no-motion .lightbox-image { animation: none !important; transition: none !important; transform: none !important; }
+.image-lightbox:fullscreen { max-width: none; max-height: none; width: 100vw; height: 100dvh; }
+.image-lightbox:fullscreen .lightbox-stage { flex: 1; }

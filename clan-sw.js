@@ -1,0 +1,6 @@
+'use strict';
+// This worker handles push only. Personal pages, APIs and calendar tokens are never cached.
+self.addEventListener('install',()=>self.skipWaiting());
+self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
+self.addEventListener('push',event=>{let data={};try{data=event.data?.json()||{};}catch(_){}const id=/^[a-f0-9-]{36}$/.test(data.recordId||'')?data.recordId:'';event.waitUntil(self.registration.showNotification('Schwarze Raben · RP-Erinnerung',{body:'Dein gewählter RP-Termin beginnt bald. Öffne den Clanbereich für die Details.',icon:new URL('favicon.svg',self.registration.scope).href,tag:'raben-event-'+id,data:{url:new URL('clan.html'+(id?'?eintrag='+id:''),self.registration.scope).href}}));});
+self.addEventListener('notificationclick',event=>{event.notification.close();const destination=new URL(event.notification.data?.url||'clan.html',self.registration.scope);if(destination.origin!==self.location.origin)return;event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(async clients=>{const existing=clients.find(c=>c.url.startsWith(self.registration.scope)&&c.url.includes('/clan.html'));if(existing){await existing.navigate(destination.href);return existing.focus();}return self.clients.openWindow(destination.href);}));});

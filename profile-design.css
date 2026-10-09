@@ -1,10 +1,11 @@
-.profile-header.profile-with-banner { position: relative; min-height: 260px; align-items: end; isolation: isolate; background: #162127; overflow: hidden; }
-.profile-with-banner::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg,#10191ff5,#10191f25 100%),var(--profile-banner,none) center / cover; opacity: var(--profile-banner-opacity,1); pointer-events: none; }
-.profile-with-banner .profile-intro { padding: .75rem; background: #10191fbd; border-radius: 6px; }
-.profile-banner-preview { position: relative; isolation: isolate; padding: 1.5rem; min-height: 180px; background: #162127; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.profile-header.profile-with-banner { position: relative; min-height: var(--profile-banner-height,260px); align-items: end; isolation: isolate; background: transparent; overflow: hidden; }
+.profile-with-banner::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--profile-banner,none) var(--profile-banner-x,50%) var(--profile-banner-y,50%) / cover; transform: scale(var(--profile-banner-zoom,1)); transform-origin: var(--profile-banner-x,50%) var(--profile-banner-y,50%); opacity: var(--profile-banner-opacity,1); pointer-events: none; }
+.profile-with-banner .profile-intro { position: relative; isolation: isolate; padding: .75rem; background: transparent; border-radius: 6px; }
+.profile-with-banner .profile-intro::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: #10191f; opacity: var(--profile-banner-box-opacity,.74); pointer-events: none; }
+.profile-banner-preview { position: relative; isolation: isolate; padding: 1.5rem; min-height: var(--profile-banner-height,260px); display: flex; align-items: end; background: transparent; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
 .profile-banner-preview.banner-removed::before { background: none; }
-.profile-styled { isolation: isolate; position: relative; border-color: var(--profile-accent); background: var(--profile-background); color: var(--profile-text); font-family: var(--profile-font); overflow: hidden; }
-.profile-styled::before { content: ''; position: absolute; inset: 0; z-index: -2; background: var(--profile-image,none) center top / cover; pointer-events: none; }
+.profile-styled { isolation: isolate; position: relative; border-color: var(--profile-accent); background: transparent; color: var(--profile-text); font-family: var(--profile-font); overflow: hidden; }
+.profile-styled::before { content: ''; position: absolute; inset: 0; z-index: -2; background: var(--profile-background); background-image: var(--profile-image,none); background-position: center top; background-size: cover; opacity: var(--profile-image-opacity,1); pointer-events: none; }
 .profile-styled::after { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--profile-panel); opacity: var(--profile-overlay,.85); pointer-events: none; }
 .profile-styled :is(.hub-body,.field-note,dd) { color: var(--profile-text); }
 body .profile-styled :is(h3,h4,h5,dt) { color: var(--profile-heading); font-family: var(--profile-font); }
@@ -14,4 +15,4 @@ body .profile-styled :is(h3,h4,h5,dt) { color: var(--profile-heading); font-fami
 .profile-design-editor .reading-group { width: 100%; }
 .profile-design-editor .reading-group[hidden] { display: none; }
 .profile-styled .form-field input,.profile-styled .form-field textarea { color: var(--profile-text); background: var(--profile-panel); }
-@media(max-width:720px) { .profile-header.profile-with-banner { min-height: 240px; } .profile-with-banner .profile-intro { padding: .5rem; } }
+@media(max-width:720px) { .profile-header.profile-with-banner { min-height: var(--profile-banner-height,260px); } .profile-with-banner .profile-intro { padding: .5rem; } }

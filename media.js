@@ -69,8 +69,8 @@
   const upload=async(ctx,file,owner,controls=null,audio=false,targetPath=null,bucket='raben-media')=>{
     const actor=await authorize(ctx),format=await validateFile(file,audio);
     if(ctx.disposed)throw {code:'42501'};
-    if(!['raben-media','raben-public','raben-profile-media','raben-clan-info-media'].includes(bucket))throw {code:'42501'};
-    if(bucket==='raben-clan-info-media'&&(actor.role!=='admin'||audio||targetPath||(owner&&owner!==actor.user_id)))throw {code:'42501'};
+    if(!['raben-media','raben-public','raben-profile-media','raben-clan-info-media','raben-map-media'].includes(bucket))throw {code:'42501'};
+    if(['raben-clan-info-media','raben-map-media'].includes(bucket)&&(actor.role!=='admin'||audio||targetPath||(owner&&owner!==actor.user_id)))throw {code:'42501'};
     if(bucket==='raben-profile-media'&&(audio||targetPath||(owner&&owner!==actor.user_id)))throw {code:'42501'};
     if(!window.tus?.Upload)throw new Error('upload_unavailable');
     if(targetPath&&(actor.role!=='admin'||!['raben-media','raben-public'].includes(bucket)))throw {code:'42501'};

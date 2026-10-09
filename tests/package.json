@@ -2,6 +2,6 @@
   "name": "schwarze-raben-verification",
   "private": true,
   "type": "module",
-  "scripts": {"test": "node roadmap-access.mjs && node roadmap-ui.mjs && node upload-transfer.mjs"},
+  "scripts": {"test": "node roadmap-access.mjs && node roadmap-ui.mjs && node upload-transfer.mjs && node --experimental-vm-modules qol-edge.mjs"},
   "devDependencies": {"@electric-sql/pglite": "0.5.8", "linkedom": "0.18.13"}
 }

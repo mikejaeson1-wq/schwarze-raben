@@ -1,85 +1,83 @@
-# Schwarze Raben · Neue Roadmap mit 20 geplanten Verbesserungen
+# Schwarze Raben · Neue Roadmap mit 20 künftigen Verbesserungen
 
-Stand: 09. Oktober 2026. Alle Punkte sind für künftige Updates geplant; die Prioritäten sind keine festen Termine.
+Stand: 09. Oktober 2026 · nach Update 2026.10.09.3. Alle Punkte sind geplant; die Reihenfolge ist kein fester Veröffentlichungstermin. Die vorherige Roadmap ist vollständig umgesetzt und in ROADMAP_20261009_ARCHIV.md dokumentiert.
 
-1. **Banner zuschneiden und Bildfokus wählen** (Profilgestaltung · Als Nächstes)
+1. **Änderungen während der Eingabe rückgängig machen** (Bearbeitung · Als Nächstes)
 
-   Bannerhöhe, Ausschnitt und sichtbaren Bildmittelpunkt direkt in einer Vorschau einstellen.
+   Absätze und Feldänderungen noch vor dem Speichern schrittweise rückgängig machen und wiederholen.
 
-2. **Bilder und Text per Drag-and-drop anordnen** (Claninfos · Als Nächstes)
+2. **Bildfokus mit Maus und Touch verschieben** (Profilgestaltung · Als Nächstes)
 
-   Absätze und Bilder verschieben, Bildabstände einstellen und mehrspaltige Vorlagen für längere Claninfos nutzen.
+   Den Bannerfokus direkt am Bild ziehen und mehrere Ausschnitte für Handy und Desktop speichern.
 
-3. **Eigene Alben und Bildreihenfolgen** (Galerie · Als Nächstes)
+3. **Mehrere Bilder gleichzeitig organisieren** (Galerie · Als Nächstes)
 
-   Charakterbilder in benannte Alben ordnen und ihre Reihenfolge per Drag-and-drop ändern.
+   Bilder gemeinsam auswählen, in Alben verschieben und vor dem Entfernen eine Übersicht der Auswahl sehen.
 
-4. **Diashow und Vollbildmodus** (Galerie · Als Nächstes)
+4. **Eigene Bildbeschreibungen ergänzen** (Barrierefreiheit · Als Nächstes)
 
-   Freigegebene Bilder mit einstellbarem Zeitabstand als Diashow zeigen; Vollbild und Animation separat steuern.
+   Für Bilder getrennte Alternativtexte pflegen, unabhängig von der sichtbaren Bildunterschrift.
 
-5. **Eigene Themes als Vorlagen speichern** (Profile · Als Nächstes)
+5. **Vorschauqualität selbst wählen** (Bilder · Danach)
 
-   Persönliche Gestaltungen speichern, duplizieren und gezielt für weitere Charaktere übernehmen.
+   Zwischen sparsamen und detailreichen Vorschauen wechseln und die erwartete Dateigröße sehen.
 
-6. **Private Entwürfe automatisch sichern** (Bearbeitung · Als Nächstes)
+6. **Eigene Theme-Vorlagen gezielt importieren** (Themes · Danach)
 
-   Ungespeicherte Texte geschützt zwischenspeichern und nach einem Verbindungsabbruch auf dem eigenen Konto wieder aufnehmen.
+   Exportierte eigene Vorlagen prüfen und einzelne Designs samt Bildern in das eigene Profil übernehmen.
 
-7. **Eigene Profilversionen und Rückgängig** (Profile · Danach)
+7. **Textkonflikte gemeinsam auflösen** (Zusammenarbeit · Als Nächstes)
 
-   Frühere Fassungen eigener Charaktere und Infokarten vergleichen und wiederherstellen; die bisherigen Freigaben bleiben geschützt.
+   Bei gleichzeitigen Änderungen die Unterschiede markieren und Texte absatzweise zusammenführen.
 
-8. **Gezielte Mitbearbeitung von Einträgen** (Zusammenarbeit · Danach)
+8. **Änderungsvorschläge mit Freigabe** (Mitbearbeitung · Danach)
 
-   Ausgewählten Mitgliedern Bearbeitungsrechte für einen konkreten Eintrag geben, ohne ihnen allgemeine Adminrechte zu gewähren.
+   Mitbearbeiter können optional Vorschläge einreichen, die der Besitzer vor der Übernahme prüft.
 
-9. **Gemeinsame Terminfindung** (Kalender · Danach)
+9. **Eigene Zeitfenster vorschlagen** (Terminfindung · Danach)
 
-   Verfügbare Spielzeiten für einen RP-Abend sammeln und die Überschneidungen übersichtlich anzeigen.
+   Mitglieder ergänzen freie Zeiträume; die Terminfindung berechnet Überschneidungen auch ohne vorgegebene Kandidaten.
 
-10. **Abonnierbare Kalender mit Widerruf** (Kalender · Danach)
+10. **Einzelne Serientermine verschieben** (Kalender · Als Nächstes)
 
-   Zusätzlich zum ICS-Export persönliche Kalenderfeeds anbieten, deren Zugang sich jederzeit wieder entziehen lässt.
+   Für einzelne Termine Datum, Uhrzeit oder Dauer ändern, ohne die gesamte Serie neu anzulegen.
 
-11. **Erinnerungen je RP-Termin** (Hinweise · Danach)
+11. **Aufbau- und Abbauzeiten berücksichtigen** (Reservierungen · Danach)
 
-   Eigene Vorlaufzeiten für ausgewählte Termine festlegen und auf Wunsch Gerätebenachrichtigungen erhalten.
+   Zusätzliche Puffer vor und nach einer Buchung festlegen und bei Überschneidungen berücksichtigen.
 
-12. **Orte und Ressourcen reservieren** (Organisation · Danach)
+12. **Geräte benennen und Zustellung prüfen** (Geräte · Als Nächstes)
 
-   Für Termine Spielorte oder gemeinsame Ressourcen buchen und zeitliche Überschneidungen erkennen.
+   Geräten eigene Namen geben und auf ausdrücklichen Wunsch eine Testbenachrichtigung auslösen.
 
-13. **Persönliche Charakter-Zeitleisten** (Geschichten · Danach)
+13. **Ablaufdatum für Kalenderlinks** (Kalender-Abos · Danach)
 
-   Freigegebene Tagebucheinträge, Plots und Ereignisse in einer Zeitleiste des jeweiligen Charakters zusammenführen.
+   Persönliche Abos zusätzlich zeitlich begrenzen und vor ihrem Ablauf auf Wunsch einen Hinweis erhalten.
 
-14. **Mehrere Karten und Kartenebenen** (Dorfplan · Später)
+14. **Zeitleisten nach Themen filtern** (Geschichten · Danach)
 
-   Zwischen Weltkarte, Dorfplan und Gebäudeansichten wechseln; Orte nach Themen ein- und ausblenden.
+   Ereignisse nach Typ, Zeitraum und Handlungsfaden filtern und einzelne Ansichten speichern.
 
-15. **Rezepte und Materialplanung** (Lager · Später)
+15. **Zoom und Touch-Gesten für alle Karten** (Karten · Als Nächstes)
 
-   Materiallisten für wiederkehrende Bauvorhaben als Vorlagen speichern und benötigte Mengen berechnen.
+   Welt- und Gebäudekarten vergrößern, mit zwei Fingern bewegen und zum Ausgangsausschnitt zurückkehren.
 
-16. **Angebote, Gesuche und Abschlussstatus** (Handel · Später)
+16. **Rezeptversionen und Verpackungseinheiten** (Materialplanung · Später)
 
-   Handelseinträge um Mengen, Tauschbedingungen, Anfragen und einen nachvollziehbaren Abschluss erweitern.
+   Materialvorlagen versionieren und Bedarf auf Bündel, Kisten oder andere Ausgabegrößen aufrunden.
 
-17. **Meldungsvorschau und mehrere Kanäle** (Discord · Später)
+17. **Handelsabschlüsse mit Lagerbuchungen verbinden** (Handel · Später)
 
-   Ankündigungen vor dem Versand ansehen und unterschiedliche Kategorien gezielt an ausgewählte Clan-Kanäle senden.
+   Erfüllte Handelsanfragen optional mit geprüften Ein- oder Auslagerungen verknüpfen.
 
-18. **Schnellere Seiten und Ladeanzeigen** (Mobil · Als Nächstes)
+18. **Meldungen vor dem Versand gezielt freigeben** (Discord · Danach)
 
-   Große Listen schrittweise laden, Bildvorschauen nach Bedarf nachladen und laufende Vorgänge auf kleinen Displays klarer anzeigen.
+   Für ausgewählte Kategorien eine zusätzliche Prüfung der wartenden Meldung anbieten und den Versand einzeln pausieren.
 
-19. **Kontrast- und Tastaturprüfung** (Bedienung · Als Nächstes)
+19. **Dialoge und Fokus auf kleinen Displays verbessern** (Bedienung · Als Nächstes)
 
-   Gespeicherte Themefarben auf Lesbarkeit prüfen und Formularfehler, Fokusführung und Screenreader-Beschriftungen verbessern.
+   Lange Dialoge übersichtlicher gliedern, Tastaturfokus nach Teiländerungen erhalten und Touch-Ziele prüfen.
 
-20. **Featurewünsche und Fehlerberichte** (Weiterentwicklung · Als Nächstes)
+20. **Verbindungsprobleme früher erkennen** (Stabilität · Als Nächstes)
 
-   Im Clan Vorschläge einreichen, unterstützte Roadmap-Punkte markieren und Fehler mit einem sichtbaren Bearbeitungsstatus verfolgen.
-
-Bereits abgeschlossene Funktionen: [ROADMAP_ARCHIV.md](ROADMAP_ARCHIV.md). Aktuelle Änderungen: im Clanbereich unter **Patchnotes**.
+   Lange Ladezeiten und fehlgeschlagene Vorgänge klar anzeigen und sichere Wiederholungen direkt anbieten.

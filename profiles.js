@@ -139,7 +139,7 @@
     if(unavailable.length)recipients.append(note('Eine frühere Freigabe gehört zu einem nicht mehr aktiven Mitglied und wird beim Speichern entfernt.'));
     const toggle=()=>{help.textContent=explanations[visibility.value];recipients.hidden=visibility.value!=='selected';};visibility.addEventListener('change',toggle);toggle();drawRecipients();form.append(visibilityWrap,help,recipients);
     const extra=await window.RabenProfileTools?.prepare(ctx,kind,item,form);if(!live(ctx,epoch))return;
-    const save=button('Speichern',null,'button small-button');save.type='submit';const actions=el('div','hub-inline-actions');actions.append(save,button('Schließen',()=>closeEditor(ctx)));form.append(actions);
+    let draft;const save=button('Speichern',null,'button small-button');save.type='submit';const actions=el('div','hub-inline-actions');actions.append(save,button('Schließen',()=>closeEditor(ctx)));form.append(actions);
     form.addEventListener('submit',event=>{event.preventDefault();act(ctx,save,async attempt=>{
       const recipients=visibility.value==='selected'?[...selected]:[];
       if(visibility.value==='selected'&&(!recipients.length||recipients.length>20))throw new Error('invalid_profile_recipients');
@@ -147,9 +147,9 @@
       let preview=item?.preview_path||null;const chosenFile=file?.input.files?.[0];if(chosenFile){if(window.RabenPictures){const image=await RabenPictures.upload(ctx,chosenFile,progress,BUCKET);path=image.imagePath;preview=image.thumbPath;}else path=await RabenMedia.upload(ctx,chosenFile,ctx.actor.user_id,progress,false,null,BUCKET);}if(!path)preview=null;
       if(!live(ctx,attempt)||!form.isConnected)return;if(kind==='avatar'&&!path)throw new Error('file_required');
       let payload={p_id:item?.id||null,p_kind:kind,p_title:kind==='avatar'?'Profilbild':title.input.value.trim(),p_body:kind==='avatar'?'':body.input.value.trim(),p_image_path:path,p_visibility:visibility.value,p_recipients:recipients,p_expected:item?.revision??null};if(window.RabenProfileTools){payload={...payload,p_details:item?.details||{},p_gallery:[],p_preview:preview};if(extra)payload=await extra.collect(payload,progress);}await check(Raben.client().rpc(payload.p_design?'raben_save_designed_profile_entry':window.RabenProfileTools?'raben_save_profile_entry':'raben_save_profile_item',payload));
-      if(!live(ctx,attempt))return;ctx.dirty=false;if(item?.image_path&&item.image_path!==path)await tidy(ctx,item.image_path,attempt);
+      if(!live(ctx,attempt))return;await draft?.clear();ctx.dirty=false;if(item?.image_path&&item.image_path!==path)await tidy(ctx,item.image_path,attempt);
       await mount(ctx);ctx.report(fields[kind]+' gespeichert · '+visibilityNames[visibility.value]+'.');
-    });});editStart(ctx,form);
+    });});editStart(ctx,form);draft=await window.RabenQol?.draft(ctx,form,'profile:'+kind+':'+(item?.id||'new'),item?.revision??null);
   };
   const itemActions=(ctx,profile,item)=>{
     const actions=el('div','hub-inline-actions'),edit=button('Bearbeiten',()=>act(ctx,edit,()=>openItem(ctx,profile,item.kind,item)));
@@ -161,7 +161,7 @@
   };
   const showProfile=async(ctx,userId,epoch)=>{
     const [profiles,items]=await Promise.all([
-      check(Raben.client().from('raben_profiles').select('user_id,display_name,avatar_path,banner_path,banner_opacity,revision').eq('user_id',userId).limit(1)),
+      check(Raben.client().from('raben_profiles').select('user_id,display_name,avatar_path,banner_path,banner_opacity,banner_layout,revision').eq('user_id',userId).limit(1)),
       check(Raben.client().from('raben_profile_items').select(window.RabenProfileTools?'id,owner_id,kind,title,body,image_path,preview_path,details,visibility,revision,created_at':'id,owner_id,kind,title,body,image_path,visibility,revision,created_at').eq('owner_id',userId).order('created_at').order('id'))
     ]);
     if(!live(ctx,epoch))return;ctx.profileSnapshot=snapshot(profiles[0],items);ctx.list.replaceChildren();const profile=profiles[0];
@@ -179,7 +179,7 @@
       const rows=items.filter(i=>i.kind===kind),grid=el('div','profile-item-grid');
       rows.forEach(item=>{const card=el('article','hub-card profile-item');card.dataset.profileItem=item.id;
         if(own)card.append(el('p','profile-visibility',visibilityNames[item.visibility]));card.append(el('h4','',item.title));if(item.body)card.append(el('p','hub-body',item.body));
-        if(own)card.append(itemActions(ctx,profile,item));grid.append(card);if(item.image_path){image(ctx,item,card);if(window.RabenGallery)card.append(RabenGallery.opener(ctx,{path:item.image_path,title:item.title},'Bild in Großansicht'));window.RabenExpansion?.comments(ctx,'portrait',item.id,card,item.owner_id);}window.RabenExpansion?.comments(ctx,'profile',item.id,card,item.owner_id);window.RabenProfileTools?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));if(kind==='character')window.RabenProfileDesign?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));
+        if(own)card.append(itemActions(ctx,profile,item));grid.append(card);if(item.image_path){image(ctx,item,card);if(window.RabenGallery)card.append(RabenGallery.opener(ctx,{path:item.image_path,title:item.title},'Bild in Großansicht'));window.RabenExpansion?.comments(ctx,'portrait',item.id,card,item.owner_id);}window.RabenExpansion?.comments(ctx,'profile',item.id,card,item.owner_id);window.RabenProfilePlus?.tools(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));window.RabenProfileTools?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));if(kind==='character')window.RabenProfileDesign?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));
       });
       if(!rows.length)grid.append(note(own?(kind==='character'?'Erstelle einen oder mehrere Charaktere. Jeder hat seine eigene Sichtbarkeit.':'Ergänze zum Beispiel RP-Vorlieben, Spielzeiten oder persönliche Notizen. Neue Einträge sind zunächst nur für dich sichtbar.'):'Keine für dich freigegebenen Angaben.'));section.append(grid);ctx.list.append(section);
     }
@@ -212,7 +212,7 @@
   };
   const mount=async ctx=>{
     if(ctx.public||ctx.disposed||ctx.kind!=='profiles')return;
-    const epoch=++ctx.epoch;RabenMedia.release(ctx);ctx.more.hidden=true;ctx.editor.replaceChildren();ctx.list.replaceChildren();ctx.dirty=false;ctx.report('Profile werden geladen …');
+    window.RabenQol?.release(ctx);const epoch=++ctx.epoch;RabenMedia.release(ctx);ctx.more.hidden=true;ctx.editor.replaceChildren();ctx.list.replaceChildren();ctx.dirty=false;ctx.report('Profile werden geladen …');
     await ctx.authorize();if(!live(ctx,epoch))return;
     await RabenIdentity.load(ctx);if(!live(ctx,epoch))return;
     if(ctx.profileId)await showProfile(ctx,ctx.profileId,epoch);else await directory(ctx,epoch);
@@ -230,5 +230,5 @@
     finally{ctx.profileAudit=false;}
   };
   const release=ctx=>{delete ctx.profileId;delete ctx.profileSearch;delete ctx.profileSnapshot;};
-  window.RabenProfiles={mount,release,audit,errorMessage};
+  window.RabenProfiles={mount,release,audit,errorMessage,openItem};
 })();
