@@ -161,7 +161,7 @@
   };
   const showProfile=async(ctx,userId,epoch)=>{
     const [profiles,items]=await Promise.all([
-      check(Raben.client().from('raben_profiles').select('user_id,display_name,avatar_path,banner_path,revision').eq('user_id',userId).limit(1)),
+      check(Raben.client().from('raben_profiles').select('user_id,display_name,avatar_path,banner_path,banner_opacity,revision').eq('user_id',userId).limit(1)),
       check(Raben.client().from('raben_profile_items').select(window.RabenProfileTools?'id,owner_id,kind,title,body,image_path,preview_path,details,visibility,revision,created_at':'id,owner_id,kind,title,body,image_path,visibility,revision,created_at').eq('owner_id',userId).order('created_at').order('id'))
     ]);
     if(!live(ctx,epoch))return;ctx.profileSnapshot=snapshot(profiles[0],items);ctx.list.replaceChildren();const profile=profiles[0];
@@ -170,7 +170,7 @@
     const own=profile.user_id===ctx.actor.user_id,header=el('article','hub-card profile-header'),portrait=el('div','profile-portrait'),intro=el('div','profile-intro');
     const heading=el('h3','');heading.append(RabenIdentity.person(ctx,userId,{large:true,link:false}));portrait.append(el('span','profile-monogram',Array.from(profile.display_name)[0].toLocaleUpperCase('de')));intro.append(el('p','eyebrow',own?'Dein Clanprofil':'Clanprofil'),heading);header.append(portrait,intro);
     if(own){const edit=button('Kontoname & Bild',()=>openName(ctx,profile));intro.append(edit);if(window.RabenProfileDesign)intro.append(button('Banner gestalten',()=>RabenProfileDesign.openBanner(ctx,profile)));intro.append(note('Dein Kontoname und Kontobild sind im Clan sichtbar. Das persönliche Profilbild und alle anderen Einträge haben eigene Freigaben.'));}else intro.append(note('Hier siehst du die für dich freigegebenen Angaben.'));
-    const avatar=items.find(i=>i.kind==='avatar');portrait.hidden=!avatar;if(avatar){image(ctx,avatar,portrait,true);intro.append(note('Persönliches Profilbild · eigene Freigabe'));if(own){intro.append(el('span','profile-visibility',visibilityNames[avatar.visibility]),itemActions(ctx,profile,avatar));}}
+    const avatar=items.find(i=>i.kind==='avatar');portrait.hidden=!avatar;if(avatar){image(ctx,avatar,portrait,true);if(window.RabenGallery)intro.append(RabenGallery.opener(ctx,{path:avatar.image_path,title:'Profilbild · '+profile.display_name},'Profilbild in Großansicht'));intro.append(note('Persönliches Profilbild · eigene Freigabe'));if(own){intro.append(el('span','profile-visibility',visibilityNames[avatar.visibility]),itemActions(ctx,profile,avatar));}}
     else if(own){const add=button('Profilbild hinzufügen',()=>act(ctx,add,()=>openItem(ctx,profile,'avatar')));intro.append(add);}
     ctx.list.append(header);window.RabenProfileDesign?.banner(ctx,profile,header).catch(()=>{});
     for(const kind of ['character','info']){
@@ -179,7 +179,7 @@
       const rows=items.filter(i=>i.kind===kind),grid=el('div','profile-item-grid');
       rows.forEach(item=>{const card=el('article','hub-card profile-item');card.dataset.profileItem=item.id;
         if(own)card.append(el('p','profile-visibility',visibilityNames[item.visibility]));card.append(el('h4','',item.title));if(item.body)card.append(el('p','hub-body',item.body));
-        if(own)card.append(itemActions(ctx,profile,item));grid.append(card);if(item.image_path){image(ctx,item,card);if(window.RabenGallery)card.append(button('Bild in Großansicht',()=>RabenGallery.open(ctx,{path:item.image_path,title:item.title})));window.RabenExpansion?.comments(ctx,'portrait',item.id,card,item.owner_id);}window.RabenExpansion?.comments(ctx,'profile',item.id,card,item.owner_id);window.RabenProfileTools?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));if(kind==='character')window.RabenProfileDesign?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));
+        if(own)card.append(itemActions(ctx,profile,item));grid.append(card);if(item.image_path){image(ctx,item,card);if(window.RabenGallery)card.append(RabenGallery.opener(ctx,{path:item.image_path,title:item.title},'Bild in Großansicht'));window.RabenExpansion?.comments(ctx,'portrait',item.id,card,item.owner_id);}window.RabenExpansion?.comments(ctx,'profile',item.id,card,item.owner_id);window.RabenProfileTools?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));if(kind==='character')window.RabenProfileDesign?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));
       });
       if(!rows.length)grid.append(note(own?(kind==='character'?'Erstelle einen oder mehrere Charaktere. Jeder hat seine eigene Sichtbarkeit.':'Ergänze zum Beispiel RP-Vorlieben, Spielzeiten oder persönliche Notizen. Neue Einträge sind zunächst nur für dich sichtbar.'):'Keine für dich freigegebenen Angaben.'));section.append(grid);ctx.list.append(section);
     }

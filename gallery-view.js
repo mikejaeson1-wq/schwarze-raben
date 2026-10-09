@@ -1,21 +1,35 @@
 (() => {
- 'use strict';const {el,check}=Raben;let modal=null;
+ 'use strict';const {el,check}=Raben;let modal=null;const entries=new WeakMap();
  const live=(ctx,e)=>!ctx.disposed&&ctx.epoch===e;
  const button=(text,fn)=>{const b=el('button','button outline small-button',text);b.type='button';b.addEventListener('click',fn);return b;};
- const close=ctx=>{if(modal&&(!ctx||modal.ctx===ctx)){const current=modal;modal=null;current.dialog.close?.();current.dialog.remove();if(current.url){URL.revokeObjectURL(current.url);current.ctx.urls.delete(current.url);}current.focus?.focus?.();}};
- const open=async(ctx,{bucket='raben-profile-media',path,title='',publicUrl=''})=>{
-  const e=ctx.epoch;close();const dialog=el('dialog','image-lightbox'),top=el('div','lightbox-toolbar'),area=el('div','lightbox-stage'),status=el('p','field-note','Bild wird geladen …');dialog.setAttribute('aria-label',title||'Großbildansicht');const focus=document.activeElement;top.append(el('h2','',title||'Bildansicht'),button('Schließen',()=>close(ctx)));area.append(status);dialog.append(top,area);document.body.append(dialog);modal={ctx,dialog,focus,url:null};if(dialog.showModal)dialog.showModal();else dialog.setAttribute('open','');
-  dialog.addEventListener('close',()=>close(ctx));dialog.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();close(ctx);}});dialog.addEventListener('click',event=>{if(event.target===dialog)close(ctx);});
-  try{
-   let src=publicUrl;if(!src){await ctx.authorize();const blob=await check(Raben.client().storage.from(bucket).download(path));if(!live(ctx,e)||modal?.dialog!==dialog)return;src=URL.createObjectURL(blob);ctx.urls.add(src);modal.url=src;}
-   if(!live(ctx,e)||modal?.dialog!==dialog)return;const image=el('img','lightbox-image');image.src=src;image.alt=title||'Bild in Großansicht';image.addEventListener('error',()=>status.textContent='Das Originalbild konnte nicht geladen werden.');image.addEventListener('load',()=>status.remove());area.append(image);
-   const zoom=()=>area.classList.toggle('is-zoomed');top.append(button('Vergrößern / Einpassen',zoom));image.addEventListener('dblclick',zoom);top.querySelector('button')?.focus();
-  }catch(error){if(live(ctx,e)&&modal?.dialog===dialog)status.textContent=Raben.errorMessage(error);}
+ const close=ctx=>{if(modal&&(!ctx||modal.ctx===ctx)){const current=modal;modal=null;current.dialog.close?.();current.dialog.remove();if(current.url){URL.revokeObjectURL(current.url);current.ctx.urls.delete(current.url);}if(current.focus?.isConnected)current.focus.focus?.();}};
+ const key=source=>(source.bucket||'raben-profile-media')+':'+(source.publicUrl||source.path);
+ const opener=(ctx,source,label='Original ansehen')=>{const b=button(label,()=>open(ctx,source));b.dataset.galleryOpen='';entries.set(b,{ctx,source});return b;};
+ const open=async(ctx,source)=>{
+  const e=ctx.epoch;if(!live(ctx,e))return;close();
+  const available=[...document.querySelectorAll('[data-gallery-open]')].map(node=>entries.get(node)).filter(entry=>entry?.ctx===ctx).map(entry=>entry.source),seen=new Set(),images=available.filter(image=>{const k=key(image);if(seen.has(k))return false;seen.add(k);return true;});
+  let index=images.findIndex(image=>key(image)===key(source));if(index<0){images.splice(0,0,source);index=0;}
+  const dialog=el('dialog','image-lightbox'),top=el('div','lightbox-toolbar'),heading=el('h2',''),counter=el('span','lightbox-counter'),area=el('div','lightbox-stage'),content=el('div','lightbox-content');counter.setAttribute('aria-live','polite');dialog.setAttribute('aria-label','Bildergalerie');
+  const focus=document.activeElement,previous=button('‹',()=>{if(active())show(modal.index-1,-1);}),next=button('›',()=>{if(active())show(modal.index+1,1);});previous.classList.add('lightbox-arrow','lightbox-previous');next.classList.add('lightbox-arrow','lightbox-next');previous.setAttribute('aria-label','Vorheriges Bild');next.setAttribute('aria-label','Nächstes Bild');previous.hidden=next.hidden=images.length<2;
+  const zoom=()=>content.classList.toggle('is-zoomed');top.append(heading,counter,button('Vergrößern / Einpassen',zoom),button('Schließen',()=>close(ctx)));area.append(content,previous,next);dialog.append(top,area,el('p','lightbox-help','← / → Bilder wechseln · Doppelklick vergrößert · Esc schließt'));document.body.append(dialog);modal={ctx,dialog,focus,url:null,index,request:0};
+  const active=()=>live(ctx,e)&&modal?.dialog===dialog;
+  const show=async(position,direction=0)=>{
+   if(!active())return;modal.index=(position+images.length)%images.length;const item=images[modal.index],attempt=++modal.request;heading.textContent=item.title||'Bildansicht';counter.textContent=(modal.index+1)+' / '+images.length;content.classList.remove('is-zoomed');content.scrollTop=content.scrollLeft=0;
+   if(modal.url){URL.revokeObjectURL(modal.url);ctx.urls.delete(modal.url);modal.url=null;}const status=el('p','field-note','Bild wird geladen …');status.setAttribute('role','status');content.replaceChildren(status);
+   try{
+    let src=item.publicUrl;if(!src){await ctx.authorize();if(!active()||attempt!==modal.request)return;const blob=await check(Raben.client().storage.from(item.bucket||'raben-profile-media').download(item.path));if(!active()||attempt!==modal.request)return;src=URL.createObjectURL(blob);ctx.urls.add(src);modal.url=src;}
+    if(!active()||attempt!==modal.request)return;const image=el('img','lightbox-image');image.alt=item.title||'Bild in Großansicht';image.dataset.direction=direction<0?'previous':'next';image.addEventListener('load',()=>{if(active()&&attempt===modal.request){status.remove();image.classList.add('is-ready');}});image.addEventListener('error',()=>{if(active()&&attempt===modal.request){status.textContent='Dieses Bild konnte nicht geladen werden. Du kannst zum nächsten Bild wechseln.';image.remove();}});image.addEventListener('dblclick',zoom);image.src=src;content.append(image);
+   }catch(error){if(active()&&attempt===modal.request)status.textContent=Raben.errorMessage(error);}
+  };
+  if(dialog.showModal)dialog.showModal();else dialog.setAttribute('open','');dialog.addEventListener('close',()=>{if(active())close(ctx);});dialog.addEventListener('cancel',event=>{event.preventDefault();if(active())close(ctx);});
+  dialog.addEventListener('keydown',event=>{if(!active())return;if(event.key==='Escape'){event.preventDefault();close(ctx);return;}if(event.target?.closest?.('input,textarea,select,[contenteditable="true"]'))return;const n=event.key==='ArrowLeft'?modal.index-1:event.key==='ArrowRight'?modal.index+1:event.key==='Home'?0:event.key==='End'?images.length-1:null;if(n!==null){event.preventDefault();show(n,event.key==='ArrowLeft'?-1:1);}});
+  dialog.addEventListener('click',event=>{if(event.target===dialog)close(ctx);});let touch=null;content.addEventListener('pointerdown',event=>{touch=event.pointerType==='touch'?{x:event.clientX,y:event.clientY}:null;});content.addEventListener('pointerup',event=>{if(touch&&!content.classList.contains('is-zoomed')){const dx=event.clientX-touch.x,dy=event.clientY-touch.y;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5)show(modal.index+(dx<0?1:-1),dx<0?1:-1);}touch=null;});top.lastChild.focus?.();await show(index);
  };
  const image=async(ctx,path,host,title='')=>{const e=ctx.epoch;try{const blob=await check(Raben.client().storage.from('raben-profile-media').download(path));if(!live(ctx,e)||!host.isConnected)return;const url=URL.createObjectURL(blob);ctx.urls.add(url);const img=el('img','hub-image');img.src=url;img.alt=title||'Charakterbild';img.loading='lazy';host.prepend(img);}catch(_){}};
  const figure=(ctx,row,item)=>{
   const e=ctx.epoch,f=el('figure','character-image');f.dataset.profileImage=row.id;let title=row.display_title||'';const caption=el('figcaption','field-note',title);caption.hidden=!title;
-  f.append(caption,button('Original ansehen',()=>open(ctx,{path:row.image_path,title})));image(ctx,row.preview_path||row.image_path,f,title);RabenExpansion.comments(ctx,'profile_image',row.id,f,item.owner_id);
+  const source={path:row.image_path,get title(){return title;}};f.append(caption,opener(ctx,source));image(ctx,row.preview_path||row.image_path,f,title);RabenExpansion.comments(ctx,'profile_image',row.id,f,item.owner_id);
+  f.addEventListener('click',event=>{if(event.target.tagName==='IMG')open(ctx,source);});
   if(item.owner_id===ctx.actor.user_id){
    const edit=()=>{if(f.querySelector('.image-title-editor'))return;const form=el('form','image-title-editor'),wrap=el('label','form-field','Eigener Bildtitel · leer lassen zum Ausblenden'),input=el('input','');input.type='text';input.maxLength=120;input.value=title;wrap.append(input);const save=el('button','button outline small-button','Bildtitel speichern');save.type='submit';form.append(wrap,save,button('Abbrechen',()=>form.remove()));f.append(form);input.focus();
     form.addEventListener('submit',async event=>{event.preventDefault();if(save.disabled)return;save.disabled=true;try{await ctx.authorize();const value=input.value.trim(),changed=await check(Raben.client().from('raben_profile_gallery').update({display_title:value}).eq('id',row.id).eq('display_title',title).select('id'));if(!changed.length)throw new Error('profile_conflict');if(!live(ctx,e))return;title=value;row.display_title=value;caption.textContent=value;caption.hidden=!value;form.remove();ctx.report('Bildtitel gespeichert.');}catch(error){if(live(ctx,e))ctx.report(RabenProfiles.errorMessage(error),true);}finally{save.disabled=false;}});
@@ -23,5 +37,5 @@
    const menu=button('⋯',edit);menu.setAttribute('aria-label','Bildtitel ändern');menu.classList.add('image-title-menu');f.append(menu);f.addEventListener('contextmenu',event=>{event.preventDefault();edit();});
   }return f;
  };
- window.RabenGallery={open,close,figure,image};window.addEventListener('raben-lock',()=>close());
+ window.RabenGallery={open,close,figure,image,opener};window.addEventListener('raben-lock',()=>close());
 })();

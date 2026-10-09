@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+export async function verifyPresentationAccess({db,as,denied,scalar,admin,member,other,blocked}){
+  const uuid=n=>'00000000-0000-4000-a000-'+String(n).padStart(12,'0');
+  await as('authenticated',member);
+  const original=await scalar('select to_jsonb(p) from public.raben_profiles p where user_id=$1',[member]);
+  assert.equal(original.banner_opacity,100,'Existing banners retain their appearance');
+  const save='select public.raben_save_profile_banner_design($1,$2,$3)';
+  const result=await scalar(save,[original.banner_path,0,original.revision]);assert.equal(result.banner_path,original.banner_path);assert.equal(result.banner_opacity,0);
+  await denied(save,[original.banner_path,50,original.revision]);await denied(save,[original.banner_path,101,result.revision]);await denied(save,[original.banner_path,null,result.revision]);
+  await scalar(save,[original.banner_path,100,result.revision]);
+  await as('authenticated',other);assert.equal((await db.query('update public.raben_profiles set banner_opacity=0 where user_id=$1 returning user_id',[member])).rows.length,0);
+  await as('authenticated',admin);assert.equal((await db.query('update public.raben_profiles set banner_opacity=0 where user_id=$1 returning user_id',[member])).rows.length,0,'No admin override for personal profiles');
+  const originalInfo=await scalar('select to_jsonb(c) from public.raben_clan_information c where id=1'),path=admin+'/'+uuid(1800)+'.jpg',preview=admin+'/'+uuid(1801)+'.webp';
+  for(const name of [path,preview])await db.query("insert into storage.objects(bucket_id,name) values('raben-clan-info-media',$1)",[name]);
+  const image={id:uuid(1802),section:'rules',imagePath:path,previewPath:preview,position:'left',width:35,paragraph:1,title:'Langhaus'};
+  await db.query('update public.raben_clan_information set images=$1 where id=1',[[image]]);
+  assert.equal(await scalar('select body from public.raben_clan_information where id=1'),originalInfo.body);
+  assert.equal((await db.query("delete from storage.objects where bucket_id='raben-clan-info-media' and name=$1 returning id",[path])).rows.length,0,'Referenced originals cannot be removed');
+  for(const invalid of [[{...image,width:0}],[{...image,paragraph:-1}],[{...image,position:'fixed'}],[{...image,section:'secret'}],[{...image,imagePath:'https://evil.test/image.jpg'}],[{...image,imagePath:admin+'/'+uuid(1899)+'.jpg'}],[{...image,style:'position:fixed'}],[image,image]])await denied('update public.raben_clan_information set images=$1 where id=1',[invalid]);
+  await as('authenticated',member);assert.equal((await db.query("select name from storage.objects where bucket_id='raben-clan-info-media'")).rows.length,2);
+  await denied("insert into storage.objects(bucket_id,name) values('raben-clan-info-media',$1)",[member+'/'+uuid(1803)+'.png']);
+  assert.equal((await db.query('update public.raben_clan_information set images=$1 where id=1 returning id',[[]])).rows.length,0);
+  await as('authenticated',blocked);assert.equal((await db.query("select name from storage.objects where bucket_id='raben-clan-info-media'")).rows.length,0);assert.equal((await db.query('select images from public.raben_clan_information')).rows.length,0);
+  await denied(save,[null,20,1]);await as('anon');await denied('select images from public.raben_clan_information');await denied(save,[null,20,1]);
+  await as('authenticated',admin);const music={type:'track',id:'4uLU6hMCjMI75M1A2tKUQC',title:'Begleitmusik',enabled:true,autoplay:true};
+  for(const type of ['track','playlist'])await db.query("update public.raben_site_content set content=content||jsonb_build_object('homeSpotify',$1::jsonb) where id=1",[{...music,type}]);
+  for(const invalid of [{...music,id:'javascript:alert(1)'},{...music,type:'album'},{...music,enabled:'true'},{...music,autoplay:'true'},{...music,access_token:'secret'}])await denied("update public.raben_site_content set content=content||jsonb_build_object('homeSpotify',$1::jsonb) where id=1",[invalid]);
+  await as('authenticated',member);assert.equal((await db.query("update public.raben_site_content set content=content||jsonb_build_object('homeSpotify',null) where id=1 returning id")).rows.length,0);
+  for(const autoplay of ['true','false'])await db.query("insert into public.raben_records(kind,title,details) values('media','Spotify mit Startauswahl',$1)",[{mediaType:'spotify',spotifyType:'track',spotifyId:music.id,autoplay}]);
+  await denied("insert into public.raben_records(kind,title,details) values('media','Ungültiger Start',$1)",[{mediaType:'spotify',spotifyType:'track',spotifyId:music.id,autoplay:'evil'}]);
+  await as('anon');assert.equal((await scalar("select content->'homeSpotify' from public.raben_site_content where id=1")).id,music.id);
+  console.log('PASS: preserved banners/clan text, opacity limits and ownership, private clan-image reads, admin-only uploads/edits, protected referenced files, validated layout metadata, public music configuration and Spotify autoplay guards.');
+}

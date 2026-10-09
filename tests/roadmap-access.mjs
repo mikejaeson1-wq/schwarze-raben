@@ -129,4 +129,6 @@ await verifyExpansion(db,{as,denied,scalar,admin,member,other,blocked});
 await verifySettingsAccess({db,as,denied,scalar,admin,member,other,blocked});
 const {verifyImprovements}=await import('./improvement-access-cases.mjs');
 await verifyImprovements({db,as,denied,scalar,admin,member,other,blocked});
+const {verifyPresentationAccess}=await import('./presentation-access-cases.mjs');
+await verifyPresentationAccess({db,as,denied,scalar,admin,member,other,blocked});
 await db.close();

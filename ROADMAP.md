@@ -1,48 +1,85 @@
-# Schwarze Raben · Gesamtupdate mit 20 Punkten
+# Schwarze Raben · Neue Roadmap mit 20 geplanten Verbesserungen
 
-Die neue Ausbaustufe ist in Website, Clanbereich und Admin-App umgesetzt. Alle privaten Freigaben gelten auch für Suche, Medien, Kommentare und Hinweise.
+Stand: 09. Oktober 2026. Alle Punkte sind für künftige Updates geplant; die Prioritäten sind keine festen Termine.
 
-1. **Bilder optimieren.** Originalbilder bleiben erhalten. Neue Uploads erzeugen kleine WebP-Vorschauen und responsive Hintergrundvarianten. Bestehende Hintergründe können Admins unter „Öffentliche Texte“ optimieren.
+1. **Banner zuschneiden und Bildfokus wählen** (Profilgestaltung · Als Nächstes)
 
-2. **Mobil einfacher navigieren.** Gruppierte Bereichsauswahl, Schnellzugriffe, große Schaltflächen und Tastaturbedienung. Animationen lassen sich auf dem eigenen Gerät abschalten.
+   Bannerhöhe, Ausschnitt und sichtbaren Bildmittelpunkt direkt in einer Vorschau einstellen.
 
-3. **Persönlicher Clanstart.** Nächster RP-Termin, neue Aushänge, offene Aufgaben, eigene Charaktere und zuletzt besuchte Bereiche.
+2. **Bilder und Text per Drag-and-drop anordnen** (Claninfos · Als Nächstes)
 
-4. **Geschützte Clansuche.** Beiträge, Termine, Medien, Wissen, Profile, Charaktere, Gesuche und Plots gemeinsam durchsuchen. Jede Quelle behält ihre Freigaben.
+   Absätze und Bilder verschieben, Bildabstände einstellen und mehrspaltige Vorlagen für längere Claninfos nutzen.
 
-5. **Hinweise und Abonnements.** Glocke, ungelesene Hinweise, Antworten, Erwähnungen und Änderungen an abonnierten Bereichen. Entzogene Freigaben blenden frühere Hinweise aus.
+3. **Eigene Alben und Bildreihenfolgen** (Galerie · Als Nächstes)
 
-6. **Kommentare und Reaktionen.** Antworten bearbeiten oder löschen und mit Rabe, Herz oder Zustimmung reagieren. Namen und runde Kontobilder zeigen die Beteiligten.
+   Charakterbilder in benannte Alben ordnen und ihre Reihenfolge per Drag-and-drop ändern.
 
-7. **RP-Gesuche.** Gewünschte Spielzeit, eigener Charakter und Ablaufdatum. Mitglieder können antworten; abgelaufene oder geschlossene Gesuche verschwinden für andere Mitglieder.
+4. **Diashow und Vollbildmodus** (Galerie · Als Nächstes)
 
-8. **Kalender mit Serien und Warteliste.** Wöchentliche, zweiwöchentliche und monatliche Serien, Einzelabsagen, Teilnehmerlimit, automatisches Nachrücken und ICS-Export. Neue und geänderte Termine lassen sich über einen Clan-Webhook in Discord ankündigen.
+   Freigegebene Bilder mit einstellbarem Zeitabstand als Diashow zeigen; Vollbild und Animation separat steuern.
 
-9. **IC und OOC unterscheiden.** Beiträge und Einträge mit IC, OOC oder gemischter Ebene kennzeichnen.
+5. **Eigene Themes als Vorlagen speichern** (Profile · Als Nächstes)
 
-10. **Als eigener Charakter schreiben.** Beim Schreiben einen eigenen Charakter auswählen. Der Beitrag bewahrt dessen damaligen Namen, während die Kontoanzeige weiterhin aktuell bleibt.
+   Persönliche Gestaltungen speichern, duplizieren und gezielt für weitere Charaktere übernehmen.
 
-11. **Charakterdossiers und Galerien.** Volk, Alter, Herkunft, Aussehen, Fähigkeiten, Ziele und eigene Felder. Bis zu zwölf zusätzliche Bilder pro Charakter. Anders freigegebene Angaben lassen sich als eigene Infokarten führen.
+6. **Private Entwürfe automatisch sichern** (Bearbeitung · Als Nächstes)
 
-12. **Bestätigte Charakterbeziehungen.** Beziehungen anfragen und von der anderen Person bestätigen lassen. Betrachtende Personen müssen beide Charaktere sehen dürfen.
+   Ungespeicherte Texte geschützt zwischenspeichern und nach einem Verbindungsabbruch auf dem eigenen Konto wieder aufnehmen.
 
-13. **Plotgruppen.** Teilnehmende, geschützte Freigaben, Kapitel, nächste Szenen, offene Fäden und Spielberichte. Andere Admins erhalten keinen Sonderzugriff auf private Plots.
+7. **Eigene Profilversionen und Rückgängig** (Profile · Danach)
 
-14. **Lager und Bauprojekte.** Materialien anlegen, Ein- und Auslagerungen mit Grund protokollieren und Bauprojekten zuordnen. Fehlmengen ergeben sich aus Bedarf und eingetragenem Bestand.
+   Frühere Fassungen eigener Charaktere und Infokarten vergleichen und wiederherstellen; die bisherigen Freigaben bleiben geschützt.
 
-15. **RP-Ränge und zusätzliche Rechte.** RP-Ränge sind unabhängig von tatsächlichen Adminrollen. Kalender- und Inhaltsrechte können gezielt vergeben werden; die Admin-App bleibt für Admins.
+8. **Gezielte Mitbearbeitung von Einträgen** (Zusammenarbeit · Danach)
 
-16. **Eigene Daten kontrollieren.** Freigaben prüfen, Vorschau für ein ausgewähltes Mitglied, persönlicher Export mit Bildern und bestätigtes Löschen des eigenen Profils. Discord-Konto und Clanmitgliedschaft bleiben bestehen.
+   Ausgewählten Mitgliedern Bearbeitungsrechte für einen konkreten Eintrag geben, ohne ihnen allgemeine Adminrechte zu gewähren.
 
-17. **Sicherungen prüfen und wiederherstellen.** ZIP-Teile mit Manifest, SHA-256-Prüfsummen und fehlenden Dateien prüfen. Originaldateien und einzelne Inhalte nach Vorschau wiederherstellen; Lagerkorrekturen bleiben protokolliert.
+9. **Gemeinsame Terminfindung** (Kalender · Danach)
 
-18. **Öffentlicher RP-Einstieg.** Bearbeitbare Dorfvorstellung, Regeln, FAQ, Bewerbungsablauf, Kontakt und Datenhinweise. Öffentliche Linkvorschau und Sitemap.
+   Verfügbare Spielzeiten für einen RP-Abend sammeln und die Überschneidungen übersichtlich anzeigen.
 
-19. **Interaktive Dorfführung.** Dorfplan zoomen und verschieben, Orte auswählen und ihre öffentlich freigegebenen Beschreibungen, Medien und verknüpften Geschichten öffnen.
+10. **Abonnierbare Kalender mit Widerruf** (Kalender · Danach)
 
-20. **Geprüfte Updates und Betriebsübersicht.** Automatische Tests für Rechte, Bedienung, Profile, Kalender und Uploads. Admins sehen Dateiverwendung, Speicherverbrauch, unbenutzte Dateien und die letzte Mediensicherung.
+   Zusätzlich zum ICS-Export persönliche Kalenderfeeds anbieten, deren Zugang sich jederzeit wieder entziehen lässt.
 
-Discord-Meldungen für Aushänge, Termine und Abstimmungen sind per optionalem Clan-Webhook eingerichtet. Ein Admin hinterlegt die Kanal-Webhook-Adresse und aktiviert die gewünschten Kategorien. Die neue CI prüft main, Pull Requests und release-Zweige. Veröffentlichungen erfolgen erst nach erfolgreichen Prüfungen des Release-Zweigs.
+11. **Erinnerungen je RP-Termin** (Hinweise · Danach)
 
+   Eigene Vorlaufzeiten für ausgewählte Termine festlegen und auf Wunsch Gerätebenachrichtigungen erhalten.
 
-Ergänzung: Persönliche Hinweise und Schriftwahl sind speicherbar. Interne Claninfos, bearbeitbare Clanränge, mehrere Ämter pro Mitglied und geschützte Discord-Webhooks für Clanmeldungen sind integriert.
+12. **Orte und Ressourcen reservieren** (Organisation · Danach)
+
+   Für Termine Spielorte oder gemeinsame Ressourcen buchen und zeitliche Überschneidungen erkennen.
+
+13. **Persönliche Charakter-Zeitleisten** (Geschichten · Danach)
+
+   Freigegebene Tagebucheinträge, Plots und Ereignisse in einer Zeitleiste des jeweiligen Charakters zusammenführen.
+
+14. **Mehrere Karten und Kartenebenen** (Dorfplan · Später)
+
+   Zwischen Weltkarte, Dorfplan und Gebäudeansichten wechseln; Orte nach Themen ein- und ausblenden.
+
+15. **Rezepte und Materialplanung** (Lager · Später)
+
+   Materiallisten für wiederkehrende Bauvorhaben als Vorlagen speichern und benötigte Mengen berechnen.
+
+16. **Angebote, Gesuche und Abschlussstatus** (Handel · Später)
+
+   Handelseinträge um Mengen, Tauschbedingungen, Anfragen und einen nachvollziehbaren Abschluss erweitern.
+
+17. **Meldungsvorschau und mehrere Kanäle** (Discord · Später)
+
+   Ankündigungen vor dem Versand ansehen und unterschiedliche Kategorien gezielt an ausgewählte Clan-Kanäle senden.
+
+18. **Schnellere Seiten und Ladeanzeigen** (Mobil · Als Nächstes)
+
+   Große Listen schrittweise laden, Bildvorschauen nach Bedarf nachladen und laufende Vorgänge auf kleinen Displays klarer anzeigen.
+
+19. **Kontrast- und Tastaturprüfung** (Bedienung · Als Nächstes)
+
+   Gespeicherte Themefarben auf Lesbarkeit prüfen und Formularfehler, Fokusführung und Screenreader-Beschriftungen verbessern.
+
+20. **Featurewünsche und Fehlerberichte** (Weiterentwicklung · Als Nächstes)
+
+   Im Clan Vorschläge einreichen, unterstützte Roadmap-Punkte markieren und Fehler mit einem sichtbaren Bearbeitungsstatus verfolgen.
+
+Bereits abgeschlossene Funktionen: [ROADMAP_ARCHIV.md](ROADMAP_ARCHIV.md). Aktuelle Änderungen: im Clanbereich unter **Patchnotes**.

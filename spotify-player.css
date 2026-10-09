@@ -1,0 +1,12 @@
+.spotify-player { display: grid; gap: .7rem; min-width: 0; }
+.spotify-player[hidden] { display: none; }
+.spotify-embed-host { min-width: 0; }.spotify-embed-host:empty { display: none; }
+.spotify-embed-host iframe { width: 100%; border: 0; border-radius: 12px; display: block; }
+.spotify-actions { display: flex; gap: .5rem; flex-wrap: wrap; }.spotify-actions [hidden] { display: none; }
+.spotify-consent { display: flex; gap: .6rem; align-items: flex-start; font-size: .85rem; line-height: 1.5; color: var(--muted,#c4c8ca); }
+.spotify-consent input { flex-shrink: 0; margin-top: .3rem; }
+.site-music { position: fixed; z-index: 35; right: 1rem; bottom: 1rem; width: min(365px,calc(100vw - 2rem)); max-height: min(75dvh,620px); overflow: auto; padding: 1rem; border: 1px solid var(--gold,#c8a46c); border-radius: 12px; background: #101a23f5; color: #f0eee8; box-shadow: 0 6px 28px #0008; }
+.site-music-heading { display: flex; align-items: center; justify-content: space-between; gap: .65rem; margin-bottom: .65rem; }
+.site-music-heading h2 { font-size: 1rem; margin: 0; color: #edd7b0; }
+.site-music .field-note { margin: 0; font-size: .8rem; }.site-music .button { padding: .5rem .7rem; font-size: .78rem; }
+@media(max-width:540px) { .site-music { right: .5rem; bottom: .5rem; width: min(350px,calc(100vw - 1rem)); padding: .75rem; } }

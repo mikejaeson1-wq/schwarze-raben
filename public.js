@@ -7,6 +7,7 @@
   ["mitglieder-inhalt","aushang-inhalt","rp-inhalt"].forEach(id => { original[id] = [...document.getElementById(id).childNodes].map(n => n.cloneNode(true)); });
   function render() {
     mediaContext.epoch++;window.RabenMedia?.releasePlayers(mediaContext);
+    window.RabenSpotify?.home(mediaContext,CLAN.homeSpotify);
     Object.entries(original).forEach(([id,nodes]) => document.getElementById(id).replaceChildren(...nodes.map(n => n.cloneNode(true))));
     const text = (value, fallback = "") => typeof value === "string" ? value.trim() || fallback : fallback;
     const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };

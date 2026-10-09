@@ -3,6 +3,9 @@
 .roadmap-list > li { counter-increment: roadmap; }
 .roadmap-list h3::before { content: counter(roadmap) ". "; color: var(--gold-light); }
 .roadmap-list h3 { font-size: clamp(1.35rem,3vw,1.8rem); }
+.roadmap-grid { list-style: none; padding: 0; margin: 1.5rem 0; display: grid; gap: 1.2rem; }
+.patchnote-list { padding-left: 1.4rem; line-height: 1.7; }
+.patchnote-list li + li { margin-top: .5rem; }
 .portal-main > .hub-card { margin-bottom: 20px; }
 .profile-directory-grid, .profile-item-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
 .profile-directory-card { display: grid; grid-template-columns: 56px minmax(0,1fr); column-gap: 16px; align-items: center; min-height: 104px; padding: 20px; border: 1px solid var(--line); background: #121d24; color: var(--text); text-align: left; }

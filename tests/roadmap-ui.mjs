@@ -74,7 +74,7 @@ async function setup(actor,mode='member',personalData=null,extension=false){
   if(name==='raben_save_discord_webhook'){data.mockWebhook={configured:!args.p_clear,enabled:args.p_enabled,scopes:args.p_scopes,pending:0,recent:[],updated_at:new Date().toISOString()};return {data:data.mockWebhook,error:null};}
   if(name==='raben_discord_check')return {data:{ok:true,status:200},error:null};
   if(name==='raben_save_emblem'){data.raben_branding=[{id:1,image_path:args.p_path,revision:args.p_expected+1}];return {data:data.raben_branding[0],error:null};}
-  if(name==='raben_save_profile_banner'){const row=data.raben_profiles.find(p=>p.user_id===currentActor.user_id);row.banner_path=args.p_path;row.revision++;return {data:row,error:null};}
+  if(name==='raben_save_profile_banner'||name==='raben_save_profile_banner_design'){const row=data.raben_profiles.find(p=>p.user_id===currentActor.user_id);row.banner_path=args.p_path;if(name.endsWith('_design'))row.banner_opacity=args.p_opacity;row.revision++;return {data:row,error:null};}
   if(name==='raben_discord_test')return {data:null,error:null};
   if(name==='raben_public_image_status'||name==='raben_public_image_like'){
    data.publicLikes||={};const key=args.p_record+':'+args.p_visitor;
@@ -106,7 +106,7 @@ async function setup(actor,mode='member',personalData=null,extension=false){
   remove:async paths=>({data:paths.filter(path=>{const key=bucket+'/'+path;if(key.endsWith(privateAudio))return false;return files.delete(key);}).map(name=>({name})),error:null})
  };}}};
  document.body.addEventListener('click',event=>{if(event.target.tagName==='A'&&event.target.download)exports.push({name:event.target.download,url:event.target.href});});
- const context={document,Event,CustomEvent,console,URL,Intl,Date,Math,Uint8Array,Blob,File,TextEncoder,crypto:globalThis.crypto,structuredClone,setTimeout:(fn,delay)=>{const timer=setTimeout(fn,delay);timer.unref();return timer;},setInterval:()=>0,confirm:()=>true,
+ const context={document,Event,CustomEvent,console,URL,Intl,Date,Math,Uint8Array,Blob,File,TextEncoder,crypto:globalThis.crypto,structuredClone,clearTimeout,setTimeout:(fn,delay)=>{const timer=setTimeout(fn,delay);timer.unref();return timer;},setInterval:()=>0,confirm:()=>true,
   localStorage:{getItem:key=>data.deviceSettings?.[key]||null,setItem:(key,value)=>{(data.deviceSettings||={})[key]=value;}},matchMedia:()=>({matches:false}),location:{href:'https://example.com/'+(mode==='public'?'entdecken.html':'clan.html'),origin:'https://example.com'},
   addEventListener:(name,fn)=>{if(!events.has(name))events.set(name,[]);events.get(name).push(fn);},dispatchEvent:event=>{for(const fn of events.get(event.type)||[])fn(event);},
   Raben:{el:(tag,classes='',text='')=>{const element=document.createElement(tag);element.className=classes;element.textContent=text;return element;},check:async result=>{const r=await result;if(r.error)throw r.error;return r.data;},client:()=>sb,member:async()=>currentActor,config:{siteUrl:'https://example.com/',supabaseUrl:'https://test.supabase.co',supabasePublishableKey:'test-key'},errorMessage:()=> 'Keine Rechte oder Fehler.',imageUrl:value=>value||''},
@@ -116,10 +116,15 @@ async function setup(actor,mode='member',personalData=null,extension=false){
    async abort(){this.aborted=true;}
   }}
  };context.window=context;const sandbox=vm.createContext(context);
- for(const name of ['vendor/fflate-0.8.3.js','media.js','branding.js','interactions.js','gallery-view.js','identity.js','history.js','profiles.js',...(extension?['pictures.js','calendar.js','profile-tools.js','expansion.js','clan-settings.js','profile-design.js','guide.js','backup-tools.js']:[]),'community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
+ const spotifyCalls=[],spotifyControllers=[],appendHead=document.head.append.bind(document.head);
+ document.head.append=(...nodes)=>{appendHead(...nodes);if(nodes.some(n=>n.src==='https://open.spotify.com/embed/iframe-api/v1'))setTimeout(()=>context.onSpotifyIframeApiReady({createController(target,options,callback){
+   const iframe=document.createElement('iframe');iframe.src='https://open.spotify.com/embed/'+options.uri.split(':').slice(1).join('/');iframe.height=String(options.height);target.replaceWith(iframe);const listeners=new Map();
+   const controller={addListener:(name,fn)=>listeners.set(name,fn),play(){spotifyCalls.push({action:'play',uri:options.uri});listeners.get('playback_started')?.({data:{playingURI:options.uri}});},pause(){spotifyCalls.push({action:'pause',uri:options.uri});listeners.get('playback_update')?.({data:{isPaused:true}});},destroy(){spotifyCalls.push({action:'destroy',uri:options.uri});iframe.remove();},fire:(name,data)=>listeners.get(name)?.({data})};spotifyControllers.push(controller);callback(controller);setTimeout(()=>listeners.get('ready')?.(),0);
+ }}),0);};
+ for(const name of ['vendor/fflate-0.8.3.js','spotify-player.js','media.js','branding.js','interactions.js','gallery-view.js','identity.js','history.js','profiles.js',...(extension?['pictures.js','calendar.js','profile-tools.js','expansion.js','clan-settings.js','clan-presentation.js','updates.js','profile-design.js','guide.js','backup-tools.js']:[]),'community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
  const root=document.getElementById('root');const hubContext=await (mode==='public'?context.RabenHub.mountPublic(root):mode==='admin'?context.RabenHub.mountAdmin(root,actor):context.RabenHub.mountMember(root,actor));await wait();
  const click=async text=>{const b=[...root.querySelectorAll('button')].find(b=>b.textContent===text&&!b.disabled);assert.ok(b,'Button: '+text);b.click();await wait();return b;};
- return {context,sandbox,document,Event,root,hubContext,data,files,calls,copies,transfers,downloads,exports,click,setActor:value=>{currentActor=value;}};
+ return {context,sandbox,document,Event,root,hubContext,data,files,calls,copies,transfers,downloads,exports,spotifyCalls,spotifyControllers,click,setActor:value=>{currentActor=value;}};
 }
 const visitor=await setup(null,'public');
 assert.equal(visitor.root.querySelector('iframe'),null);assert.equal(visitor.root.querySelector('img'),null,'Text is never interpreted as HTML');
@@ -275,3 +280,5 @@ const {verifySettingsUI}=await import('./settings-ui-cases.mjs');
 await verifySettingsUI({setup,wait,member,lead,id});
 const {verifyImprovementUI}=await import('./improvement-ui-cases.mjs');
 await verifyImprovementUI({setup,wait,member,lead,id});
+const {verifyPresentationUI}=await import('./presentation-ui-cases.mjs');
+await verifyPresentationUI({setup,wait,member,lead,id});
