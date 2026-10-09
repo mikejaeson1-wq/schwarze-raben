@@ -10,15 +10,16 @@
   <title>Admin-App installieren · Schwarze Raben</title>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icons/icon-180.png">
   <link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="../style.css?v=e1294113c8cb"><link rel="stylesheet" href="../portal.css?v=160fc595be42"><link rel="stylesheet" href="app.css?v=efc22394a88d">
+  <link rel="stylesheet" href="../branding.css?v=3c6c94ccb227"><link rel="stylesheet" href="../reading.css?v=c90e44f18c2a">
 </head>
 <body class="portal-body installer">
   <a class="skip-link" href="#installation">Zur Installation springen</a>
   <header class="portal-header app-header"><div class="container header-inner">
-    <a class="brand" href="../"><span class="brand-mark" aria-hidden="true"><span>R</span></span><span><span class="brand-name">Schwarze Raben</span><span class="brand-caption">DIE CLANFÜHRUNG UNTERWEGS</span></span></a>
+    <a class="brand" href="../"><span class="brand-mark" aria-hidden="true"><img data-clan-emblem src="../assets/clan-emblem.svg" alt="" width="48" height="48"></span><span><span class="brand-name">Schwarze Raben</span><span class="brand-caption">DIE CLANFÜHRUNG UNTERWEGS</span></span></a>
     <nav class="app-header-nav" aria-label="Navigation"><a href="../">Website</a><a href="./">App öffnen ↗</a></nav>
   </div></header>
   <main class="container install-main" id="installation">
-    <div class="install-heading"><img class="install-icon" src="icons/icon-192.png" alt="Raben-Admin-Appsymbol" width="100" height="100"><div><p class="eyebrow">Raben Admin · Nur für Admins</p><h1>Die Clanführung.<br><span>Immer dabei.</span></h1><p class="install-intro">Mitglieder freigeben, Beiträge pflegen und eure Website gestalten. Auf deinem Handy, mit deinem Discord-Konto.</p></div></div>
+    <div class="install-heading"><img data-clan-emblem class="install-icon" src="icons/icon-192.png" alt="Raben-Admin-Appsymbol" width="100" height="100"><div><p class="eyebrow">Raben Admin · Nur für Admins</p><h1>Die Clanführung.<br><span>Immer dabei.</span></h1><p class="install-intro">Mitglieder freigeben, Beiträge pflegen und eure Website gestalten. Auf deinem Handy, mit deinem Discord-Konto.</p></div></div>
     <p class="status-message" id="install-status" role="status" hidden></p>
     <div class="install-grid">
       <section class="install-card">
@@ -45,5 +46,6 @@
     <noscript><p class="status-message">Die Installation über das Browsermenü ist möglich. Die Verwaltung benötigt JavaScript.</p></noscript>
   </main>
   <script src="install.js?v=0a04c8483701"></script>
+<script src="../config.js?v=a9cc7a500a2e"></script><script src="../vendor/supabase-2.117.2.js?v=59d39487c358"></script><script src="../app.js?v=10052867750d"></script><script src="../branding.js?v=55faf457736a"></script>
 </body>
 </html>

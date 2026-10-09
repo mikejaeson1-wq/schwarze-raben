@@ -1,0 +1,15 @@
+@font-face { font-family: RabenFraktur; src: url('assets/fonts/fraktur-latin.woff2') format('woff2'); font-display: swap; font-weight: 400; }
+@font-face { font-family: RabenMedieval; src: url('assets/fonts/medieval-latin.woff2') format('woff2'); font-display: swap; font-weight: 400; }
+body.personal-appearance :is(h1,h2,h3,h4,h5,h6) { font-family: var(--personal-heading-font, var(--serif)); color: var(--personal-heading-color,var(--gold-light)); }
+body.personal-appearance :is(.hub-card h3,.hub-card h4,.profile-section h3,.post h3) { font-size: var(--personal-heading-size,1.5rem); line-height: 1.3; }
+body.personal-heading-gradient :is(h1,h2,h3,h4,h5,h6) { background-image: var(--personal-heading-gradient); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+body.personal-text-gradient :is(.hub-body,.post-body,.field-note,.character-fields dd) { background-image: var(--personal-text-gradient); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+body.personal-heading-shadow :is(h1,h2,h3,h4,h5,h6) { text-shadow: 0 2px 3px #000, 1px 0 1px #000; }
+body.personal-text-shadow :is(.hub-body,.post-body,.field-note,.character-fields dd) { text-shadow: 0 1px 2px #000; }
+body.personal-heading-glow :is(h1,h2,h3,h4,h5,h6) { text-shadow: 0 0 .6em var(--personal-heading-color),0 1px 2px #000; }
+body.personal-text-glow :is(.hub-body,.post-body,.field-note,.character-fields dd) { text-shadow: 0 0 .5em var(--personal-color),0 1px 2px #000; }
+.reading-preview { padding: 1rem; border: 1px solid var(--line); background: #101619; overflow-wrap: anywhere; }
+.reading-preview p,.reading-preview h4 { background-clip: text; -webkit-background-clip: text; }
+.reading-group { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,200px),1fr)); gap: 1rem; }
+.reading-group .form-field { min-width: 0; }
+@supports not (background-clip:text) { body.personal-text-gradient :is(.hub-body,.post-body,.field-note,.character-fields dd) { color: var(--personal-color); } body.personal-heading-gradient :is(h1,h2,h3,h4,h5,h6) { color: var(--personal-heading-color); } }

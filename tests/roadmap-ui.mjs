@@ -23,7 +23,7 @@ async function setup(actor,mode='member',personalData=null,extension=false){
  Object.defineProperty(HTMLSelectElement.prototype,'value',{configurable:true,get(){return [...this.options].find(o=>o.hasAttribute('selected'))?.value||this.options[0]?.value||'';},set(value){for(const o of this.options)o.removeAttribute('selected');[...this.options].find(o=>o.value===String(value))?.setAttribute('selected','');}});
  let currentActor=actor;const calls=[],copies=[],transfers=[],downloads=[],exports=[],events=new Map();
  const data={raben_records:structuredClone(fixtures),raben_memberships:[lead,member],raben_site_content:[{id:1,revision:1,content:{name:'Schwarze Raben',extraInfos:[]}}],raben_content_versions:[{id:id(100),source_table:'raben_records',entity_key:characterId,kind:'character',title:'Alter Testcharakter',revision:1,operation:'insert',actor_name:'Test-Mitglied',changed_at:'2026-10-07T20:00:00Z',snapshot:{...fixtures[2],title:'Frühere Fassung'}}],raben_applications:[],raben_character_notes:[],raben_event_responses:[],raben_poll_votes:[],raben_task_claims:[],raben_clan_posts:[]};
- for(const table of ['raben_clan_information','raben_member_offices','raben_permissions','raben_ranks','raben_member_ranks','raben_preferences','raben_rp_requests','raben_plots','raben_plot_guests','raben_comments','raben_reactions','raben_notifications','raben_event_slots','raben_profile_gallery','raben_relationships','raben_stock_items','raben_stock_movements','raben_project_materials','raben_backup_runs'])data[table]=[];
+ for(const table of ['raben_clan_information','raben_member_offices','raben_permissions','raben_ranks','raben_member_ranks','raben_preferences','raben_rp_requests','raben_plots','raben_plot_guests','raben_comments','raben_reactions','raben_notifications','raben_event_slots','raben_profile_gallery','raben_relationships','raben_stock_items','raben_stock_movements','raben_project_materials','raben_backup_runs','raben_profile_styles','raben_branding'])data[table]=[];
  data.raben_clan_information=[{id:1,title:'Schwarze Raben',body:'',rules:'',playtimes:'',contact:'',revision:1}];data.raben_memberships.push(friend);data.raben_profiles=[];data.raben_profile_items=[];data.raben_profile_grants=[];
  if(personalData)for(const name of ['raben_profiles','raben_profile_items','raben_profile_grants'])data[name]=structuredClone(personalData[name]);
  const files=new Map([['raben-media/'+privateAudio,new Blob([new Uint8Array([73,68,51,0])],{type:'audio/mpeg'})],['raben-public/'+releasedAudio,new Blob([new Uint8Array([73,68,51,0])],{type:'audio/mpeg'})]]);
@@ -46,7 +46,7 @@ async function setup(actor,mode='member',personalData=null,extension=false){
    if(!currentActor&&columns.includes('created_by'))return {error:{code:'42501'},data:null};
    let rows=(data[table]||[]).filter(visible).filter(r=>filters.every(f=>f(r)));
    if(operation==='upsert'){const row=data[table].find(r=>(payload.user_id?r.user_id===payload.user_id:true)&&(payload.item_id?r.item_id===payload.item_id:true)&&(payload.project_id?r.project_id===payload.project_id:true));if(row){Object.assign(row,payload);rows=[row];}else{data[table].push(payload);rows=[payload];}}
-   if(operation==='insert'){const row={id:id(200+data.raben_records.length),created_by:currentActor.user_id,revision:1,...payload};data[table].push(row);rows=[row];}
+   if(operation==='insert'){const row={user_id:currentActor.user_id,id:id(200+data.raben_records.length),created_by:currentActor.user_id,revision:1,...payload};data[table].push(row);rows=[row];}
    if(operation==='update')rows.forEach(r=>Object.assign(r,payload,{revision:(r.revision||0)+1}));
    if(operation==='delete')data[table]=data[table].filter(r=>!rows.includes(r));
    for(const [key,options] of [...orders].reverse())rows.sort((a,b)=>{const x=value(a,key),y=value(b,key);if(x==null)return 1;if(y==null)return -1;return (x<y?-1:x>y?1:0)*(options.ascending===false?-1:1);});
@@ -60,8 +60,8 @@ async function setup(actor,mode='member',personalData=null,extension=false){
    if(!row){row={user_id:currentActor.user_id,revision:0};data.raben_profiles.push(row);}
    Object.assign(row,{display_name:args.p_name,revision:row.revision+1,...(name==='raben_save_account'?{avatar_path:args.p_avatar_path}:{})});return {data:structuredClone(row),error:null};
   }
-  if(name==='raben_save_preferences'){
-   const values={user_id:currentActor.user_id,subscriptions:args.p_subscriptions,font_family:args.p_font_family,font_color:args.p_font_color,font_size:args.p_font_size};
+  if(name==='raben_save_preferences'||name==='raben_save_reading_preferences'){
+   const values={user_id:currentActor.user_id,subscriptions:args.p_subscriptions,font_family:args.p_font_family,font_color:args.p_font_color,font_size:args.p_font_size,reading_style:args.p_style||{}};
    const row=data.raben_preferences.find(r=>r.user_id===currentActor.user_id);if(row)Object.assign(row,values);else data.raben_preferences.push(values);return {data:structuredClone(values),error:null};
   }
   if(name==='raben_assign_clan_roles'){
@@ -70,20 +70,30 @@ async function setup(actor,mode='member',personalData=null,extension=false){
    data.raben_member_offices=data.raben_member_offices.filter(r=>r.user_id!==args.p_user);for(const office_id of args.p_offices)data.raben_member_offices.push({user_id:args.p_user,office_id});
    return {data:null,error:null};
   }
-  if(name==='raben_discord_status')return {data:{configured:false,enabled:false,scopes:['posts','event','poll'],pending:0,recent:[]},error:null};
-  if(name==='raben_save_discord_webhook')return {data:{configured:!args.p_clear,enabled:args.p_enabled,scopes:args.p_scopes,pending:0,recent:[]},error:null};
+  if(name==='raben_discord_status')return {data:data.mockWebhook||{configured:false,enabled:false,scopes:['posts','event','poll'],pending:0,recent:[]},error:null};
+  if(name==='raben_save_discord_webhook'){data.mockWebhook={configured:!args.p_clear,enabled:args.p_enabled,scopes:args.p_scopes,pending:0,recent:[],updated_at:new Date().toISOString()};return {data:data.mockWebhook,error:null};}
+  if(name==='raben_discord_check')return {data:{ok:true,status:200},error:null};
+  if(name==='raben_save_emblem'){data.raben_branding=[{id:1,image_path:args.p_path,revision:args.p_expected+1}];return {data:data.raben_branding[0],error:null};}
+  if(name==='raben_save_profile_banner'){const row=data.raben_profiles.find(p=>p.user_id===currentActor.user_id);row.banner_path=args.p_path;row.revision++;return {data:row,error:null};}
   if(name==='raben_discord_test')return {data:null,error:null};
+  if(name==='raben_public_image_status'||name==='raben_public_image_like'){
+   data.publicLikes||={};const key=args.p_record+':'+args.p_visitor;
+   if(name==='raben_public_image_like')data.publicLikes[key]=args.p_liked;
+   return {data:{count:Object.keys(data.publicLikes).filter(k=>k.startsWith(args.p_record+':')&&data.publicLikes[k]).length,liked:!!data.publicLikes[key]},error:null};
+  }
   if(name==='raben_my_capabilities')return {data:{calendar:currentActor.role==='admin',content:currentActor.role==='admin'},error:null};
   if(name==='raben_search')return {data:data.raben_records.filter(r=>(r.title+' '+r.body).includes(args.p_query)).map(r=>({type:'record',id:r.id,title:r.title,snippet:r.body})),error:null};
   if(name==='raben_event_respond_on'){const row=data.raben_event_slots.find(r=>r.record_id===args.p_record&&r.user_id===currentActor.user_id&&r.occurrence_date===args.p_date);if(row)row.choice=args.p_choice;else data.raben_event_slots.push({record_id:args.p_record,user_id:currentActor.user_id,occurrence_date:args.p_date,choice:args.p_choice});return {data:null,error:null};}
   if(name==='raben_save_plot'){const row={id:args.p_id||id(900+data.raben_plots.length),owner_id:currentActor.user_id,title:args.p_title,body:args.p_body,visibility:args.p_visibility,stage:args.p_stage,chapters:args.p_chapters,revision:1};data.raben_plots.push(row);return {data:row,error:null};}
   if(name==='raben_move_stock'){const item=data.raben_stock_items.find(i=>i.id===args.p_item);item.quantity=Number(item.quantity||0)+args.p_delta;item.revision++;data.raben_stock_movements.push({item_id:item.id,delta:args.p_delta,reason:args.p_reason,created_by:currentActor.user_id,created_at:new Date().toISOString()});return {data:{},error:null};}
-  if(name==='raben_save_profile_item'||name==='raben_save_profile_entry'){
+  if(name==='raben_save_profile_item'||name==='raben_save_profile_entry'||name==='raben_save_designed_profile_entry'){
    let row=data.raben_profile_items.find(p=>p.id===args.p_id);
    if(!row){row={id:id(500+data.raben_profile_items.length),owner_id:currentActor.user_id,revision:0,created_at:'2026-10-08T09:00:00Z'};data.raben_profile_items.push(row);}
    Object.assign(row,{details:args.p_details||{},preview_path:args.p_preview,kind:args.p_kind,title:args.p_title,body:args.p_body,image_path:args.p_image_path,visibility:args.p_visibility,revision:row.revision+1});
    data.raben_profile_grants=data.raben_profile_grants.filter(g=>g.item_id!==row.id);
    if(args.p_visibility==='selected')for(const grantee_id of args.p_recipients)data.raben_profile_grants.push({item_id:row.id,owner_id:row.owner_id,grantee_id});
+   if(args.p_design)data.raben_profile_styles=[...data.raben_profile_styles.filter(s=>s.item_id!==row.id),{item_id:row.id,owner_id:row.owner_id,...args.p_design}];
+   if(args.p_gallery){const old=data.raben_profile_gallery.filter(g=>g.item_id===row.id);data.raben_profile_gallery=data.raben_profile_gallery.filter(g=>g.item_id!==row.id);for(const g of args.p_gallery)data.raben_profile_gallery.push({id:old.find(x=>x.image_path===g.image_path)?.id||id(800+data.raben_profile_gallery.length),item_id:row.id,owner_id:row.owner_id,...g});}
    return {data:structuredClone(row),error:null};
   }
   if(name==='raben_export_content')return {data:{application:'schwarze-raben',schemaVersion:1,siteContent:data.raben_site_content[0],records:data.raben_records,posts:[],notes:[],versions:data.raben_content_versions,files:inventory()},error:null};
@@ -97,7 +107,7 @@ async function setup(actor,mode='member',personalData=null,extension=false){
  };}}};
  document.body.addEventListener('click',event=>{if(event.target.tagName==='A'&&event.target.download)exports.push({name:event.target.download,url:event.target.href});});
  const context={document,Event,CustomEvent,console,URL,Intl,Date,Math,Uint8Array,Blob,File,TextEncoder,crypto:globalThis.crypto,structuredClone,setTimeout:(fn,delay)=>{const timer=setTimeout(fn,delay);timer.unref();return timer;},setInterval:()=>0,confirm:()=>true,
-  localStorage:{getItem:()=>null,setItem:()=>{}},matchMedia:()=>({matches:false}),location:{href:'https://example.com/'+(mode==='public'?'entdecken.html':'clan.html'),origin:'https://example.com'},
+  localStorage:{getItem:key=>data.deviceSettings?.[key]||null,setItem:(key,value)=>{(data.deviceSettings||={})[key]=value;}},matchMedia:()=>({matches:false}),location:{href:'https://example.com/'+(mode==='public'?'entdecken.html':'clan.html'),origin:'https://example.com'},
   addEventListener:(name,fn)=>{if(!events.has(name))events.set(name,[]);events.get(name).push(fn);},dispatchEvent:event=>{for(const fn of events.get(event.type)||[])fn(event);},
   Raben:{el:(tag,classes='',text='')=>{const element=document.createElement(tag);element.className=classes;element.textContent=text;return element;},check:async result=>{const r=await result;if(r.error)throw r.error;return r.data;},client:()=>sb,member:async()=>currentActor,config:{siteUrl:'https://example.com/',supabaseUrl:'https://test.supabase.co',supabasePublishableKey:'test-key'},errorMessage:()=> 'Keine Rechte oder Fehler.',imageUrl:value=>value||''},
   tus:{Upload:class{
@@ -106,7 +116,7 @@ async function setup(actor,mode='member',personalData=null,extension=false){
    async abort(){this.aborted=true;}
   }}
  };context.window=context;const sandbox=vm.createContext(context);
- for(const name of ['vendor/fflate-0.8.3.js','media.js','identity.js','history.js','profiles.js',...(extension?['pictures.js','calendar.js','profile-tools.js','expansion.js','clan-settings.js','guide.js','backup-tools.js']:[]),'community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
+ for(const name of ['vendor/fflate-0.8.3.js','media.js','branding.js','interactions.js','gallery-view.js','identity.js','history.js','profiles.js',...(extension?['pictures.js','calendar.js','profile-tools.js','expansion.js','clan-settings.js','profile-design.js','guide.js','backup-tools.js']:[]),'community.js'])vm.runInContext(await readFile(name,'utf8'),sandbox);
  const root=document.getElementById('root');const hubContext=await (mode==='public'?context.RabenHub.mountPublic(root):mode==='admin'?context.RabenHub.mountAdmin(root,actor):context.RabenHub.mountMember(root,actor));await wait();
  const click=async text=>{const b=[...root.querySelectorAll('button')].find(b=>b.textContent===text&&!b.disabled);assert.ok(b,'Button: '+text);b.click();await wait();return b;};
  return {context,sandbox,document,Event,root,hubContext,data,files,calls,copies,transfers,downloads,exports,click,setActor:value=>{currentActor=value;}};
@@ -263,3 +273,5 @@ await verifyExpansionUI({setup,wait,member,lead,id});
 
 const {verifySettingsUI}=await import('./settings-ui-cases.mjs');
 await verifySettingsUI({setup,wait,member,lead,id});
+const {verifyImprovementUI}=await import('./improvement-ui-cases.mjs');
+await verifyImprovementUI({setup,wait,member,lead,id});

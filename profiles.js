@@ -43,10 +43,10 @@
   const image=async(ctx,item,host,avatar=false)=>{
     if(!item.image_path)return;const epoch=ctx.epoch;
     try{
-      const blob=await check(Raben.client().storage.from(BUCKET).download(item.image_path));
+      const blob=await check(Raben.client().storage.from(BUCKET).download(avatar?item.image_path:item.preview_path||item.image_path));
       if(!live(ctx,epoch)||!host.isConnected)return;
       const url=URL.createObjectURL(blob);ctx.urls.add(url);const img=el('img',avatar?'profile-avatar':'hub-image');
-      img.src=url;img.alt=avatar?'Profilbild':item.title;img.loading='lazy';host.prepend(img);
+      img.src=url;img.alt=avatar?'Profilbild':item.title;img.loading='lazy';if(!avatar)img.addEventListener('click',()=>window.RabenGallery?.open(ctx,{path:item.image_path,title:item.title}));host.prepend(img);
     }catch(_){if(live(ctx,epoch)&&host.isConnected)host.append(note('Das Bild ist gerade nicht verfügbar. Aktualisiere das Profil.'));}
   };
   // Delete only an old, owned file that is no longer attached. The server checks again.
@@ -146,7 +146,7 @@
       let path=removeImage?.input.checked?null:item?.image_path||null;
       let preview=item?.preview_path||null;const chosenFile=file?.input.files?.[0];if(chosenFile){if(window.RabenPictures){const image=await RabenPictures.upload(ctx,chosenFile,progress,BUCKET);path=image.imagePath;preview=image.thumbPath;}else path=await RabenMedia.upload(ctx,chosenFile,ctx.actor.user_id,progress,false,null,BUCKET);}if(!path)preview=null;
       if(!live(ctx,attempt)||!form.isConnected)return;if(kind==='avatar'&&!path)throw new Error('file_required');
-      let payload={p_id:item?.id||null,p_kind:kind,p_title:kind==='avatar'?'Profilbild':title.input.value.trim(),p_body:kind==='avatar'?'':body.input.value.trim(),p_image_path:path,p_visibility:visibility.value,p_recipients:recipients,p_expected:item?.revision??null};if(window.RabenProfileTools){payload={...payload,p_details:item?.details||{},p_gallery:[],p_preview:preview};if(extra)payload=await extra.collect(payload,progress);}await check(Raben.client().rpc(window.RabenProfileTools?'raben_save_profile_entry':'raben_save_profile_item',payload));
+      let payload={p_id:item?.id||null,p_kind:kind,p_title:kind==='avatar'?'Profilbild':title.input.value.trim(),p_body:kind==='avatar'?'':body.input.value.trim(),p_image_path:path,p_visibility:visibility.value,p_recipients:recipients,p_expected:item?.revision??null};if(window.RabenProfileTools){payload={...payload,p_details:item?.details||{},p_gallery:[],p_preview:preview};if(extra)payload=await extra.collect(payload,progress);}await check(Raben.client().rpc(payload.p_design?'raben_save_designed_profile_entry':window.RabenProfileTools?'raben_save_profile_entry':'raben_save_profile_item',payload));
       if(!live(ctx,attempt))return;ctx.dirty=false;if(item?.image_path&&item.image_path!==path)await tidy(ctx,item.image_path,attempt);
       await mount(ctx);ctx.report(fields[kind]+' gespeichert · '+visibilityNames[visibility.value]+'.');
     });});editStart(ctx,form);
@@ -161,7 +161,7 @@
   };
   const showProfile=async(ctx,userId,epoch)=>{
     const [profiles,items]=await Promise.all([
-      check(Raben.client().from('raben_profiles').select('user_id,display_name,avatar_path,revision').eq('user_id',userId).limit(1)),
+      check(Raben.client().from('raben_profiles').select('user_id,display_name,avatar_path,banner_path,revision').eq('user_id',userId).limit(1)),
       check(Raben.client().from('raben_profile_items').select(window.RabenProfileTools?'id,owner_id,kind,title,body,image_path,preview_path,details,visibility,revision,created_at':'id,owner_id,kind,title,body,image_path,visibility,revision,created_at').eq('owner_id',userId).order('created_at').order('id'))
     ]);
     if(!live(ctx,epoch))return;ctx.profileSnapshot=snapshot(profiles[0],items);ctx.list.replaceChildren();const profile=profiles[0];
@@ -169,17 +169,17 @@
     if(!profile){ctx.list.append(note('Dieses Profil ist nicht verfügbar. Es kann noch nicht erstellt, gelöscht oder der Clan-Zugang gesperrt worden sein.'));if(userId===ctx.actor.user_id)ctx.list.append(button('Mein Profil erstellen',()=>openName(ctx), 'button small-button'));return;}
     const own=profile.user_id===ctx.actor.user_id,header=el('article','hub-card profile-header'),portrait=el('div','profile-portrait'),intro=el('div','profile-intro');
     const heading=el('h3','');heading.append(RabenIdentity.person(ctx,userId,{large:true,link:false}));portrait.append(el('span','profile-monogram',Array.from(profile.display_name)[0].toLocaleUpperCase('de')));intro.append(el('p','eyebrow',own?'Dein Clanprofil':'Clanprofil'),heading);header.append(portrait,intro);
-    if(own){const edit=button('Kontoname & Bild',()=>openName(ctx,profile));intro.append(edit,note('Dein Kontoname und Kontobild sind im Clan sichtbar. Das persönliche Profilbild und alle anderen Einträge haben eigene Freigaben.'));}else intro.append(note('Hier siehst du die für dich freigegebenen Angaben.'));
+    if(own){const edit=button('Kontoname & Bild',()=>openName(ctx,profile));intro.append(edit);if(window.RabenProfileDesign)intro.append(button('Banner gestalten',()=>RabenProfileDesign.openBanner(ctx,profile)));intro.append(note('Dein Kontoname und Kontobild sind im Clan sichtbar. Das persönliche Profilbild und alle anderen Einträge haben eigene Freigaben.'));}else intro.append(note('Hier siehst du die für dich freigegebenen Angaben.'));
     const avatar=items.find(i=>i.kind==='avatar');portrait.hidden=!avatar;if(avatar){image(ctx,avatar,portrait,true);intro.append(note('Persönliches Profilbild · eigene Freigabe'));if(own){intro.append(el('span','profile-visibility',visibilityNames[avatar.visibility]),itemActions(ctx,profile,avatar));}}
     else if(own){const add=button('Profilbild hinzufügen',()=>act(ctx,add,()=>openItem(ctx,profile,'avatar')));intro.append(add);}
-    ctx.list.append(header);
+    ctx.list.append(header);window.RabenProfileDesign?.banner(ctx,profile,header).catch(()=>{});
     for(const kind of ['character','info']){
       const section=el('section','profile-section'),title=el('div','hub-title-row');title.append(el('h3','',kind==='character'?'Charaktere':'Infos'));
       if(own){const add=button(kind==='character'?'Charakter hinzufügen':'Infokarte hinzufügen',()=>act(ctx,add,()=>openItem(ctx,profile,kind)));title.append(add);}section.append(title);
       const rows=items.filter(i=>i.kind===kind),grid=el('div','profile-item-grid');
       rows.forEach(item=>{const card=el('article','hub-card profile-item');card.dataset.profileItem=item.id;
         if(own)card.append(el('p','profile-visibility',visibilityNames[item.visibility]));card.append(el('h4','',item.title));if(item.body)card.append(el('p','hub-body',item.body));
-        if(own)card.append(itemActions(ctx,profile,item));grid.append(card);if(item.image_path)image(ctx,{...item,image_path:item.preview_path||item.image_path},card);window.RabenProfileTools?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));
+        if(own)card.append(itemActions(ctx,profile,item));grid.append(card);if(item.image_path){image(ctx,item,card);if(window.RabenGallery)card.append(button('Bild in Großansicht',()=>RabenGallery.open(ctx,{path:item.image_path,title:item.title})));window.RabenExpansion?.comments(ctx,'portrait',item.id,card,item.owner_id);}window.RabenExpansion?.comments(ctx,'profile',item.id,card,item.owner_id);window.RabenProfileTools?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));if(kind==='character')window.RabenProfileDesign?.render(ctx,item,card).catch(error=>ctx.report(errorMessage(error),true));
       });
       if(!rows.length)grid.append(note(own?(kind==='character'?'Erstelle einen oder mehrere Charaktere. Jeder hat seine eigene Sichtbarkeit.':'Ergänze zum Beispiel RP-Vorlieben, Spielzeiten oder persönliche Notizen. Neue Einträge sind zunächst nur für dich sichtbar.'):'Keine für dich freigegebenen Angaben.'));section.append(grid);ctx.list.append(section);
     }

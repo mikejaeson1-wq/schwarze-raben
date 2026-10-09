@@ -19,6 +19,7 @@ export async function prepareSettings(db,path) {
     create table raben_private.http_test_calls(url text,body jsonb,content_type text);
     create function extensions.http_set_curlopt(p_option text,p_value text) returns boolean language sql as $$select true$$;
     create function extensions.http_post(p_url text,p_body text,p_content_type text) returns table(status integer,content text) language plpgsql as $$begin insert into raben_private.http_test_calls values(p_url,p_body::jsonb,p_content_type);return query select r.status,r.content from raben_private.http_test_response r;end;$$;
+    create function extensions.http_get(p_url text) returns table(status integer,content text) language sql as $$select r.status,r.content from raben_private.http_test_response r$$;
   `);
   for(const filename of (await readdir(path+'migrations')).filter(name=>name.includes('discord_webhook_part')).sort()) {
     const hosted=await readFile(path+'migrations/'+filename,'utf8');

@@ -2,7 +2,7 @@
   'use strict';
   const {el,check}=Raben;
   const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
-  const mediaNames={image:'Bild',youtube:'YouTube',mp3:'MP3'};
+  const mediaNames={image:'Bild',youtube:'YouTube',mp3:'MP3',spotify:'Spotify'};
   const states={draft:'Entwurf',clan:'Clanintern',review:'Zur Freigabe',public:'Öffentlich',archived:'Archiviert'};
   const uploads=new WeakMap();
   const IMAGE_LIMIT=50*1024*1024,MP3_LIMIT=20*1024*1024;
@@ -48,6 +48,7 @@
     if(!(audio?/^[a-f0-9-]{36}\.mp3$/:/^[a-f0-9-]{36}\.(jpg|png|webp)$/).test(path||''))return '';
     return Raben.client().storage.from('raben-public').getPublicUrl(path).data.publicUrl;
   };
+  const spotifyLink=value=>{try{const u=new URL(String(value).trim());if(u.protocol!=='https:'||u.hostname!=='open.spotify.com'||u.username||u.password||u.port)return null;const m=u.pathname.match(/^\/(?:intl-[a-z-]+\/|embed\/)?(track|playlist)\/([A-Za-z0-9]{22})\/?$/);return m?{type:m[1],id:m[2]}:null;}catch(_){return null;}};
   const validateFile=async(file,audio)=>{
     if(!file||file.size===0)throw new Error('file_required');
     if(audio){
@@ -129,17 +130,21 @@
     const audioWrap=el('label','form-field full','MP3-Datei · maximal 20 MB'),audio=document.createElement('input');audio.type='file';audio.accept='.mp3,audio/mpeg';audioWrap.append(audio);
     const existing=message(details.fileName?'Aktuelle Datei: '+details.fileName:''),controls=progressControls();
     const coverWrap=inputs.image?.parentNode;if(coverWrap)coverWrap.firstChild.textContent='Bild oder optionales Cover · JPG, PNG, WebP · maximal 50 MB';
-    grid.append(ytWrap,audioWrap,existing,controls.wrap);
-    const toggle=()=>{const type=inputs.mediaType.value;ytWrap.hidden=type!=='youtube';audioWrap.hidden=type!=='mp3';existing.hidden=type!=='mp3'||!details.fileName;};
+    const spotifyWrap=el('label','form-field full','Spotify-Link · Song oder Playlist'),spotify=el('input','');spotify.type='url';spotify.maxLength=1000;spotify.placeholder='https://open.spotify.com/track/… oder /playlist/…';spotify.value=details.spotifyId?'https://open.spotify.com/'+details.spotifyType+'/'+details.spotifyId:'';spotifyWrap.append(spotify);
+    const autoWrap=el('label','form-field full','YouTube nach dem Laden automatisch abspielen'),auto=el('input','');auto.type='checkbox';auto.checked=details.autoplay!=='false';autoWrap.append(auto);
+    grid.append(ytWrap,autoWrap,spotifyWrap,audioWrap,existing,controls.wrap);
+    const toggle=()=>{const type=inputs.mediaType.value;ytWrap.hidden=type!=='youtube';autoWrap.hidden=type!=='youtube';spotifyWrap.hidden=type!=='spotify';audioWrap.hidden=type!=='mp3';existing.hidden=type!=='mp3'||!details.fileName;};
     inputs.mediaType.addEventListener('change',toggle);toggle();
     let removeCover=false;
     if(details.imagePath){const remove=btn('Cover entfernen',()=>{removeCover=true;remove.disabled=true;remove.textContent='Cover wird beim Speichern entfernt';grid.dispatchEvent(new Event('change',{bubbles:true}));});grid.append(remove);}
     return {controls,committed:data=>{audio.value='';Object.assign(details,data);existing.textContent=data.fileName?'Aktuelle Datei: '+data.fileName:'';removeCover=false;},collect:async data=>{
       if(removeCover){delete data.imagePath;delete data.publicImage;delete data.thumbPath;delete data.publicThumb;}
       const type=data.mediaType;
-      if(type!=='youtube')delete data.youtubeId;
+      if(type!=='youtube'){delete data.youtubeId;delete data.autoplay;}
+      if(type!=='spotify'){delete data.spotifyType;delete data.spotifyId;}
       if(type!=='mp3'){delete data.audioPath;delete data.publicAudio;delete data.fileName;}
-      if(type==='youtube'){const id=youtubeId(yt.value);if(!id)throw new Error('invalid_youtube');data.youtubeId=id;}
+      if(type==='youtube'){const id=youtubeId(yt.value);if(!id)throw new Error('invalid_youtube');data.youtubeId=id;data.autoplay=String(auto.checked);}
+      if(type==='spotify'){const link=spotifyLink(spotify.value);if(!link)throw new Error('invalid_spotify');data.spotifyType=link.type;data.spotifyId=link.id;}
       if(type==='mp3'){
         if(audio.files?.[0]){data.audioPath=await upload(ctx,audio.files[0],ctx.actor.user_id,controls,true);data.fileName=audio.files[0].name.slice(0,255);delete data.publicAudio;}
         else if(!data.audioPath)throw new Error('audio_file_required');
@@ -149,6 +154,7 @@
     }};
   };
   const releasePlayers=ctx=>{
+    window.RabenGallery?.close(ctx);
     window.RabenIdentity?.releaseImages(ctx);
     for(const player of ctx.players||[]){if(player.tagName==='AUDIO'){player.pause?.();player.removeAttribute('src');player.load?.();}else player.remove();}
     ctx.players?.clear();ctx.urls?.forEach(url=>URL.revokeObjectURL(url));ctx.urls?.clear();
@@ -160,18 +166,23 @@
     const epoch=ctx.epoch,wrap=el('div','media-player');ctx.players ||=new Set();ctx.urls ||=new Set();
     if(d.mediaType==='youtube'&&/^[A-Za-z0-9_-]{11}$/.test(d.youtubeId||'')){
       wrap.append(message('YouTube wird erst durch einen Klick geladen.'));
-      const load=btn('Video laden',async()=>{
+      const play=async(automatic=false)=>{
         load.disabled=true;
         try{
           if(!ctx.public)await authorize(ctx);
           if(ctx.disposed||ctx.epoch!==epoch||!host.isConnected)return;
           const iframe=document.createElement('iframe'),url=new URL('https://www.youtube-nocookie.com/embed/'+d.youtubeId);
-          url.searchParams.set('playsinline','1');url.searchParams.set('autoplay','0');url.searchParams.set('rel','0');
+          url.searchParams.set('playsinline','1');url.searchParams.set('autoplay',automatic||d.autoplay==='true'?'1':'0');url.searchParams.set('rel','0');if(automatic)url.searchParams.set('mute','1');
           iframe.src=url.href;iframe.title=row.title+' · YouTube';iframe.className='media-video';
-          iframe.setAttribute('allow','fullscreen; encrypted-media; picture-in-picture');iframe.setAttribute('allowfullscreen','');
+          iframe.setAttribute('allow','autoplay; fullscreen; encrypted-media; picture-in-picture');iframe.setAttribute('allowfullscreen','');
           iframe.referrerPolicy='strict-origin-when-cross-origin';ctx.players.add(iframe);wrap.replaceChildren(iframe);
         }catch(_){wrap.append(message('Bitte prüfe deinen Clan-Zugang.'));load.disabled=false;}
-      });wrap.append(load);
+      };const load=btn('Video laden',()=>play(false));wrap.append(load);
+      const autoload=btn('Autoplay auf diesem Gerät einschalten',async()=>{try{localStorage.setItem('raben-youtube-autoplay','1');}catch(_){}await play(true);});wrap.append(autoload,message('Autoplay lädt YouTube-Videos auf diesem Gerät automatisch und startet sie stumm. Du kannst es unter „Meine Einstellungen“ ausschalten.'));
+      try{if(localStorage.getItem('raben-youtube-autoplay')==='1'&&d.autoplay!=='false')Promise.resolve().then(()=>play(true));}catch(_){}
+    }else if(d.mediaType==='spotify'&&['track','playlist'].includes(d.spotifyType)&&/^[A-Za-z0-9]{22}$/.test(d.spotifyId||'')){
+      wrap.append(message('Spotify wird erst durch einen Klick geladen.'));
+      const load=btn('Spotify laden',async()=>{load.disabled=true;try{if(!ctx.public)await authorize(ctx);if(ctx.disposed||ctx.epoch!==epoch||!host.isConnected)return;const iframe=el('iframe','media-spotify');iframe.src='https://open.spotify.com/embed/'+d.spotifyType+'/'+d.spotifyId+'?utm_source=generator&theme=0';iframe.title=row.title+' · Spotify';iframe.height=d.spotifyType==='playlist'?'352':'152';iframe.setAttribute('allow','autoplay; encrypted-media; fullscreen; picture-in-picture');iframe.setAttribute('allowfullscreen','');iframe.referrerPolicy='strict-origin-when-cross-origin';ctx.players.add(iframe);wrap.replaceChildren(iframe,message('Spotify bestimmt, ob eine Vorschau oder die vollständige Wiedergabe verfügbar ist.'));}catch(_){load.disabled=false;wrap.append(message('Der Spotify-Player konnte nicht geladen werden.'));}});wrap.append(load);
     }else if(d.mediaType==='mp3'){
       const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.setAttribute('aria-label',row.title);audio.className='media-audio';
       if(ctx.public){const url=publicAsset(d.publicAudio,true);if(!url)return;audio.src=url;wrap.append(audio);}
@@ -211,6 +222,7 @@
         if(src&&ctx.epoch===epoch&&card.isConnected){const image=document.createElement('img');image.src=src;image.alt=row.title;image.loading='lazy';image.className='hub-image';card.prepend(image);}
       }
       await render(ctx,row,card);
+      if(ctx.public&&row.details?.publicImage)window.RabenInteractions?.like(ctx,'record',row.id,card,true);else if(!ctx.public)window.RabenExpansion?.comments(ctx,'record',row.id,card,row.created_by);
     }
     if(rows.length<(ids||[]).length)host.append(message('Einige Anhänge sind derzeit nicht verfügbar.'));
   };
@@ -271,5 +283,5 @@
     const format=await validateFile(file,path.endsWith('.mp3'));if(!path.endsWith('.'+format.extension))throw new Error('invalid_media_path');
     return upload(ctx,file,path.split('/')[0],controls,path.endsWith('.mp3'),path,bucket);
   };
-  window.RabenMedia={uploadOriginal,youtubeId,publicAsset,validateFile,upload,publish,editSource,progressControls,release,releasePlayers,render,references,relations,picker,bytes,usage,UUID,errorMessage:uploadMessage};
+  window.RabenMedia={uploadOriginal,youtubeId,spotifyLink,publicAsset,validateFile,upload,publish,editSource,progressControls,release,releasePlayers,render,references,relations,picker,bytes,usage,UUID,errorMessage:uploadMessage};
 })();

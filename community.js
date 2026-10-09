@@ -2,7 +2,7 @@
   "use strict";
   const {el,check}=Raben;
   const definitions={
-    media:{label:"Medien",singular:"Medienbeitrag",public:true,member:true,fields:[['mediaType','Medienart','select',[['image','Bild'],['youtube','YouTube-Video'],['mp3','MP3-Aufnahme']]]],image:true},
+    media:{label:"Medien",singular:"Medienbeitrag",public:true,member:true,fields:[['mediaType','Medienart','select',[['image','Bild'],['youtube','YouTube-Video'],['spotify','Spotify-Song oder Playlist'],['mp3','MP3-Aufnahme']]]],image:true},
     gallery:{label:"Dorfgalerie",singular:"Dorfaufnahme",public:true,fields:[['date','Aufnahmedatum','date']],image:true},
     place:{label:"Dorfplan",singular:"Ort",public:true,fields:[['category','Art des Ortes'],['x','Position von links (%)','number'],['y','Position von oben (%)','number']]},
     chronicle:{label:"Chronik",singular:"Chronikeintrag",public:true,fields:[['date','Datum des Ereignisses','date']],image:true},
@@ -29,6 +29,7 @@
     if(m.includes('audio_file_required'))return 'Bitte wähle eine MP3-Datei für diese Aufnahme aus.';
     if(m.includes('image_required'))return 'Bitte lade ein Bild für diesen Medienbeitrag hoch.';
     if(m.includes('invalid_mp3'))return 'Bitte wähle eine echte MP3-Datei mit maximal 20 MB.';
+    if(m.includes('invalid_spotify'))return 'Bitte füge einen Spotify-Link zu einem Song oder einer Playlist ein.';
     if(m.includes('invalid_youtube'))return 'Bitte füge einen gültigen HTTPS-Link zu einem YouTube-Video ein.';
     if(m.includes('upload_interrupted'))return 'Der Upload wurde unterbrochen. Deine Eingaben bleiben erhalten. Mit Speichern kannst du ihn fortsetzen.';
     if(m.includes('media_in_use'))return 'Dieses Medium wird noch verwendet. Öffne „Verwendung ansehen“ und entferne zuerst die Verknüpfungen.';
@@ -147,7 +148,7 @@
     form.addEventListener('input',()=>{ctx.dirty=true;});form.addEventListener('change',()=>{ctx.dirty=true;});
     form.addEventListener('submit',event=>{event.preventDefault();run(ctx,save,async()=>{
       let data={};schema.fields.forEach(([key,,type])=>{const input=inputs[key];if(type==='checkbox')data[key]=input.checked;else if(type==='number')data[key]=Number(input.value);else if(type==='options')data[key]=input.value.split('\n').map(s=>s.trim()).filter(Boolean);else if(input.value.trim())data[key]=input.value.trim();});
-      ['imagePath','publicImage','thumbPath','publicThumb','sourceId','audioPath','publicAudio','youtubeId','fileName'].forEach(key=>{if(details[key])data[key]=details[key];});
+      ['imagePath','publicImage','thumbPath','publicThumb','sourceId','audioPath','publicAudio','youtubeId','fileName','spotifyType','spotifyId','autoplay'].forEach(key=>{if(details[key])data[key]=details[key];});
       data.mediaIds=mediaPicker?mediaPicker.read():details.mediaIds||[];data.relatedIds=relatedPicker?relatedPicker.read():details.relatedIds||[];data.story=inputs.story.value.trim();
       if(kind==='knowledge')data.pinned=inputs.pinned?inputs.pinned.checked:details.pinned===true;
       if(expansion)Object.assign(data,await expansion.read());
@@ -212,7 +213,7 @@
     const head=el('div','hub-card-head');head.append(el('p','eyebrow',definitions[row.kind].singular));if(!ctx.public)head.append(el('span','hub-badge',visibilityNames[row.visibility]));
     card.append(head,el('h3','',row.title));window.RabenExpansion?.marker(row,card);
     const meta=[];if(d.date)meta.push(formatDate(d.date));if(d.time)meta.push(d.time+' Uhr · Berlin');if(d.location)meta.push(d.location);if(d.profession)meta.push(d.profession);if(d.category)meta.push(d.category);if(d.dueDate)meta.push('Bis '+formatDate(d.dueDate));if(d.expires)meta.push('Gültig bis '+formatDate(d.expires));
-    if(d.mediaType)meta.push({image:'Bild',youtube:'YouTube',mp3:'MP3'}[d.mediaType]||'Medium');
+    if(d.mediaType)meta.push({image:'Bild',youtube:'YouTube',spotify:'Spotify',mp3:'MP3'}[d.mediaType]||'Medium');
     if(d.pinned)meta.push('Angeheftet');
     if(meta.length)card.append(note(meta.join(' · '),'hub-meta'));
     if(d.story){const storyButton=button('Geschichte: '+d.story,()=>{ctx.storyFilter.value=d.story;selectKind(ctx,'stories');});card.append(storyButton);}
@@ -236,13 +237,13 @@
     if(row.kind==='media'&&window.RabenMedia)RabenMedia.render(ctx,row,card).catch(error=>inform(ctx,failure(error),true));
     if(d.mediaIds?.length&&window.RabenMedia){const attachments=el('div','media-attachments');card.append(attachments);RabenMedia.references(ctx,d.mediaIds,attachments).catch(error=>inform(ctx,failure(error),true));}
     if(d.relatedIds?.length&&window.RabenMedia)RabenMedia.relations(ctx,d.relatedIds,card).catch(error=>inform(ctx,failure(error),true));
-    if(definitions[row.kind].image){paintImage(ctx,row,card).catch(()=>{});if(d.imagePath||d.publicImage){const original=el('details','');original.append(el('summary','','Originalbild ansehen'));let loaded=false;original.addEventListener('toggle',async()=>{if(!original.open||loaded)return;const epoch=ctx.epoch;try{let src=publicImage(d.publicImage);if(!src&&!ctx.public){await ensure(ctx);const blob=await check(Raben.client().storage.from('raben-media').download(d.imagePath));if(ctx.disposed||ctx.epoch!==epoch)return;src=URL.createObjectURL(blob);ctx.urls.add(src);}if(src&&original.isConnected){const image=el('img','hub-image');image.src=src;image.alt=row.title;original.append(image);loaded=true;}}catch(error){inform(ctx,failure(error),true);}});card.append(original);}}
+    if(definitions[row.kind].image){paintImage(ctx,row,card).catch(()=>{});if(d.imagePath||d.publicImage)card.append(button('Originalbild ansehen',()=>RabenGallery.open(ctx,{bucket:'raben-media',path:d.imagePath,publicUrl:publicImage(d.publicImage),title:row.title})));}
     if(!ctx.public&&['clan','public'].includes(row.visibility)){
       if(row.kind==='event')(window.RabenCalendar?RabenCalendar.render(ctx,row,card):responses(ctx,row,card)).catch(error=>inform(ctx,failure(error),true));
       if(row.kind==='task')claim(ctx,row,card).catch(error=>inform(ctx,failure(error),true));
       if(row.kind==='poll')poll(ctx,row,card).catch(error=>inform(ctx,failure(error),true));
     }else if(ctx.public&&row.kind==='event')card.append(link('Clanbereich öffnen','clan.html'));
-    if(!ctx.public)window.RabenExpansion?.comments(ctx,'record',row.id,card,row.created_by);
+    if(ctx.public&&d.publicImage)window.RabenInteractions?.like(ctx,'record',row.id,card,true);else if(!ctx.public)window.RabenExpansion?.comments(ctx,'record',row.id,card,row.created_by);
     return card;
   };
   const drawMap=async(ctx,rows)=>{
@@ -322,7 +323,7 @@
     ctx.status=el('p','status-message');ctx.status.setAttribute('role','status');ctx.status.hidden=true;
     const tabs=el('div','hub-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Gemeinschaftsbereiche');
     let kinds=ctx.public?[...publicKinds,'stories']:ctx.admin?['dashboard','profiles','applications','review',...Object.keys(definitions),'stories','history','storage','backup']:['profiles',...memberKinds,'stories'];
-    if(!ctx.public&&window.RabenExpansion)kinds=[...['home','clanInfo','searchAll','notices','requests','plots','stock','settings'],...(ctx.actor.role==='admin'?['access','publicSettings','webhook']:[]),...kinds];
+    if(!ctx.public&&window.RabenExpansion)kinds=[...['home','clanInfo','searchAll','notices','requests','plots','stock','settings'],...(ctx.actor.role==='admin'?['access','publicSettings','webhook','emblem']:[]),...kinds];
     const uid=++sequence;ctx.uid=uid;
     kinds.forEach((kind,index)=>{const b=button(window.RabenExpansion?.labels[kind]||definitions[kind]?.label||({dashboard:'Übersicht',profiles:'Clanprofile',applications:'Bewerbungen',review:'Freigaben',stories:'Geschichten',history:'Versionen',storage:'Speicher',backup:'Sicherung'}[kind]),()=>selectKind(ctx,kind),'hub-tab');b.dataset.kind=kind;b.setAttribute('role','tab');b.setAttribute('aria-controls','hub-panel-'+uid);b.setAttribute('aria-selected',String(index===0));b.tabIndex=index===0?0:-1;b.id='hub-tab-'+uid+'-'+kind;ctx.tabs.push(b);tabs.append(b);});
     ctx.tabs.forEach((tab,index)=>tab.addEventListener('keydown',event=>{const n=event.key==='Home'?0:event.key==='End'?ctx.tabs.length-1:event.key==='ArrowRight'?(index+1)%ctx.tabs.length:event.key==='ArrowLeft'?(index+ctx.tabs.length-1)%ctx.tabs.length:null;if(n!==null){event.preventDefault();ctx.tabs[n].click();ctx.tabs[n].focus();}}));

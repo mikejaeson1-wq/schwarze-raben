@@ -30,6 +30,7 @@ await db.exec(await readFile(path+'migrations/20261008105012_clan_account_identi
 for(const migration of (await readdir(path+'migrations')).filter(n=>n.includes('twenty_update_part')).sort())await db.exec(await readFile(path+'migrations/'+migration,'utf8'));
 const {prepareSettings,verifySettingsAccess}=await import('./settings-access-cases.mjs');
 await prepareSettings(db,path);
+for(const migration of (await readdir(path+'migrations')).filter(n=>n.startsWith('20261009')).sort())await db.exec(await readFile(path+'migrations/'+migration,'utf8'));
 assert.equal(Number((await db.query("select file_size_limit from storage.buckets where id='raben-media'")).rows[0].file_size_limit),50*1024*1024);
 assert.equal(Number((await db.query("select file_size_limit from storage.buckets where id='raben-public'")).rows[0].file_size_limit),50*1024*1024);
 const admin='00000000-0000-4000-a000-000000000001';
@@ -126,4 +127,6 @@ await verifyAccounts(db,{as,denied,scalar,admin,member,other,blocked});
 const {verifyExpansion}=await import('./expansion-access-cases.mjs');
 await verifyExpansion(db,{as,denied,scalar,admin,member,other,blocked});
 await verifySettingsAccess({db,as,denied,scalar,admin,member,other,blocked});
+const {verifyImprovements}=await import('./improvement-access-cases.mjs');
+await verifyImprovements({db,as,denied,scalar,admin,member,other,blocked});
 await db.close();

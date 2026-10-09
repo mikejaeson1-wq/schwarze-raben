@@ -1,1 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#101619"/><path d="M256 70 442 256 256 442 70 256Z" fill="none" stroke="#c8a46c" stroke-width="10"/><text x="256" y="329" text-anchor="middle" font-family="Georgia,DejaVu Serif,serif" font-size="236" fill="#ece9e1">R</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Schwarzer Rabe auf nordischem Schild">
+ <defs>
+  <radialGradient id="wood"><stop stop-color="#415054"/><stop offset="1" stop-color="#172329"/></radialGradient>
+  <linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#f4d7a0"/><stop offset=".46" stop-color="#bd9155"/><stop offset="1" stop-color="#65502e"/></linearGradient>
+  <linearGradient id="feather" x2="1" y2="1"><stop stop-color="#17262e"/><stop offset="1" stop-color="#050b10"/></linearGradient>
+  <clipPath id="round"><circle cx="128" cy="128" r="105"/></clipPath>
+ </defs>
+ <circle cx="128" cy="128" r="119" fill="#0b1115"/>
+ <circle cx="128" cy="128" r="113" fill="url(#wood)" stroke="url(#metal)" stroke-width="10"/>
+ <g clip-path="url(#round)" stroke="#0c171d" stroke-width="3" opacity=".6"><path d="M47 12v232M81 12v232M115 12v232M149 12v232M183 12v232M217 12v232"/></g>
+ <circle cx="128" cy="128" r="99" fill="none" stroke="#bf9b65" stroke-width="1.5"/>
+ <g fill="#edd3a0" stroke="#6d532f" stroke-width="1"><circle cx="128" cy="15" r="3.6"/><circle cx="208" cy="48" r="3.6"/><circle cx="241" cy="128" r="3.6"/><circle cx="208" cy="208" r="3.6"/><circle cx="128" cy="241" r="3.6"/><circle cx="48" cy="208" r="3.6"/><circle cx="15" cy="128" r="3.6"/><circle cx="48" cy="48" r="3.6"/></g>
+ <g fill="none" stroke="#96784d" stroke-width="2" opacity=".8"><path d="m113 35 15-8 15 8-15 8zm0 186 15-8 15 8-15 8zM35 113l8 15-8 15-8-15zm186 0 8 15-8 15-8-15z"/></g>
+ <path d="M72 180c16-15 23-34 32-53C76 115 57 96 48 73c23 6 43 17 62 29-11-21-17-39-12-56 20 21 39 39 48 61l8-2c-10-19-7-36 8-42 13-6 27 1 30 14l23 10-23 9c-1 17-7 28-15 39-3 28-16 40-38 46l-12 31-7-20-18 21 3-27-22 18 9-28-23 11z" fill="url(#feather)" stroke="#bd9a64" stroke-width="2.2" stroke-linejoin="round"/>
+ <path d="M109 117c21 0 35 16 36 40-9 12-22 19-41 23m3-56 25 23m-34-9 26 19m-34-8 25 16" fill="none" stroke="#6b7d82" stroke-width="2" stroke-linecap="round"/>
+ <path d="m159 179 4 14 11 6m-11-6-8 6m-17-17 2 15 10 5m-10-5-10 5" fill="none" stroke="#d2b47a" stroke-width="3" stroke-linecap="round"/>
+ <circle cx="177" cy="81" r="3" fill="#f6dfaa"/>
+ <path d="m194 87 13 1-13 5" fill="#d3b276"/>
+</svg>
