@@ -1,83 +1,83 @@
 # Schwarze Raben · Neue Roadmap mit 20 künftigen Verbesserungen
 
-Stand: 09. Oktober 2026 · nach Update 2026.10.09.3. Alle Punkte sind geplant; die Reihenfolge ist kein fester Veröffentlichungstermin. Die vorherige Roadmap ist vollständig umgesetzt und in ROADMAP_20261009_ARCHIV.md dokumentiert.
+Stand: 15. Oktober 2026 · nach Update 2026.10.15.3. Alle Punkte sind geplant; die Reihenfolge ist kein fester Veröffentlichungstermin.
 
-1. **Änderungen während der Eingabe rückgängig machen** (Bearbeitung · Als Nächstes)
+1. **Antworten auf einzelne Nachrichten** (Privatchat · Als Nächstes)
 
-   Absätze und Feldänderungen noch vor dem Speichern schrittweise rückgängig machen und wiederholen.
+   Nachrichten direkt zitieren und vom Zitat zum ursprünglichen Eintrag springen.
 
-2. **Bildfokus mit Maus und Touch verschieben** (Profilgestaltung · Als Nächstes)
+2. **Freiwillige Tippanzeige** (Privatchat · Danach)
 
-   Den Bannerfokus direkt am Bild ziehen und mehrere Ausschnitte für Handy und Desktop speichern.
+   Pro Gespräch entscheiden, ob während der Eingabe eine kurzlebige Tippanzeige erscheint.
 
-3. **Mehrere Bilder gleichzeitig organisieren** (Galerie · Als Nächstes)
+3. **Wichtige Nachrichten persönlich merken** (Privatchat · Als Nächstes)
 
-   Bilder gemeinsam auswählen, in Alben verschieben und vor dem Entfernen eine Übersicht der Auswahl sehen.
+   Eigene Lesezeichen im Gespräch setzen und in einer persönlichen Merkliste wiederfinden.
 
-4. **Eigene Bildbeschreibungen ergänzen** (Barrierefreiheit · Als Nächstes)
+4. **Private Chatentwürfe geräteübergreifend** (Privatchat · Danach)
 
-   Für Bilder getrennte Alternativtexte pflegen, unabhängig von der sichtbaren Bildunterschrift.
+   Optional eigene ungesendete Texte im Konto sichern und vor dem Gerätewechsel wieder aufnehmen.
 
-5. **Vorschauqualität selbst wählen** (Bilder · Danach)
+5. **Eigene Aufbewahrungszeiten für Dateien** (Anhänge · Später)
 
-   Zwischen sparsamen und detailreichen Vorschauen wechseln und die erwartete Dateigröße sehen.
+   Ablaufende Chat-Anhänge erkennen und eine bewusste Löschfrist für neu geteilte Dateien wählen.
 
-6. **Eigene Theme-Vorlagen gezielt importieren** (Themes · Danach)
+6. **Albumsicherungen geprüft wieder einlesen** (Galerie · Danach)
 
-   Exportierte eigene Vorlagen prüfen und einzelne Designs samt Bildern in das eigene Profil übernehmen.
+   Sicherungen auf Prüfsummen und Dateitypen prüfen und ausgewählte eigene Bilder als neues Album übernehmen.
 
-7. **Textkonflikte gemeinsam auflösen** (Zusammenarbeit · Als Nächstes)
+7. **Bildauswahlen vor dem Export bilanzieren** (Galerie · Als Nächstes)
 
-   Bei gleichzeitigen Änderungen die Unterschiede markieren und Texte absatzweise zusammenführen.
+   Gesamtgröße und einzelne Dateien vor einer Albumsicherung anzeigen und große Sicherungen in Teile aufteilen.
 
-8. **Änderungsvorschläge mit Freigabe** (Mitbearbeitung · Danach)
+8. **Dekorative Bilder ausdrücklich markieren** (Barrierefreiheit · Danach)
 
-   Mitbearbeiter können optional Vorschläge einreichen, die der Besitzer vor der Übernahme prüft.
+   Bewusst dekorative Bilder unabhängig von noch fehlenden Beschreibungen kennzeichnen und gemeinsam prüfen.
 
-9. **Eigene Zeitfenster vorschlagen** (Terminfindung · Danach)
+9. **Markdown mit Tastaturwerkzeugen bearbeiten** (Texte · Als Nächstes)
 
-   Mitglieder ergänzen freie Zeiträume; die Terminfindung berechnet Überschneidungen auch ohne vorgegebene Kandidaten.
+   Ausgewählte Textstellen per Werkzeugleiste formatieren und die Vorschau gezielt anspringen.
 
-10. **Einzelne Serientermine verschieben** (Kalender · Als Nächstes)
+10. **Zeitumstellungen deutlicher prüfen** (Kalender · Als Nächstes)
 
-   Für einzelne Termine Datum, Uhrzeit oder Dauer ändern, ohne die gesamte Serie neu anzulegen.
+   Nicht vorhandene und doppelte Uhrzeiten bei Sommer- und Winterzeit vor dem Speichern erläutern.
 
-11. **Aufbau- und Abbauzeiten berücksichtigen** (Reservierungen · Danach)
+11. **Kapazitäten über eine Woche vergleichen** (Reservierungen · Danach)
 
-   Zusätzliche Puffer vor und nach einer Buchung festlegen und bei Überschneidungen berücksichtigen.
+   Belegung und freie Einheiten mehrerer Ressourcen in einer gemeinsamen Wochenansicht zeigen.
 
-12. **Geräte benennen und Zustellung prüfen** (Geräte · Als Nächstes)
+12. **Persönliche Besetzungsfilter speichern** (Terminfindung · Danach)
 
-   Geräten eigene Namen geben und auf ausdrücklichen Wunsch eine Testbenachrichtigung auslösen.
+   Spieldauer, Mindestbesetzung und gewünschte Personen für wiederkehrende Planungen als eigene Ansicht speichern.
 
-13. **Ablaufdatum für Kalenderlinks** (Kalender-Abos · Danach)
+13. **Serienänderungen mit genauer Textdifferenz** (Kalender · Danach)
 
-   Persönliche Abos zusätzlich zeitlich begrenzen und vor ihrem Ablauf auf Wunsch einen Hinweis erhalten.
+   Neben den betroffenen Zuordnungen auch alte und neue Uhrzeiten und Dauer pro Termin gegenüberstellen.
 
-14. **Zeitleisten nach Themen filtern** (Geschichten · Danach)
+14. **Einladungshinweise mit Ablaufwarnung** (Mitbearbeitung · Als Nächstes)
 
-   Ereignisse nach Typ, Zeitraum und Handlungsfaden filtern und einzelne Ansichten speichern.
+   Neue Einladungen und bald endende Mitbearbeitungen als persönliche Hinweise bündeln.
 
-15. **Zoom und Touch-Gesten für alle Karten** (Karten · Als Nächstes)
+15. **Frühere Rezeptvarianten wiederherstellen** (Materialplanung · Danach)
 
-   Welt- und Gebäudekarten vergrößern, mit zwei Fingern bewegen und zum Ausgangsausschnitt zurückkehren.
+   Auch für alternative Materiallisten eine begrenzte Historie mit Vergleich und Wiederherstellung anbieten.
 
-16. **Rezeptversionen und Verpackungseinheiten** (Materialplanung · Später)
+16. **Bestandsbeobachtung feiner steuern** (Lager · Danach)
 
-   Materialvorlagen versionieren und Bedarf auf Bündel, Kisten oder andere Ausgabegrößen aufrunden.
+   Hinweise einzelner Materialien zeitweise pausieren und nach einer bewussten Prüfung erneut aktivieren.
 
-17. **Handelsabschlüsse mit Lagerbuchungen verbinden** (Handel · Später)
+17. **Eigene Meldungsvorlagen prüfen** (Discord · Später)
 
-   Erfüllte Handelsanfragen optional mit geprüften Ein- oder Auslagerungen verknüpfen.
+   Wiederkehrende Ankündigungsformate als Vorlagen speichern und vor jeder Freigabe auf fehlende Angaben prüfen.
 
-18. **Meldungen vor dem Versand gezielt freigeben** (Discord · Danach)
+18. **Neue Inhalte ohne Ansichtswechsel melden** (Bedienung · Als Nächstes)
 
-   Für ausgewählte Kategorien eine zusätzliche Prüfung der wartenden Meldung anbieten und den Versand einzeln pausieren.
+   Neue oder geänderte Einträge mit einem dezenten Hinweis ankündigen und auf Wunsch gezielt übernehmen.
 
-19. **Dialoge und Fokus auf kleinen Displays verbessern** (Bedienung · Als Nächstes)
+19. **Laufende Übertragungen zentral verwalten** (Uploads · Danach)
 
-   Lange Dialoge übersichtlicher gliedern, Tastaturfokus nach Teiländerungen erhalten und Touch-Ziele prüfen.
+   Aktive Uploads, Fortschritt und sichere Wiederholungen in einer gemeinsamen Geräteübersicht anzeigen.
 
-20. **Verbindungsprobleme früher erkennen** (Stabilität · Als Nächstes)
+20. **Schneller zwischen Clanbereichen wechseln** (Navigation · Als Nächstes)
 
-   Lange Ladezeiten und fehlgeschlagene Vorgänge klar anzeigen und sichere Wiederholungen direkt anbieten.
+   Eine per Tastatur erreichbare Bereichssuche mit eigenen Favoriten anbieten.

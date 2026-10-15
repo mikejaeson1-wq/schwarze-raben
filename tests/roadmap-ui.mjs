@@ -315,3 +315,5 @@ await verifyQolUI({setup,wait,member,lead,friend,id});
 const {verifyNextUI}=await import('./next-ui-cases.mjs');await verifyNextUI({setup,member,lead,friend,id,wait});
 
 const {verifyFutureUI}=await import('./future-ui-cases.mjs');await verifyFutureUI({setup,member,lead,friend,id,wait});
+
+const {verifyDiscordUpdates}=await import('./discord-updates-cases.mjs');await verifyDiscordUpdates({setup,member,wait});

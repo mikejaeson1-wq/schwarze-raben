@@ -124,6 +124,19 @@
 ].map(([area,title,body,priority],i)=>({number:i+1,area,title,body,priority,status:'Geplant'}));
   const releases=[
 {
+  "version": "2026.10.15.3",
+  "date": "15. Oktober 2026",
+  "title": "Kurzanleitung, aktuelle Roadmap und Discord-Vorlagen",
+  "extends": "2026.10.15.2",
+  "items": [
+    "Neue Kurzanleitung für Discord-Anmeldung, Freigabe, eigenes Clanprofil und mehrere Charaktere. Die Anleitung ist vor der Anmeldung und im Clanbereich erreichbar.",
+    "Roadmap und Patchnotes lassen sich als formatierten Discord-Text kopieren. Lange Texte werden in nummerierte Teile aufgeteilt; jeder Teil hat eine eigene Kopier-Schaltfläche und eine prüfbare Textvorschau.",
+    "Die aktuellen Patchnotes zum Kopieren enthalten auch das vollständige 20-Punkte-Update 2026.10.15.2. Ältere Versionen bleiben einzeln erreichbar.",
+    "Die neue Roadmap enthält weiterhin genau 20 geplante Verbesserungen. Die herunterladbare Textfassung zeigt denselben aktuellen Stand wie die Website."
+  ],
+  "note": "Die Kopierfunktion überträgt den ausgewählten Text in deine Zwischenablage. Du fügst ihn selbst in Discord ein. Spotify-Lautstärke benötigt weiterhin die Einrichtung einer Spotify-App und eine persönliche Premium-Verbindung."
+},
+{
   "version": "2026.10.15.2",
   "date": "15. Oktober 2026",
   "title": "20-Punkte-Update · Privatchat, Planung und stabile Clanansichten",
@@ -229,11 +242,82 @@
       'Bearbeitbare Claninfos, Clanränge und Ämter sowie geprüfte Sicherungen und automatische Website-Tests.'
     ]}
   ];
+  const quickGuide=[
+  {
+    "title": "1 · Mit Discord anmelden",
+    "steps": [
+      "Öffne den Clanbereich und klicke auf „Mit Discord anmelden“.",
+      "Melde dich mit deinem Discord-Konto an und bestätige die Anmeldung. Ein zusätzliches Website-Passwort brauchst du nicht.",
+      "Die Clanführung muss deinen Zugang freigeben. Falls eine Bewerbung nötig ist, nutze „Mit Charakterkonzept bewerben“. Nach der Freigabe klicke auf „Status prüfen“ oder öffne den Clanbereich erneut."
+    ]
+  },
+  {
+    "title": "2 · Dein eigenes Profil erstellen",
+    "steps": [
+      "Öffne im Clanbereich „Clanprofile“ und klicke auf „Mein Profil erstellen“. Wenn dein Profil schon besteht, wähle „Mein Profil öffnen“.",
+      "Gib deinen Kontonamen ein. Ein rundes Kontobild kannst du optional hochladen. Klicke anschließend auf „Profil erstellen“ bzw. „Konto speichern“.",
+      "Öffne danach dein Profil. Über „Kontoname & Bild“ änderst du diese Angaben später; über „Banner gestalten“ passt du deinen Banner an."
+    ]
+  },
+  {
+    "title": "3 · Einen oder mehrere Charaktere anlegen",
+    "steps": [
+      "Öffne dein eigenes Profil. Klicke im Abschnitt „Charaktere“ auf „Charakter hinzufügen“.",
+      "Trage den Charakternamen und deine Charakterinfos ein. Bild, zusätzliche Dossierfelder, Galerie und Theme kannst du bei Bedarf ergänzen.",
+      "Wähle unter „Wer darf diesen Eintrag sehen?“: „Nur du“, „Ganzer Clan“ oder „Ausgewählte Mitglieder“. Klicke auf „Speichern“.",
+      "Für jeden weiteren Charakter wiederholst du „Charakter hinzufügen“. Vorhandene Charaktere änderst du über „Bearbeiten“."
+    ]
+  },
+  {
+    "title": "Wer sieht was?",
+    "steps": [
+      "Dein Kontoname und dein rundes Kontobild sind für aktive Clanmitglieder sichtbar.",
+      "Neue Charaktere und Infokarten sind zunächst nur für dich sichtbar. „Ganzer Clan“ bedeutet alle freigegebenen Clanmitglieder. „Ausgewählte Mitglieder“ bedeutet nur die von dir ausgewählten Personen.",
+      "Eigene Zusatzinfos, etwa Spielzeiten oder RP-Vorlieben, legst du in deinem Profil über „Infokarte hinzufügen“ an."
+    ]
+  }
+];
   const el=(tag,classes='',text='')=>{const n=document.createElement(tag);n.className=classes;n.textContent=text;return n;};
+  const discordText=value=>String(value??'').replace(/@/g,'@\u200b').replace(/\r/g,'');
+  // Keep each copied message below the normal Discord message size, including its heading.
+  const splitDiscord=(title,blocks,limit=1900)=>{
+    if(!Number.isInteger(limit)||limit<160)throw new Error('invalid_discord_limit');
+    const safeTitle=discordText(title).slice(0,100),budget=limit-safeTitle.length-55,parts=[];let current='';
+    const flush=()=>{if(current.trim())parts.push(current.trim());current='';};
+    for(const raw of blocks){let block=discordText(raw).trim();if(!block)continue;
+      if(block.length>budget){flush();while(block.length>budget){let end=block.lastIndexOf('\n',budget);if(end<budget/2)end=block.lastIndexOf(' ',budget);if(end<budget/2)end=budget;if(/[\uD800-\uDBFF]/.test(block[end-1]||''))end--;parts.push(block.slice(0,end).trim());block=block.slice(end).trim();}}
+      if(current&&current.length+block.length+2>budget)flush();current+=(current?'\n\n':'')+block;
+    }flush();return parts.map((body,index)=>'## '+safeTitle+(parts.length>1?' · Teil '+(index+1)+'/'+parts.length:'')+'\n\n'+body);
+  };
+  const roadmapDiscord=()=>splitDiscord('🐦‍⬛ Schwarze Raben · Neue Roadmap',[
+    '**20 kommende Verbesserungen**\nAlle Punkte sind geplant. Die Reihenfolge ist eine Orientierung und kein fester Veröffentlichungstermin.',
+    ...roadmap.map(p=>'**'+p.number+' · '+p.title+'**\n'+p.body+'\n*'+p.area+' · '+p.status+' · '+p.priority+'*')
+  ]);
+  const releaseBundle=release=>{const result=[],seen=new Set();let current=release;while(current&&!seen.has(current.version)){seen.add(current.version);result.push(current);current=releases.find(r=>r.version===current.extends);}return result;};
+  const patchnoteBlocks=release=>{
+    const blocks=['**'+release.date+' · Version '+release.version+'**\n'+release.title];
+    if(release.version==='2026.10.15.2'){
+      const groups=[['💬 Privatchat & Benachrichtigungen',[1,4,5,6,7,8]],['🖼️ Profile, Texte & Galerie',[2,3,9,10,11,12]],['📅 Kalender & Zusammenarbeit',[13,14,15,16,17]],['📦 Material, Lager & Discord',[18,19,20]],['🛠️ Stabilität & Musik',[0,21,22]]];
+      for(const [title,indices] of groups){indices.forEach((index,n)=>{const item=release.items[index];if(item)blocks.push((n===0?'**'+title+'**\n':'')+'- '+item.replace(/^Punkt \d+ · /,''));});}
+    }else for(const item of release.items)blocks.push('- '+item);
+    if(release.note)blocks.push('*Hinweis:* '+release.note);return blocks;
+  };
+  const patchnotesDiscord=(release=releases[0],complete=true)=>splitDiscord('🐦‍⬛ Schwarze Raben · Patchnotes',(complete?releaseBundle(release):[release]).flatMap(patchnoteBlocks));
+  const guideDiscord=()=>splitDiscord('🐦‍⬛ Schwarze Raben · Kurzanleitung',['**Clanbereich:** <'+new URL('clan.html',window.Raben?.config?.siteUrl||location.href).href+'>',...quickGuide.map(section=>'**'+section.title+'**\n'+section.steps.map((step,index)=>(index+1)+'. '+step).join('\n'))]);
+  const copyPanel=(title,parts)=>{
+    const area=el('details','discord-copy-panel'),summary=el('summary','',title+' für Discord kopieren'),intro=el('p','field-note','Die Überschriften und Hervorhebungen sind für Discord vorbereitet. Kopiere die Teile nacheinander und füge jeden als eigene Nachricht ein.'),status=el('p','field-note');status.setAttribute('role','status');status.setAttribute('aria-live','polite');area.dataset.noMarkdown='';area.append(summary,intro,status);
+    parts.forEach((part,index)=>{const row=el('section','discord-copy-part'),heading=el('h4','',parts.length>1?'Teil '+(index+1)+' von '+parts.length:'Vollständiger Text'),actions=el('div','hub-inline-actions'),copy=el('button','button outline small-button','Teil '+(index+1)+' kopieren'),show=el('details','discord-text-preview'),label=el('label','form-field','Discord-Text · '+part.length+' Zeichen'),input=el('textarea','discord-copy-text'),select=el('button','button outline small-button','Text markieren');copy.type=select.type='button';input.value=part;input.readOnly=true;input.rows=9;input.spellcheck=false;input.setAttribute('aria-label',title+' · Teil '+(index+1));label.append(input);show.append(el('summary','','Text ansehen / manuell kopieren'),label,select);actions.append(copy);row.append(heading,actions,show);area.append(row);
+      const mark=()=>{show.open=true;input.focus();input.select?.();input.setSelectionRange?.(0,input.value.length);};select.addEventListener('click',mark);
+      const copied=()=>{status.textContent='Teil '+(index+1)+' von '+parts.length+' kopiert. Jetzt in Discord einfügen.';};
+      const manual=()=>{mark();status.textContent='Automatisches Kopieren ist hier nicht verfügbar. Der Text ist markiert: Drücke Strg+C oder nutze auf dem Handy „Kopieren“.';};
+      copy.addEventListener('click',()=>{try{if(!navigator.clipboard?.writeText){manual();return;}const result=navigator.clipboard.writeText(part);Promise.resolve(result).then(copied,manual);}catch(_){manual();}});
+    });return area;
+  };
   const roadmapList=()=>{const list=el('ol','roadmap-grid');for(const item of roadmap){const card=el('li','hub-card');card.dataset.roadmapStatus='planned';card.append(el('p','eyebrow','Punkt '+item.number+' · '+item.area),el('h3','',item.title),el('p','hub-body',item.body),el('p','field-note',item.status+' · '+item.priority));list.append(card);}return list;};
-  const renderRoadmap=(host,ctx=null)=>{host.replaceChildren(el('p','field-note','Alle 20 Punkte sind Vorschläge für kommende Updates. Die Reihenfolge ist eine Orientierung und kein fester Veröffentlichungstermin.'),roadmapList());if(ctx)window.RabenCommunityPlus?.roadmapSupport(ctx,host.querySelector('ol')).catch(error=>ctx.report(error.message||Raben.errorMessage(error),true));};
-  const patchnotes=ctx=>{for(const release of releases){const card=el('article','hub-card patchnote');card.append(el('p','eyebrow',release.date+' · '+release.version),el('h3','',release.title));const list=el('ul','patchnote-list');release.items.forEach(text=>list.append(el('li','',text)));card.append(list);if(release===releases[0])card.append(el('p','field-note',release.note||'Spotify-Autostart hängt von den Wiedergaberegeln deines Browsers ab. Der Player bleibt auch manuell bedienbar.'));ctx.list.append(card);}};
-  if(window.RabenExpansion){Object.assign(RabenExpansion.labels,{patchnotes:'Patchnotes',futureRoadmap:'Neue Roadmap'});Object.assign(RabenExpansion.handlers,{patchnotes,futureRoadmap:ctx=>renderRoadmap(ctx.list,ctx)});}
-  const publicHost=document.querySelector('[data-public-roadmap]');if(publicHost)renderRoadmap(publicHost);
-  window.RabenUpdates={roadmapVersion:'20261015v2',roadmap,releases,renderRoadmap,patchnotes};
+  const renderRoadmap=(host,ctx=null)=>{host.replaceChildren(el('p','field-note','Alle 20 Punkte sind Vorschläge für kommende Updates. Die Reihenfolge ist eine Orientierung und kein fester Veröffentlichungstermin.'),copyPanel('Neue Roadmap',roadmapDiscord()),roadmapList());if(ctx)window.RabenCommunityPlus?.roadmapSupport(ctx,host.querySelector('ol')).catch(error=>ctx.report(error.message||Raben.errorMessage(error),true));};
+  const patchnotes=ctx=>{ctx.list.append(el('p','field-note','Aktueller Stand: '+releases[0].version+'. Die Discord-Vorlage enthält auch das vollständige 20-Punkte-Update '+releases[0].extends+'.'),copyPanel('Aktuelle Patchnotes',patchnotesDiscord()));for(const release of releases){const card=el('article','hub-card patchnote');card.append(el('p','eyebrow',release.date+' · '+release.version),el('h3','',release.title));const list=el('ul','patchnote-list');release.items.forEach(text=>list.append(el('li','',text)));card.append(list);if(release.note)card.append(el('p','field-note',release.note));if(release!==releases[0])card.append(copyPanel('Nur Version '+release.version,patchnotesDiscord(release,false)));ctx.list.append(card);}};
+  const renderQuickGuide=host=>{host.replaceChildren(el('p','field-note','In wenigen Schritten zu deinem Clanprofil. Du meldest dich mit Discord an; den Clan-Zugang gibt die Clanführung frei.'),copyPanel('Kurzanleitung',guideDiscord()));for(const section of quickGuide){const card=el('article','hub-card quick-guide-card'),list=el('ol','quick-guide-steps');card.append(el('h3','',section.title));for(const step of section.steps)list.append(el('li','',step));card.append(list);host.append(card);}const actions=el('div','hub-inline-actions');for(const [label,path] of [['Zum Clanbereich','clan.html'],['Bewerbung öffnen','bewerben.html']]){const a=el('a','button outline',label);a.href=new URL(path,window.Raben?.config?.siteUrl||location.href).href;actions.append(a);}host.append(actions);};
+  if(window.RabenExpansion){Object.assign(RabenExpansion.labels,{patchnotes:'Patchnotes',futureRoadmap:'Neue Roadmap',quickGuide:'Kurzanleitung'});Object.assign(RabenExpansion.handlers,{patchnotes,futureRoadmap:ctx=>renderRoadmap(ctx.list,ctx),quickGuide:ctx=>renderQuickGuide(ctx.list)});}
+  const publicHost=document.querySelector('[data-public-roadmap]');if(publicHost)renderRoadmap(publicHost);const guideHost=document.querySelector('[data-quick-guide]');if(guideHost)renderQuickGuide(guideHost);
+  window.RabenUpdates={roadmapVersion:'20261015v2',roadmap,releases,quickGuide,renderRoadmap,patchnotes,renderQuickGuide,splitDiscord,roadmapDiscord,patchnotesDiscord,guideDiscord,copyPanel};
 })();

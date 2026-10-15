@@ -1,5 +1,7 @@
 # Schwarze Raben – Website, Discord-Login und Clan-Verwaltung
 
+**Für Mitglieder:** [Kurzanleitung für Anmeldung, Profil und Charaktere](ANLEITUNG_MITGLIEDER.md) · [Direkt auf der Website öffnen](anleitung.html).
+
 Die öffentliche Website wird über GitHub Pages bereitgestellt. Supabase speichert Inhalte und Mitgliederrechte und übernimmt die Discord-Anmeldung. Die Website benötigt keinen eigenen kostenpflichtigen Server.
 
 ## Enthalten
