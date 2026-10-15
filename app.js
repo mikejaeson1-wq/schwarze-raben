@@ -10,6 +10,7 @@
     if (!configured()) throw new Error("Die Anmeldung wird noch eingerichtet. Bitte versuche es später erneut.");
     if (!window.supabase?.createClient) throw new Error("Die Anmeldung konnte nicht geladen werden. Bitte lade die Seite erneut.");
     if (!client) client = window.supabase.createClient(config.supabaseUrl, config.supabasePublishableKey, {
+      global:{fetch:(...args)=>(window.RabenNext?.networkFetch||fetch)(...args)},
       auth: {flowType: "pkce", persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: "schwarze-raben-session"}
     });
     return client;

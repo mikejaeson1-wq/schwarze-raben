@@ -73,5 +73,6 @@
     if(event === "SIGNED_OUT") lock();
     if(["SIGNED_IN","SIGNED_OUT","TOKEN_REFRESHED"].includes(event)) setTimeout(load,0);
   });
+  if(typeof navigator!=='undefined'&&navigator.serviceWorker?.getRegistration)navigator.serviceWorker.getRegistration(new URL('clan.html',Raben.config.siteUrl).href).then(registration=>registration?.update()).catch(()=>{});
   load();
 })();

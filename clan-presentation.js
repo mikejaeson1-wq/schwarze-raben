@@ -23,7 +23,7 @@
           const figure=el('figure','clan-info-image');figure.dataset.position=picture.position;figure.dataset.infoBlock='image:'+picture.id;figure.style.setProperty('--info-image-width',Math.max(15,Math.min(100,Number(picture.width)||40))+'%');
           const image=el('img','');image.alt=picture.title||'Bild in den Claninfos';image.loading='lazy';figure.append(image);if(picture.title)figure.append(el('figcaption','field-note',picture.title));
           if(!preview&&picture.imagePath&&window.RabenGallery)figure.append(RabenGallery.opener(ctx,{bucket:B,path:picture.imagePath,title:picture.title},'Bild öffnen'));
-          flow.append(figure);if(picture._url)image.src=picture._url;else RabenQol.observe(ctx,figure,()=>load(picture.previewPath||picture.imagePath).then(url=>{if(live(ctx,epoch)&&figure.isConnected&&url)image.src=url;}).catch(()=>{if(figure.isConnected)figure.append(note('Das Bild ist momentan nicht verfügbar.'));}));
+          flow.append(figure);if(!preview&&window.RabenNext)RabenNext.describe(ctx,'clan',picture.id,figure,ctx.actor?.role==='admin').catch(()=>{});if(picture._url)image.src=picture._url;else RabenQol.observe(ctx,figure,()=>load(picture.previewPath||picture.imagePath).then(url=>{if(live(ctx,epoch)&&figure.isConnected&&url)image.src=url;}).catch(()=>{if(figure.isConnected)figure.append(note('Das Bild ist momentan nicht verfügbar.'));}));
         }
         if(n<paragraphs.length){const p=el('p','hub-body',paragraphs[n]);p.dataset.infoBlock='text:'+n;flow.append(p);}
       }

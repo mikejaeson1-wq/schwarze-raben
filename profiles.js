@@ -43,10 +43,10 @@
   const image=async(ctx,item,host,avatar=false)=>{
     if(!item.image_path)return;const epoch=ctx.epoch;
     try{
-      const blob=await check(Raben.client().storage.from(BUCKET).download(avatar?item.image_path:item.preview_path||item.image_path));
+      const blob=await check(Raben.client().storage.from(BUCKET).download(avatar?item.image_path:(window.RabenNext?.previewPath(item.image_path,item.preview_path)||item.preview_path||item.image_path)));
       if(!live(ctx,epoch)||!host.isConnected)return;
       const url=URL.createObjectURL(blob);ctx.urls.add(url);const img=el('img',avatar?'profile-avatar':'hub-image');
-      img.src=url;img.alt=avatar?'Profilbild':item.title;img.loading='lazy';if(!avatar)img.addEventListener('click',()=>window.RabenGallery?.open(ctx,{path:item.image_path,title:item.title}));host.prepend(img);
+      img.src=url;img.alt=avatar?'Profilbild':item.title;img.loading='lazy';if(!avatar)img.addEventListener('click',()=>window.RabenGallery?.open(ctx,{path:item.image_path,title:item.title,alt:img.alt,parentType:'profile',parentId:item.id}));host.prepend(img);window.RabenNext?.describe(ctx,'profile',item.id,host,item.owner_id===ctx.actor.user_id).catch(()=>{});
     }catch(_){if(live(ctx,epoch)&&host.isConnected)host.append(note('Das Bild ist gerade nicht verfügbar. Aktualisiere das Profil.'));}
   };
   // Delete only an old, owned file that is no longer attached. The server checks again.
@@ -146,7 +146,7 @@
       let path=removeImage?.input.checked?null:item?.image_path||null;
       let preview=item?.preview_path||null;const chosenFile=file?.input.files?.[0];if(chosenFile){if(window.RabenPictures){const image=await RabenPictures.upload(ctx,chosenFile,progress,BUCKET);path=image.imagePath;preview=image.thumbPath;}else path=await RabenMedia.upload(ctx,chosenFile,ctx.actor.user_id,progress,false,null,BUCKET);}if(!path)preview=null;
       if(!live(ctx,attempt)||!form.isConnected)return;if(kind==='avatar'&&!path)throw new Error('file_required');
-      let payload={p_id:item?.id||null,p_kind:kind,p_title:kind==='avatar'?'Profilbild':title.input.value.trim(),p_body:kind==='avatar'?'':body.input.value.trim(),p_image_path:path,p_visibility:visibility.value,p_recipients:recipients,p_expected:item?.revision??null};if(window.RabenProfileTools){payload={...payload,p_details:item?.details||{},p_gallery:[],p_preview:preview};if(extra)payload=await extra.collect(payload,progress);}await check(Raben.client().rpc(payload.p_design?'raben_save_designed_profile_entry':window.RabenProfileTools?'raben_save_profile_entry':'raben_save_profile_item',payload));
+      let payload={p_id:item?.id||null,p_kind:kind,p_title:kind==='avatar'?'Profilbild':title.input.value.trim(),p_body:kind==='avatar'?'':body.input.value.trim(),p_image_path:path,p_visibility:visibility.value,p_recipients:recipients,p_expected:item?.revision??null};if(window.RabenProfileTools){payload={...payload,p_details:item?.details||{},p_gallery:[],p_preview:preview};if(extra)payload=await extra.collect(payload,progress);}try{await check(Raben.client().rpc(payload.p_design?'raben_save_designed_profile_entry':window.RabenProfileTools?'raben_save_profile_entry':'raben_save_profile_item',payload));}catch(error){if(item&&kind!=='avatar'&&(error.code==='40001'||error.message?.includes('conflict'))){await RabenNext.conflict(ctx,'profile',item,title.input,body.input);return;}throw error;}
       if(!live(ctx,attempt))return;await draft?.clear();ctx.dirty=false;if(item?.image_path&&item.image_path!==path)await tidy(ctx,item.image_path,attempt);
       await mount(ctx);ctx.report(fields[kind]+' gespeichert · '+visibilityNames[visibility.value]+'.');
     });});editStart(ctx,form);draft=await window.RabenQol?.draft(ctx,form,'profile:'+kind+':'+(item?.id||'new'),item?.revision??null);

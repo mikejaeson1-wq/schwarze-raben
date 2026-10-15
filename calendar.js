@@ -8,13 +8,13 @@
     const date=new Date(start+'T12:00:00Z');for(let n=0;n<740&&result.length<limit;n++){
       const value=date.toISOString().slice(0,10);if(value>until)break;
       const delta=Math.round((date-new Date(start+'T12:00:00Z'))/86400000);
-      if((value===start||details.repeat==='weekly'&&delta%7===0||details.repeat==='fortnightly'&&delta%14===0||details.repeat==='monthly'&&date.getUTCDate()===Number(start.slice(-2)))&&value>=from)result.push(value);
+      if((value===start||details.repeat==='weekly'&&delta%7===0||details.repeat==='fortnightly'&&delta%14===0||details.repeat==='monthly'&&date.getUTCDate()===Number(start.slice(-2)))&&(details.occurrenceChanges?.[value]?.date||value)>=from)result.push(value);
       date.setUTCDate(date.getUTCDate()+1);
     }return result;
   };
   const escape=value=>String(value??'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
   const fold=line=>{let result='',part='',length=0;for(const char of line){const bytes=new TextEncoder().encode(char).length;if(length+bytes>75){result+=part+'\r\n';part=' ';length=1;}part+=char;length+=bytes;}return result+part;};
-  const ics=rows=>{
+  const ics=rows=>{if(window.RabenNext?.calendarICS)return RabenNext.calendarICS(rows);
     const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Schwarze Raben//Clan Kalender//DE','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VTIMEZONE','TZID:Europe/Berlin','BEGIN:DAYLIGHT','DTSTART:19700329T020000','TZOFFSETFROM:+0100','TZOFFSETTO:+0200','RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU','END:DAYLIGHT','BEGIN:STANDARD','DTSTART:19701025T030000','TZOFFSETFROM:+0200','TZOFFSETTO:+0100','RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU','END:STANDARD','END:VTIMEZONE'];
     for(const row of rows){const d=row.details||{};if(!d.date)continue;const start=(d.date+'T'+(d.time||'20:00').replace(':','')+'00').replaceAll('-','');const endDate=new Date(d.date+'T'+(d.time||'20:00')+':00Z');endDate.setUTCMinutes(endDate.getUTCMinutes()+Number(d.duration||120));
       lines.push('BEGIN:VEVENT','UID:'+row.id+'@schwarze-raben','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z'),'DTSTART;TZID=Europe/Berlin:'+start,'DURATION:PT'+Math.max(15,Math.min(1440,Number(d.duration)||120))+'M','SUMMARY:'+escape(row.title),'DESCRIPTION:'+escape(row.body),'LOCATION:'+escape(d.location),'STATUS:'+(d.cancelled?'CANCELLED':'CONFIRMED'));
@@ -31,15 +31,15 @@
   const render=async(ctx,row,card)=>{
     const epoch=ctx.epoch,d=row.details||{},area=el('section','hub-interactions'),select=el('select','');select.setAttribute('aria-label','Termin auswählen');
     const occurrences=dates(d,day(),80);if(!occurrences.length)occurrences.push(d.date);
-    occurrences.forEach(date=>{const o=el('option','',date+(d.exceptions?.includes(date)?' · abgesagt':''));o.value=date;select.append(o);});
+    occurrences.forEach(date=>{const o=el('option','',(d.occurrenceChanges?.[date]?.date||date)+(d.occurrenceChanges?.[date]?' · verschoben':'')+(d.exceptions?.includes(date)?' · abgesagt':''));o.value=date;select.append(o);});
     const exportButton=el('button','button outline small-button','ICS herunterladen');exportButton.type='button';exportButton.addEventListener('click',()=>download(ctx,[row]));area.append(select,exportButton);const content=el('div','');area.append(content);card.append(area);
     const draw=async()=>{
       await ctx.authorize();const date=select.value,rows=await check(Raben.client().from('raben_event_slots').select('user_id,choice,wait_since').eq('record_id',row.id).eq('occurrence_date',date).order('wait_since'));
-      if(ctx.disposed||ctx.epoch!==epoch||!area.isConnected)return;content.replaceChildren();const closed=d.cancelled||d.exceptions?.includes(date)||d.registrationOpen===false||date<day(),mine=rows.find(r=>r.user_id===ctx.actor.user_id),actions=el('div','hub-inline-actions');
+      if(ctx.disposed||ctx.epoch!==epoch||!area.isConnected)return;content.replaceChildren();const closed=d.cancelled||d.exceptions?.includes(date)||d.registrationOpen===false||(d.occurrenceChanges?.[date]?.date||date)<day(),mine=rows.find(r=>r.user_id===ctx.actor.user_id),actions=el('div','hub-inline-actions');
       content.append(el('p','field-note',closed?'Termin abgesagt oder Anmeldung geschlossen':rows.filter(r=>r.choice==='yes').length+' Zusagen'+(d.capacity?' / '+d.capacity+' Plätze':'')+' · '+rows.filter(r=>r.choice==='wait').length+' auf der Warteliste'));
       for(const [choice,label] of [['yes','Dabei'],['maybe','Vielleicht'],['no','Absage']]){const b=el('button','button outline small-button',label);b.type='button';b.disabled=closed;b.setAttribute('aria-pressed',String(mine?.choice===choice||choice==='yes'&&mine?.choice==='wait'));b.addEventListener('click',async()=>{b.disabled=true;try{await ctx.authorize();await check(Raben.client().rpc('raben_event_respond_on',{p_record:row.id,p_choice:choice,p_date:date}));await draw();}catch(e){ctx.report(Raben.errorMessage(e),true);}finally{b.disabled=closed;}});actions.append(b);}content.append(actions);
       if(mine?.choice==='wait')content.append(el('p','status-message','Du stehst auf der Warteliste und rückst bei einem freien Platz automatisch nach.'));
-      const details=el('details','');details.append(el('summary','','Teilnahmen ansehen'));rows.forEach(r=>{const p=el('p','field-note');p.append(RabenIdentity.person(ctx,r.user_id,{suffix:' · '+({yes:'Dabei',maybe:'Vielleicht',no:'Absage',wait:'Warteliste'}[r.choice])}));details.append(p);});content.append(details);await window.RabenCalendarPlus?.eventTools(ctx,row,date,content);
+      const details=el('details','');details.append(el('summary','','Teilnahmen ansehen'));rows.forEach(r=>{const p=el('p','field-note');p.append(RabenIdentity.person(ctx,r.user_id,{suffix:' · '+({yes:'Dabei',maybe:'Vielleicht',no:'Absage',wait:'Warteliste'}[r.choice])}));details.append(p);});content.append(details);await window.RabenCalendarPlus?.eventTools(ctx,row,date,content);window.RabenNext?.occurrence(ctx,row,date,content);
     };select.addEventListener('change',()=>draw().catch(e=>ctx.report(Raben.errorMessage(e),true)));await draw();
   };
   window.RabenCalendar={dates,ics,editor,render,download,day};

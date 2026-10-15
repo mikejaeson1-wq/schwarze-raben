@@ -3,126 +3,156 @@
   const roadmap=[
   [
     "Bearbeitung",
-    "Änderungen während der Eingabe rückgängig machen",
-    "Absätze und Feldänderungen noch vor dem Speichern schrittweise rückgängig machen und wiederholen.",
+    "Entwürfe mit offenen Bilduploads wieder aufnehmen",
+    "Begonnene Bearbeitungen inklusive noch nicht zugeordneter Uploads gezielt fortsetzen und verwaiste Dateien leichter erkennen.",
     "Als Nächstes"
   ],
   [
-    "Profilgestaltung",
-    "Bildfokus mit Maus und Touch verschieben",
-    "Den Bannerfokus direkt am Bild ziehen und mehrere Ausschnitte für Handy und Desktop speichern.",
+    "Texte",
+    "Sichere Markdown-Vorschau",
+    "Formatierungen, Listen und Verweise schon während der Eingabe prüfen und einheitlich barrierearm darstellen.",
+    "Danach"
+  ],
+  [
+    "Privatchat",
+    "Eigene Unterhaltungen durchsuchen",
+    "Nachrichten im eigenen Gesprächsverlauf nach Suchwort und Zeitraum finden.",
     "Als Nächstes"
+  ],
+  [
+    "Privatchat",
+    "Nachrichten korrigieren und zurückziehen",
+    "Eigene Nachrichten mit sichtbarem Bearbeitungshinweis ändern oder innerhalb einer festgelegten Frist zurückziehen.",
+    "Als Nächstes"
+  ],
+  [
+    "Privatchat",
+    "Geschützte Anhänge senden",
+    "Bilder und Dateien mit Größenanzeige, Prüfung und Zugriff ausschließlich für die Gesprächspartner teilen.",
+    "Danach"
+  ],
+  [
+    "Privatchat",
+    "Gespräche archivieren und stummschalten",
+    "Unterhaltungen für sich ordnen und Hinweise pro Kontakt einstellen.",
+    "Danach"
+  ],
+  [
+    "Hinweise",
+    "Benachrichtigungen feiner einstellen",
+    "Erwähnungen, Chats, Kalender und Projektmeldungen getrennt abonnieren und Ruhezeiten festlegen.",
+    "Danach"
   ],
   [
     "Galerie",
-    "Mehrere Bilder gleichzeitig organisieren",
-    "Bilder gemeinsam auswählen, in Alben verschieben und vor dem Entfernen eine Übersicht der Auswahl sehen.",
-    "Als Nächstes"
+    "Albumcover und gespeicherte Bildauswahlen",
+    "Alben mit einem eigenen Titelbild versehen und wiederkehrende Mehrfachauswahlen speichern.",
+    "Danach"
+  ],
+  [
+    "Galerie",
+    "Eigene Alben gesammelt exportieren",
+    "Ausgewählte eigene Bilder mit Beschreibungen und Reihenfolge als überprüfbare Sicherung herunterladen.",
+    "Danach"
   ],
   [
     "Barrierefreiheit",
-    "Eigene Bildbeschreibungen ergänzen",
-    "Für Bilder getrennte Alternativtexte pflegen, unabhängig von der sichtbaren Bildunterschrift.",
+    "Bildbeschreibungen gemeinsam prüfen",
+    "Fehlende oder wenig aussagekräftige Alternativtexte übersichtlich anzeigen und gezielt verbessern.",
     "Als Nächstes"
-  ],
-  [
-    "Bilder",
-    "Vorschauqualität selbst wählen",
-    "Zwischen sparsamen und detailreichen Vorschauen wechseln und die erwartete Dateigröße sehen.",
-    "Danach"
   ],
   [
     "Themes",
-    "Eigene Theme-Vorlagen gezielt importieren",
-    "Exportierte eigene Vorlagen prüfen und einzelne Designs samt Bildern in das eigene Profil übernehmen.",
-    "Danach"
+    "Importierte Bilder platzsparend verwalten",
+    "Doppelte Bilddateien beim Theme-Import erkennen und nur nach bewusster Auswahl zusammenführen.",
+    "Später"
   ],
   [
-    "Zusammenarbeit",
-    "Textkonflikte gemeinsam auflösen",
-    "Bei gleichzeitigen Änderungen die Unterschiede markieren und Texte absatzweise zusammenführen.",
-    "Als Nächstes"
-  ],
-  [
-    "Mitbearbeitung",
-    "Änderungsvorschläge mit Freigabe",
-    "Mitbearbeiter können optional Vorschläge einreichen, die der Besitzer vor der Übernahme prüft.",
-    "Danach"
-  ],
-  [
-    "Terminfindung",
-    "Eigene Zeitfenster vorschlagen",
-    "Mitglieder ergänzen freie Zeiträume; die Terminfindung berechnet Überschneidungen auch ohne vorgegebene Kandidaten.",
+    "Kalender",
+    "Persönliche Anzeige-Zeitzone",
+    "Termine auf Wunsch in einer eigenen Zeitzone sehen, während die gemeinsame Planung eindeutig bleibt.",
     "Danach"
   ],
   [
     "Kalender",
-    "Einzelne Serientermine verschieben",
-    "Für einzelne Termine Datum, Uhrzeit oder Dauer ändern, ohne die gesamte Serie neu anzulegen.",
+    "Auswirkungen von Serienänderungen vorab sehen",
+    "Betroffene Teilnahmen, Erinnerungen und Reservierungen vor größeren Serienänderungen gemeinsam prüfen.",
     "Als Nächstes"
   ],
   [
-    "Reservierungen",
-    "Aufbau- und Abbauzeiten berücksichtigen",
-    "Zusätzliche Puffer vor und nach einer Buchung festlegen und bei Überschneidungen berücksichtigen.",
-    "Danach"
+    "Ressourcen",
+    "Teilbare Kapazitäten reservieren",
+    "Mehrere Einheiten derselben Ressource buchen und die verfügbare Restmenge pro Zeitraum anzeigen.",
+    "Später"
   ],
   [
-    "Geräte",
-    "Geräte benennen und Zustellung prüfen",
-    "Geräten eigene Namen geben und auf ausdrücklichen Wunsch eine Testbenachrichtigung auslösen.",
+    "Terminfindung",
+    "Mindestbesetzung und Spieldauer berücksichtigen",
+    "Gemeinsame Zeitfenster nach benötigter Dauer, Teilnehmerzahl und gewünschten Personen filtern.",
     "Als Nächstes"
   ],
   [
-    "Kalender-Abos",
-    "Ablaufdatum für Kalenderlinks",
-    "Persönliche Abos zusätzlich zeitlich begrenzen und vor ihrem Ablauf auf Wunsch einen Hinweis erhalten.",
+    "Zusammenarbeit",
+    "Einladungen zur Mitbearbeitung annehmen",
+    "Mitbearbeitung zunächst als Einladung senden und erst nach Annahme aktivieren.",
     "Danach"
-  ],
-  [
-    "Geschichten",
-    "Zeitleisten nach Themen filtern",
-    "Ereignisse nach Typ, Zeitraum und Handlungsfaden filtern und einzelne Ansichten speichern.",
-    "Danach"
-  ],
-  [
-    "Karten",
-    "Zoom und Touch-Gesten für alle Karten",
-    "Welt- und Gebäudekarten vergrößern, mit zwei Fingern bewegen und zum Ausgangsausschnitt zurückkehren.",
-    "Als Nächstes"
   ],
   [
     "Materialplanung",
-    "Rezeptversionen und Verpackungseinheiten",
-    "Materialvorlagen versionieren und Bedarf auf Bündel, Kisten oder andere Ausgabegrößen aufrunden.",
+    "Rezeptvarianten und Verschnitt berechnen",
+    "Alternative Materialien, Reservebedarf und unterschiedliche Ausgabegrößen pro Bauvorhaben vergleichen.",
     "Später"
   ],
   [
-    "Handel",
-    "Handelsabschlüsse mit Lagerbuchungen verbinden",
-    "Erfüllte Handelsanfragen optional mit geprüften Ein- oder Auslagerungen verknüpfen.",
-    "Später"
-  ],
-  [
-    "Discord",
-    "Meldungen vor dem Versand gezielt freigeben",
-    "Für ausgewählte Kategorien eine zusätzliche Prüfung der wartenden Meldung anbieten und den Versand einzeln pausieren.",
+    "Lager",
+    "Persönliche Hinweise bei niedrigen Beständen",
+    "Für ausgewählte Materialien Mindestmengen festlegen und bei Unterschreitung einen Clan-Hinweis erhalten.",
     "Danach"
   ],
   [
-    "Bedienung",
-    "Dialoge und Fokus auf kleinen Displays verbessern",
-    "Lange Dialoge übersichtlicher gliedern, Tastaturfokus nach Teiländerungen erhalten und Touch-Ziele prüfen.",
-    "Als Nächstes"
+    "Discord",
+    "Freigegebene Meldungen zeitlich planen",
+    "Geprüfte Ankündigungen für einen gewünschten Zeitpunkt vormerken und bis dahin nachvollziehbar bearbeiten.",
+    "Später"
   ],
   [
     "Stabilität",
-    "Verbindungsprobleme früher erkennen",
-    "Lange Ladezeiten und fehlgeschlagene Vorgänge klar anzeigen und sichere Wiederholungen direkt anbieten.",
+    "Datensparsame Fehlerdiagnose zum Kopieren",
+    "Bei Fehlern einen prüfbaren Diagnosebericht ohne Nachrichteninhalte, Zugangsdaten oder geheime Links erzeugen.",
     "Als Nächstes"
   ]
 ].map(([area,title,body,priority],i)=>({number:i+1,area,title,body,priority,status:'Geplant'}));
   const releases=[
+{
+  "version": "2026.10.15.1",
+  "date": "15. Oktober 2026",
+  "title": "Gesamtupdate · 20 Verbesserungen und Privatchat",
+  "items": [
+    "Privatchat: freigeschaltete Clanmitglieder können Direktnachrichten mit Verlauf und Lesestatus austauschen. Der Verlauf aktualisiert sich regelmäßig; weitere Nachrichten lassen sich nachladen. Beteiligtenprüfung und Blockierungen gelten serverseitig, auch für normale Clanadmins. Wiederholtes Senden nach einem Verbindungsfehler erzeugt keine doppelte Nachricht.",
+    "Punkt 1 · Eingaben in Text- und Zahlenfeldern lassen sich vor dem Speichern schrittweise rückgängig machen und wiederholen. Die Bearbeitungshistorie bleibt ausschließlich im geöffneten Tab.",
+    "Punkt 2 · Bannerfokus mit Maus, Touch oder Pfeiltasten verschieben. Handy und Desktop haben getrennte Ausschnitte, Höhen und Vergrößerungen.",
+    "Punkt 3 · Mehrere Charakterbilder auswählen, gemeinsam in ein Album verschieben und die Auswahl vor dem Entfernen kontrollieren.",
+    "Punkt 4 · Eigene Alternativtexte für Profilbilder, Galerie-, Beitrags- und Claninfo-Bilder pflegen; sichtbare Bildunterschriften bleiben unabhängig.",
+    "Punkt 5 · Sparsame, ausgewogene oder detailreiche Bildvorschauen auf dem eigenen Gerät wählen. Bei Charakter-Galeriebildern wird die gespeicherte Dateigröße der gewählten Vorschau angezeigt.",
+    "Punkt 6 · Eigene Theme-Vorlagen gezielt mit Bildern exportieren, Importdateien vorab prüfen und ausgewählte Designs in das eigene Konto übernehmen.",
+    "Punkt 7 · Bei konkurrierenden Textänderungen bisherigen Text, eigenen Entwurf und gespeicherte Fassung absatzweise vergleichen und zusammenführen. Erneutes Speichern bleibt ausdrücklich erforderlich.",
+    "Punkt 8 · Mitbearbeitung wahlweise auf Änderungsvorschläge beschränken. Die besitzende Person kann Vorschläge prüfen, übernehmen oder ablehnen; direkte Textänderungen bleiben in diesem Modus gesperrt.",
+    "Punkt 9 · Offene Terminfindungen ohne Kandidaten erstellen. Mitglieder ergänzen eigene Zeitfenster; die Auswertung ermittelt Überschneidungen und zählt Personen nur einmal.",
+    "Punkt 10 · Einzelne Termine einer Serie mit eigenem Datum, Uhrzeit und Dauer verschieben. Teilnahmen bleiben am ursprünglichen Serientermin zugeordnet; Kalenderexport, Abos, Erinnerungen und Reservierungen berücksichtigen die Änderung.",
+    "Punkt 11 · Aufbau- und Abbauzeiten je Reservierung speichern. Zeitpuffer werden bei Überschneidungen und späteren Terminänderungen serverseitig berücksichtigt.",
+    "Punkt 12 · Geräte selbst benennen und auf ausdrücklichen Wunsch eine Testbenachrichtigung anstoßen. Der Prüfstatus unterscheidet Warteschlange, Versand, Annahme durch den Push-Dienst und Fehler.",
+    "Punkt 13 · Neue Kalender-Abos können ein Ablaufdatum erhalten. Auf Wunsch erscheint bis zu drei Tage vorher ein persönlicher Clan-Hinweis; abgelaufene Links liefern keine Kalenderdaten mehr.",
+    "Punkt 14 · Charakter-Zeitleisten nach Typ, Zeitraum und Handlungsfaden filtern und persönliche Ansichten speichern.",
+    "Punkt 15 · Welt-, Dorf- und Gebäudekarten mit Zoom, Ziehen und Zwei-Finger-Gesten bedienen sowie zum Ausgangsausschnitt zurückkehren.",
+    "Punkt 16 · Materialvorlagen behalten bis zu 30 frühere Versionen. Der Bedarf wird auf frei wählbare Bündel-, Kisten- oder andere Ausgabegrößen aufgerundet.",
+    "Punkt 17 · Erfüllte Handelsanfragen optional mit einer geprüften Ein- oder Auslagerung verbinden. Menge, Einheit, Bestandsrevision und einmalige Buchung werden serverseitig geprüft.",
+    "Punkt 18 · Kategorien und Discord-Kanäle können eine zusätzliche Versandfreigabe verlangen. Wartende Meldungen einzeln ansehen, freigeben, pausieren, fortsetzen oder verwerfen.",
+    "Punkt 19 · Dialoge passen sich kleinen Displays an; größere Touch-Ziele, begrenzte Dialoghöhen und Fokuswiederherstellung erleichtern die Bedienung.",
+    "Punkt 20 · Langsame Verbindungen, Offline-Zustände und unterbrochene Anfragen werden früher angezeigt. Schreibvorgänge werden nicht automatisch wiederholt; Eingaben bleiben im geöffneten Formular erhalten.",
+    "Fehlerbehebung: Albumänderungen bleiben auch bei einer vollständig belegten Charaktergalerie mit zwölf Bildern möglich. Bestehende Profile, Freigaben, Medien und Termine werden durch das Update nicht neu angelegt."
+  ],
+  "note": "Private Nachrichten sind nicht Ende-zu-Ende verschlüsselt. Die Annahme einer Testbenachrichtigung durch den Push-Dienst bestätigt noch nicht deren Anzeige auf dem Gerät."
+},
 {
   "version": "2026.10.09.3",
   "date": "09. Oktober 2026",
@@ -171,8 +201,8 @@
   const el=(tag,classes='',text='')=>{const n=document.createElement(tag);n.className=classes;n.textContent=text;return n;};
   const roadmapList=()=>{const list=el('ol','roadmap-grid');for(const item of roadmap){const card=el('li','hub-card');card.dataset.roadmapStatus='planned';card.append(el('p','eyebrow','Punkt '+item.number+' · '+item.area),el('h3','',item.title),el('p','hub-body',item.body),el('p','field-note',item.status+' · '+item.priority));list.append(card);}return list;};
   const renderRoadmap=(host,ctx=null)=>{host.replaceChildren(el('p','field-note','Alle 20 Punkte sind Vorschläge für kommende Updates. Die Reihenfolge ist eine Orientierung und kein fester Veröffentlichungstermin.'),roadmapList());if(ctx)window.RabenCommunityPlus?.roadmapSupport(ctx,host.querySelector('ol')).catch(error=>ctx.report(error.message||Raben.errorMessage(error),true));};
-  const patchnotes=ctx=>{for(const release of releases){const card=el('article','hub-card patchnote');card.append(el('p','eyebrow',release.date+' · '+release.version),el('h3','',release.title));const list=el('ul','patchnote-list');release.items.forEach(text=>list.append(el('li','',text)));card.append(list);if(release===releases[0])card.append(el('p','field-note','Spotify-Autostart hängt von den Wiedergaberegeln deines Browsers ab. Der Player bleibt auch manuell bedienbar.'));ctx.list.append(card);}};
+  const patchnotes=ctx=>{for(const release of releases){const card=el('article','hub-card patchnote');card.append(el('p','eyebrow',release.date+' · '+release.version),el('h3','',release.title));const list=el('ul','patchnote-list');release.items.forEach(text=>list.append(el('li','',text)));card.append(list);if(release===releases[0])card.append(el('p','field-note',release.note||'Spotify-Autostart hängt von den Wiedergaberegeln deines Browsers ab. Der Player bleibt auch manuell bedienbar.'));ctx.list.append(card);}};
   if(window.RabenExpansion){Object.assign(RabenExpansion.labels,{patchnotes:'Patchnotes',futureRoadmap:'Neue Roadmap'});Object.assign(RabenExpansion.handlers,{patchnotes,futureRoadmap:ctx=>renderRoadmap(ctx.list,ctx)});}
   const publicHost=document.querySelector('[data-public-roadmap]');if(publicHost)renderRoadmap(publicHost);
-  window.RabenUpdates={roadmapVersion:'20261009v3',roadmap,releases,renderRoadmap,patchnotes};
+  window.RabenUpdates={roadmapVersion:'20261015v1',roadmap,releases,renderRoadmap,patchnotes};
 })();

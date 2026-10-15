@@ -133,4 +133,6 @@ const {verifyPresentationAccess}=await import('./presentation-access-cases.mjs')
 await verifyPresentationAccess({db,as,denied,scalar,admin,member,other,blocked});
 const {verifyQolAccess}=await import('./qol-access-cases.mjs');
 await verifyQolAccess({db,as,denied,scalar,admin,member,other,blocked});
+await db.exec('reset role');await db.exec(await readFile(path+'migrations/20261015074256_clan_collaboration_chat_update.sql','utf8'));
+const {verifyNextAccess}=await import('./next-access-cases.mjs');await verifyNextAccess({db,as,denied,scalar,admin,member,other,blocked});
 await db.close();

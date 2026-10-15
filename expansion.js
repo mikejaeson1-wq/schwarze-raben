@@ -41,7 +41,7 @@
       const form=el('form','comment-form'),body=field('Deine Antwort','textarea');body.input.required=true;body.input.maxLength=4000;form.append(body.wrap);const mentions=el('details','');mentions.append(el('summary','','Mitglieder erwähnen'));const picker=pickMembers(ctx);mentions.append(picker.wrap);form.append(mentions);const send=el('button','button outline small-button','Antwort senden');send.type='submit';form.append(send);form.addEventListener('submit',e=>{e.preventDefault();act(ctx,send,async()=>{const ids=picker.read();if(ids.length>10)throw new Error('invalid_mentions');await check(Raben.client().from('raben_comments').insert({parent_type:type,parent_id:id,body:body.input.value.trim(),mentions:ids}));await draw();});});area.append(form);
     };details.addEventListener('toggle',()=>{if(details.open&&!opened){opened=true;draw().catch(e=>{opened=false;ctx.report(failure(e),true);});}});
   };
-  const openParent=async(ctx,type,id)=>{
+  const openParent=async(ctx,type,id)=>{if(type==='calendarFeed'){ctx.navigate('calendarTools');return;}
     if(type==='record'){const rows=await check(Raben.client().from('raben_records').select('id,kind').eq('id',id).limit(1));if(rows[0])ctx.openRecord(rows[0]);else ctx.report('Dieser Eintrag ist nicht mehr für dich freigegeben.');}
     else if(type==='post'){const node=document.querySelector('[data-post-id="'+id+'"]');if(node)node.scrollIntoView({block:'center'});else location.href=new URL('clan.html#post-'+id,Raben.config.siteUrl).href;}
     else {ctx.expandedTarget=id;ctx.navigate(type==='plot'?'plots':'requests');}
