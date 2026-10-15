@@ -30,7 +30,8 @@
   const member = async () => {
     const sb = getClient();
     const {data, error} = await sb.auth.getUser();
-    if (error || !data.user) return null;
+    if (error) {if(error.name==='AuthSessionMissingError'||error.status===401||error.status===403)return null;throw error;}
+    if (!data.user) return null;
     const rows = await check(sb.rpc("raben_request_membership"));
     const membership=Array.isArray(rows)?rows[0]:rows;
     if(!membership||membership.status!=="active")return membership;

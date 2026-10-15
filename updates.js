@@ -2,127 +2,158 @@
   'use strict';
   const roadmap=[
   [
-    "Bearbeitung",
-    "Entwürfe mit offenen Bilduploads wieder aufnehmen",
-    "Begonnene Bearbeitungen inklusive noch nicht zugeordneter Uploads gezielt fortsetzen und verwaiste Dateien leichter erkennen.",
-    "Als Nächstes"
-  ],
-  [
-    "Texte",
-    "Sichere Markdown-Vorschau",
-    "Formatierungen, Listen und Verweise schon während der Eingabe prüfen und einheitlich barrierearm darstellen.",
-    "Danach"
-  ],
-  [
     "Privatchat",
-    "Eigene Unterhaltungen durchsuchen",
-    "Nachrichten im eigenen Gesprächsverlauf nach Suchwort und Zeitraum finden.",
+    "Antworten auf einzelne Nachrichten",
+    "Nachrichten direkt zitieren und vom Zitat zum ursprünglichen Eintrag springen.",
     "Als Nächstes"
   ],
   [
     "Privatchat",
-    "Nachrichten korrigieren und zurückziehen",
-    "Eigene Nachrichten mit sichtbarem Bearbeitungshinweis ändern oder innerhalb einer festgelegten Frist zurückziehen.",
+    "Freiwillige Tippanzeige",
+    "Pro Gespräch entscheiden, ob während der Eingabe eine kurzlebige Tippanzeige erscheint.",
+    "Danach"
+  ],
+  [
+    "Privatchat",
+    "Wichtige Nachrichten persönlich merken",
+    "Eigene Lesezeichen im Gespräch setzen und in einer persönlichen Merkliste wiederfinden.",
     "Als Nächstes"
   ],
   [
     "Privatchat",
-    "Geschützte Anhänge senden",
-    "Bilder und Dateien mit Größenanzeige, Prüfung und Zugriff ausschließlich für die Gesprächspartner teilen.",
+    "Private Chatentwürfe geräteübergreifend",
+    "Optional eigene ungesendete Texte im Konto sichern und vor dem Gerätewechsel wieder aufnehmen.",
     "Danach"
   ],
   [
-    "Privatchat",
-    "Gespräche archivieren und stummschalten",
-    "Unterhaltungen für sich ordnen und Hinweise pro Kontakt einstellen.",
-    "Danach"
+    "Anhänge",
+    "Eigene Aufbewahrungszeiten für Dateien",
+    "Ablaufende Chat-Anhänge erkennen und eine bewusste Löschfrist für neu geteilte Dateien wählen.",
+    "Später"
   ],
   [
-    "Hinweise",
-    "Benachrichtigungen feiner einstellen",
-    "Erwähnungen, Chats, Kalender und Projektmeldungen getrennt abonnieren und Ruhezeiten festlegen.",
+    "Galerie",
+    "Albumsicherungen geprüft wieder einlesen",
+    "Sicherungen auf Prüfsummen und Dateitypen prüfen und ausgewählte eigene Bilder als neues Album übernehmen.",
     "Danach"
   ],
   [
     "Galerie",
-    "Albumcover und gespeicherte Bildauswahlen",
-    "Alben mit einem eigenen Titelbild versehen und wiederkehrende Mehrfachauswahlen speichern.",
-    "Danach"
-  ],
-  [
-    "Galerie",
-    "Eigene Alben gesammelt exportieren",
-    "Ausgewählte eigene Bilder mit Beschreibungen und Reihenfolge als überprüfbare Sicherung herunterladen.",
-    "Danach"
+    "Bildauswahlen vor dem Export bilanzieren",
+    "Gesamtgröße und einzelne Dateien vor einer Albumsicherung anzeigen und große Sicherungen in Teile aufteilen.",
+    "Als Nächstes"
   ],
   [
     "Barrierefreiheit",
-    "Bildbeschreibungen gemeinsam prüfen",
-    "Fehlende oder wenig aussagekräftige Alternativtexte übersichtlich anzeigen und gezielt verbessern.",
-    "Als Nächstes"
-  ],
-  [
-    "Themes",
-    "Importierte Bilder platzsparend verwalten",
-    "Doppelte Bilddateien beim Theme-Import erkennen und nur nach bewusster Auswahl zusammenführen.",
-    "Später"
-  ],
-  [
-    "Kalender",
-    "Persönliche Anzeige-Zeitzone",
-    "Termine auf Wunsch in einer eigenen Zeitzone sehen, während die gemeinsame Planung eindeutig bleibt.",
+    "Dekorative Bilder ausdrücklich markieren",
+    "Bewusst dekorative Bilder unabhängig von noch fehlenden Beschreibungen kennzeichnen und gemeinsam prüfen.",
     "Danach"
   ],
   [
-    "Kalender",
-    "Auswirkungen von Serienänderungen vorab sehen",
-    "Betroffene Teilnahmen, Erinnerungen und Reservierungen vor größeren Serienänderungen gemeinsam prüfen.",
+    "Texte",
+    "Markdown mit Tastaturwerkzeugen bearbeiten",
+    "Ausgewählte Textstellen per Werkzeugleiste formatieren und die Vorschau gezielt anspringen.",
     "Als Nächstes"
   ],
   [
-    "Ressourcen",
-    "Teilbare Kapazitäten reservieren",
-    "Mehrere Einheiten derselben Ressource buchen und die verfügbare Restmenge pro Zeitraum anzeigen.",
-    "Später"
+    "Kalender",
+    "Zeitumstellungen deutlicher prüfen",
+    "Nicht vorhandene und doppelte Uhrzeiten bei Sommer- und Winterzeit vor dem Speichern erläutern.",
+    "Als Nächstes"
+  ],
+  [
+    "Reservierungen",
+    "Kapazitäten über eine Woche vergleichen",
+    "Belegung und freie Einheiten mehrerer Ressourcen in einer gemeinsamen Wochenansicht zeigen.",
+    "Danach"
   ],
   [
     "Terminfindung",
-    "Mindestbesetzung und Spieldauer berücksichtigen",
-    "Gemeinsame Zeitfenster nach benötigter Dauer, Teilnehmerzahl und gewünschten Personen filtern.",
-    "Als Nächstes"
-  ],
-  [
-    "Zusammenarbeit",
-    "Einladungen zur Mitbearbeitung annehmen",
-    "Mitbearbeitung zunächst als Einladung senden und erst nach Annahme aktivieren.",
+    "Persönliche Besetzungsfilter speichern",
+    "Spieldauer, Mindestbesetzung und gewünschte Personen für wiederkehrende Planungen als eigene Ansicht speichern.",
     "Danach"
   ],
   [
+    "Kalender",
+    "Serienänderungen mit genauer Textdifferenz",
+    "Neben den betroffenen Zuordnungen auch alte und neue Uhrzeiten und Dauer pro Termin gegenüberstellen.",
+    "Danach"
+  ],
+  [
+    "Mitbearbeitung",
+    "Einladungshinweise mit Ablaufwarnung",
+    "Neue Einladungen und bald endende Mitbearbeitungen als persönliche Hinweise bündeln.",
+    "Als Nächstes"
+  ],
+  [
     "Materialplanung",
-    "Rezeptvarianten und Verschnitt berechnen",
-    "Alternative Materialien, Reservebedarf und unterschiedliche Ausgabegrößen pro Bauvorhaben vergleichen.",
-    "Später"
+    "Frühere Rezeptvarianten wiederherstellen",
+    "Auch für alternative Materiallisten eine begrenzte Historie mit Vergleich und Wiederherstellung anbieten.",
+    "Danach"
   ],
   [
     "Lager",
-    "Persönliche Hinweise bei niedrigen Beständen",
-    "Für ausgewählte Materialien Mindestmengen festlegen und bei Unterschreitung einen Clan-Hinweis erhalten.",
+    "Bestandsbeobachtung feiner steuern",
+    "Hinweise einzelner Materialien zeitweise pausieren und nach einer bewussten Prüfung erneut aktivieren.",
     "Danach"
   ],
   [
     "Discord",
-    "Freigegebene Meldungen zeitlich planen",
-    "Geprüfte Ankündigungen für einen gewünschten Zeitpunkt vormerken und bis dahin nachvollziehbar bearbeiten.",
+    "Eigene Meldungsvorlagen prüfen",
+    "Wiederkehrende Ankündigungsformate als Vorlagen speichern und vor jeder Freigabe auf fehlende Angaben prüfen.",
     "Später"
   ],
   [
-    "Stabilität",
-    "Datensparsame Fehlerdiagnose zum Kopieren",
-    "Bei Fehlern einen prüfbaren Diagnosebericht ohne Nachrichteninhalte, Zugangsdaten oder geheime Links erzeugen.",
+    "Bedienung",
+    "Neue Inhalte ohne Ansichtswechsel melden",
+    "Neue oder geänderte Einträge mit einem dezenten Hinweis ankündigen und auf Wunsch gezielt übernehmen.",
+    "Als Nächstes"
+  ],
+  [
+    "Uploads",
+    "Laufende Übertragungen zentral verwalten",
+    "Aktive Uploads, Fortschritt und sichere Wiederholungen in einer gemeinsamen Geräteübersicht anzeigen.",
+    "Danach"
+  ],
+  [
+    "Navigation",
+    "Schneller zwischen Clanbereichen wechseln",
+    "Eine per Tastatur erreichbare Bereichssuche mit eigenen Favoriten anbieten.",
     "Als Nächstes"
   ]
 ].map(([area,title,body,priority],i)=>({number:i+1,area,title,body,priority,status:'Geplant'}));
   const releases=[
+{
+  "version": "2026.10.15.2",
+  "date": "15. Oktober 2026",
+  "title": "20-Punkte-Update · Privatchat, Planung und stabile Clanansichten",
+  "items": [
+    "Fehlerbehebung: Hintergrundprüfungen bauen Clanansichten nicht mehr alle 30 Sekunden neu auf. Unveränderte Aushänge, geöffnete Diskussionen, Eingaben und Player bleiben bestehen; vorübergehende Verbindungsfehler sperren eine bereits geöffnete Ansicht nicht pauschal.",
+    "Chat-Extras: Emoji-Auswahl, acht Emoji-Reaktionen, sichtbare Korrekturhinweise und Lesestatus. Private Anhänge erhalten einen eigenen geschützten Speicherbereich; normale Clanadmins erhalten keinen Lesezugriff.",
+    "Punkt 1 · Bereits hochgeladene, noch nicht zugeordnete Bilder im passenden Entwurf erneut auswählen. Eine eigene Übersicht zeigt offene Uploads, gespeicherte Entwürfe und verwendete Dateien.",
+    "Punkt 2 · Sichere Markdown-Vorschau für Texte mit Überschriften, Listen, Links, Hervorhebungen und Code. HTML und externe Bilder werden nicht ausgeführt.",
+    "Punkt 3 · Eigene Gespräche nach Suchwort und Zeitraum filtern; ältere Treffer nachladen.",
+    "Punkt 4 · Eigene Nachrichten korrigieren oder innerhalb von 15 Minuten zurückziehen. Zurückgezogene Nachrichten bleiben als Hinweis sichtbar; ihre Anhänge sind nicht mehr über das Gespräch abrufbar.",
+    "Punkt 5 · Bis zu vier geschützte Anhänge pro Nachricht, jeweils bis 10 MiB. Dateityp, Inhaltssignatur und Größe werden vor dem Upload geprüft; Zugriff und Zuordnung werden serverseitig kontrolliert.",
+    "Punkt 6 · Gespräche persönlich archivieren und Hinweise je Kontakt stummschalten.",
+    "Punkt 7 · Erwähnungen, Chats, Kalender und Clanmeldungen getrennt einstellen. Ruhezeiten gelten für Desktop-Hinweise. Geräte müssen ausdrücklich aktiviert werden; Chattexte bleiben auf dem Sperrbildschirm verborgen.",
+    "Punkt 8 · Albumcover festlegen und eigene Bildauswahlen benennen, speichern, laden und löschen.",
+    "Punkt 9 · Eigene Alben oder Bildauswahlen als ZIP mit Reihenfolge, Beschreibungen und SHA-256-Prüfsummen sichern.",
+    "Punkt 10 · Fehlende oder auffällig kurze Bildbeschreibungen gemeinsam prüfen und im Rahmen der eigenen Berechtigungen verbessern.",
+    "Punkt 11 · Identische Bilder beim Theme-Import anhand ihrer Prüfsumme erkennen. Vorhandene eigene oder identische importierte Dateien ausschließlich nach bewusster Auswahl wiederverwenden.",
+    "Punkt 12 · Persönliche Anzeige-Zeitzone speichern. Die gemeinsame Planung und Kalenderserien bleiben eindeutig auf Europe/Berlin bezogen.",
+    "Punkt 13 · Vor Termin- und Serienänderungen die betroffenen Teilnahmen, Erinnerungen und Reservierungen prüfen und das Speichern ausdrücklich freigeben.",
+    "Punkt 14 · Teilbare Ressourcenkapazitäten und benötigte Einheiten buchen. Freie Kapazität einschließlich Aufbau und Abbau prüfen; gleichzeitige Buchungen werden an der Ressource serialisiert.",
+    "Punkt 15 · Gemeinsame Zeitfenster nach Mindestdauer, Besetzung und gewünschten Personen filtern. Personen müssen den gesamten vorgeschlagenen Zeitraum abdecken.",
+    "Punkt 16 · Neue Mitbearbeitungen als Einladung senden. Zugriff beginnt nach Annahme; Ablehnen, Verlassen, Ablauf und Widerruf sind möglich. Bestehende Freigaben bleiben angenommen.",
+    "Punkt 17 · Alternative Materiallisten als Rezeptvarianten mit Verschnitt und Ausgabegrößen anlegen und mit zusätzlicher Projektreserve vergleichen.",
+    "Punkt 18 · Persönliche Mindestbestände beobachten. Bei Unterschreitung erscheint ein Clan-Hinweis; erneute Warnungen folgen nach zwischenzeitlicher Auffüllung.",
+    "Punkt 19 · Geprüfte Discord-Meldungen für einen Zeitpunkt vormerken und die Planung bis zum Versand ändern. Geänderte Quellen müssen erneut freigegeben werden.",
+    "Punkt 20 · Einen vor dem Kopieren prüfbaren Diagnosebericht mit technischen Statuswerten erzeugen. Texte, Nutzerkennungen, Webadressen und Zugangsdaten sind ausgeschlossen.",
+    "Spotify: echter Lautstärkeregler über den optionalen Premium-Webplayer vorbereitet. Der Betreiber muss eine Spotify-App mit Client-ID einrichten; anschließend verbindet jedes freigeschaltete Premium-Konto seinen eigenen Player. Der bisherige Embed-Player bleibt nutzbar."
+  ],
+  "note": "Desktop-Benachrichtigungen benötigen eine Browserfreigabe. Dateiprüfungen ersetzen keinen Virenscanner. Spotify-Embeds bieten keine externe Lautstärkeschnittstelle; die Premium-Anbindung benötigt eine eingerichtete Spotify-App."
+},
 {
   "version": "2026.10.15.1",
   "date": "15. Oktober 2026",
@@ -204,5 +235,5 @@
   const patchnotes=ctx=>{for(const release of releases){const card=el('article','hub-card patchnote');card.append(el('p','eyebrow',release.date+' · '+release.version),el('h3','',release.title));const list=el('ul','patchnote-list');release.items.forEach(text=>list.append(el('li','',text)));card.append(list);if(release===releases[0])card.append(el('p','field-note',release.note||'Spotify-Autostart hängt von den Wiedergaberegeln deines Browsers ab. Der Player bleibt auch manuell bedienbar.'));ctx.list.append(card);}};
   if(window.RabenExpansion){Object.assign(RabenExpansion.labels,{patchnotes:'Patchnotes',futureRoadmap:'Neue Roadmap'});Object.assign(RabenExpansion.handlers,{patchnotes,futureRoadmap:ctx=>renderRoadmap(ctx.list,ctx)});}
   const publicHost=document.querySelector('[data-public-roadmap]');if(publicHost)renderRoadmap(publicHost);
-  window.RabenUpdates={roadmapVersion:'20261015v1',roadmap,releases,renderRoadmap,patchnotes};
+  window.RabenUpdates={roadmapVersion:'20261015v2',roadmap,releases,renderRoadmap,patchnotes};
 })();

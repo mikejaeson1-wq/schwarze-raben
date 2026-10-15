@@ -62,7 +62,7 @@
       try{
         const actor=await ctx.authorize();if(actor?.role!=='admin')throw {code:'42501'};const pictures=[];
         for(const item of items.filter(i=>!i.removed)){
-          const picture=readPicture(item);delete picture._url;
+          const picture=readPicture(item);delete picture._url;const recovered=window.RabenFuture?.recovered(item.file)?.[0];if(recovered){picture.imagePath=recovered.imagePath;picture.previewPath=recovered.mediumPath||recovered.thumbPath;}
           if(item.file.files?.[0]){const uploaded=await RabenPictures.upload(ctx,item.file.files[0],progress,B);picture.imagePath=uploaded.imagePath;picture.previewPath=uploaded.mediumPath||uploaded.thumbPath||null;}
           if(!picture.imagePath)throw new Error('Bitte wähle für jedes hinzugefügte Bild eine Datei aus.');pictures.push(picture);
         }

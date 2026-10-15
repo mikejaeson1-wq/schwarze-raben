@@ -153,10 +153,11 @@
       if(kind==='knowledge')data.pinned=inputs.pinned?inputs.pinned.checked:details.pinned===true;
       if(expansion)Object.assign(data,await expansion.read());
       if(source)data=await source.collect(data);
-      if(inputs.image?.files?.[0]){if(window.RabenPictures){const picture=await RabenPictures.upload(ctx,inputs.image.files[0],source?.controls||controls);data.imagePath=picture.imagePath;if(picture.thumbPath)data.thumbPath=picture.thumbPath;else delete data.thumbPath;}else data.imagePath=await upload(ctx,inputs.image.files[0],ctx.actor.user_id,source?.controls||controls);delete data.publicImage;delete data.publicThumb;details.imagePath=data.imagePath;delete details.publicImage;inputs.image.value='';}
+      const recovered=window.RabenFuture?.recovered(inputs.image)?.[0];if(recovered){data.imagePath=recovered.imagePath;data.thumbPath=recovered.thumbPath||recovered.mediumPath;delete data.publicImage;delete data.publicThumb;}if(inputs.image?.files?.[0]){if(window.RabenPictures){const picture=await RabenPictures.upload(ctx,inputs.image.files[0],source?.controls||controls);data.imagePath=picture.imagePath;if(picture.thumbPath)data.thumbPath=picture.thumbPath;else delete data.thumbPath;}else data.imagePath=await upload(ctx,inputs.image.files[0],ctx.actor.user_id,source?.controls||controls);delete data.publicImage;delete data.publicThumb;details.imagePath=data.imagePath;delete details.publicImage;inputs.image.value='';}
       Object.keys(details).forEach(key=>delete details[key]);Object.assign(details,data);
       if(inputs.visibility.value==='public'){if(kind==='media'&&(current?.visibility!=='public'||data.audioPath!==current?.details.audioPath||data.imagePath!==current?.details.imagePath||data.youtubeId!==current?.details.youtubeId||data.spotifyId!==current?.details.spotifyId||data.spotifyType!==current?.details.spotifyType)&&!confirm('Dieses Medium einschließlich Bild, Video, Spotify oder MP3-Aufnahme öffentlich freigeben?'))return;data=await publishImage(ctx,data);}
       if(ctx.disposed||!form.isConnected)return;
+      if(current&&kind==='event'&&window.RabenFuture&&!await RabenFuture.seriesPreview(ctx,current,data))return;
       const payload={title:inputs.title.value.trim(),body:inputs.body.value.trim(),details:data,visibility:inputs.visibility.value};
       const result=current?await check(Raben.client().from('raben_records').update(payload).eq('id',current.id).eq('revision',current.revision).select('id,kind,title,body,details,visibility,created_by,revision,updated_at')):await check(Raben.client().from('raben_records').insert({...payload,kind}).select('id,kind,title,body,details,visibility,created_by,revision,updated_at'));
       if(!result.length){if(current&&window.RabenNext){await RabenNext.conflict(ctx,'record',current,inputs.title,inputs.body);return;}throw new Error('record_conflict');}if(ctx.disposed)return;
@@ -165,7 +166,7 @@
     ctx.editor.append(form);title.input.focus();window.RabenQol?.draft(ctx,form,'record:'+kind+':'+(row?.id||'new'),row?.revision??null).then(d=>draft=d).catch(()=>{});
   };
   const removeRecord=(ctx,row,b)=>run(ctx,b,async()=>{
-    if(!confirm('„'+row.title+'“ einschließlich zugehöriger Zusagen, Stimmen oder Notizen löschen?'))return;
+    if(!confirm('„'+row.title+'“ einschließlich zugehöriger Zusagen, Stimmen oder Notizen löschen?'))return;if(row.kind==='event'&&window.RabenFuture&&!await RabenFuture.seriesPreview(ctx,row,{...row.details,cancelled:true}))return;
     const rows=await check(Raben.client().from('raben_records').delete().eq('id',row.id).eq('revision',row.revision).select('id'));
     if(!rows.length)throw new Error('record_conflict');await loadList(ctx,true);inform(ctx,'Eintrag gelöscht.');
   });
@@ -322,7 +323,7 @@
     ctx.status=el('p','status-message');ctx.status.setAttribute('role','status');ctx.status.hidden=true;
     const tabs=el('div','hub-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Gemeinschaftsbereiche');
     let kinds=ctx.public?[...publicKinds,'stories']:ctx.admin?['dashboard','profiles','applications','review',...Object.keys(definitions),'stories','history','storage','backup']:['profiles',...memberKinds,'stories'];
-    if(!ctx.public&&window.RabenExpansion)kinds=[...['home','clanInfo','patchnotes','futureRoadmap','chat','searchAll','notices','requests','plots','availability','calendarTools','reservations','maps','stock','recipes','feedback','settings'],...(ctx.actor.role==='admin'?['access','publicSettings','siteMusic','webhook','discordChannels','discordReview','emblem']:[]),...kinds];
+    if(!ctx.public&&window.RabenExpansion)kinds=[...['home','clanInfo','patchnotes','futureRoadmap','chat','searchAll','notices','requests','plots','availability','calendarTools','reservations','maps','stock','recipes','feedback',...(window.RabenFuture?['invitations']:[]),'settings'],...(ctx.actor.role==='admin'?['access','publicSettings','siteMusic','webhook','discordChannels','discordReview','emblem']:[]),...kinds];
     const uid=++sequence;ctx.uid=uid;
     kinds.forEach((kind,index)=>{const b=button(window.RabenExpansion?.labels[kind]||definitions[kind]?.label||({dashboard:'Übersicht',profiles:'Clanprofile',applications:'Bewerbungen',review:'Freigaben',stories:'Geschichten',history:'Versionen',storage:'Speicher',backup:'Sicherung'}[kind]),()=>selectKind(ctx,kind),'hub-tab');b.dataset.kind=kind;b.setAttribute('role','tab');b.setAttribute('aria-controls','hub-panel-'+uid);b.setAttribute('aria-selected',String(index===0));b.tabIndex=index===0?0:-1;b.id='hub-tab-'+uid+'-'+kind;ctx.tabs.push(b);tabs.append(b);});
     ctx.tabs.forEach((tab,index)=>tab.addEventListener('keydown',event=>{const n=event.key==='Home'?0:event.key==='End'?ctx.tabs.length-1:event.key==='ArrowRight'?(index+1)%ctx.tabs.length:event.key==='ArrowLeft'?(index+ctx.tabs.length-1)%ctx.tabs.length:null;if(n!==null){event.preventDefault();ctx.tabs[n].click();ctx.tabs[n].focus();}}));

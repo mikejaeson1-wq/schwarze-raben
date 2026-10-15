@@ -21,7 +21,7 @@
   const upload=async(ctx,file,controls,bucket='raben-media',target=null)=>{
     const previews=await variants(file),imagePath=await RabenMedia.upload(ctx,file,ctx.actor.user_id,controls,false,target,bucket),paths=[];
     for(const preview of previews){let target=null;if(bucket==='raben-public'){target=targets.get(preview);if(!target){target=crypto.randomUUID()+'.'+(preview.type==='image/webp'?'webp':'png');targets.set(preview,target);}}paths.push(await RabenMedia.upload(ctx,preview,ctx.actor.user_id,controls,false,target,bucket));}
-    return {imagePath,thumbPath:paths[0]||null,mediumPath:paths[1]||paths[0]||null};
+    const result={imagePath,thumbPath:paths[0]||null,mediumPath:paths[1]||paths[0]||null};if(window.RabenFuture)try{await RabenFuture.registerUpload(ctx,file,result,bucket,controls);}catch(_){ctx.report?.('Bild hochgeladen; die Zuordnung zur Entwurfswiederaufnahme konnte nicht gesichert werden.',true);}return result;
   };
   const publicUrl=path=>path?Raben.client().storage.from('raben-public').getPublicUrl(path).data.publicUrl:'';
   const background=async(ctx,file,controls,target)=>{

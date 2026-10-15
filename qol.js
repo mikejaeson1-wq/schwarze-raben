@@ -13,7 +13,7 @@
   const load=async()=>{busy(list,true);status.textContent='Einträge werden geladen …';const result=await query().range(offset,offset+24);if(result.error)throw result.error;if(!live(ctx,epoch))return;offset+=result.data.length;count=Number(result.count??offset);for(const row of result.data){const card=await render(row);if(!live(ctx,epoch))return;if(card)list.append(card);}more.hidden=offset>=count;status.textContent=count?offset+' von '+count+' Einträgen':'';busy(list,false);if(!offset)list.append(note('Hier gibt es noch keine Einträge.'));};await load();return list;
  };
  // Text drafts are self-only in the database. Files, credentials and sharing choices are deliberately not captured.
- const draft=async(ctx,form,key,revision=null)=>{if(ctx.public||!ctx.actor?.user_id)return null;const epoch=ctx.epoch,uid=ctx.actor.user_id;let timer,pending=Promise.resolve(),disposed=false,cancelled=false,changed=false;
+ const draft=async(ctx,form,key,revision=null)=>{if(ctx.public||!ctx.actor?.user_id)return null;form.dataset.draftKey=key;window.RabenFuture?.uploadRecovery(ctx,form,key).catch(()=>{});const epoch=ctx.epoch,uid=ctx.actor.user_id;let timer,pending=Promise.resolve(),disposed=false,cancelled=false,changed=false;
   const status=note('Private Textentwürfe werden auf deinem Konto gesichert.'),recover=el('div','draft-recovery');status.setAttribute('role','status');form.prepend(recover,status);
   const inputs=()=>[...form.querySelectorAll('textarea,input')].filter(i=>i.tagName==='TEXTAREA'||['text','search','email','url','number','date','time','datetime-local'].includes(i.type));
   const capture=()=>({revision,fields:inputs().map((i,index)=>({index,type:i.tagName==='TEXTAREA'?'textarea':i.type,value:i.value})),savedAt:new Date().toISOString()});

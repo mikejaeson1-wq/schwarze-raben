@@ -135,4 +135,7 @@ const {verifyQolAccess}=await import('./qol-access-cases.mjs');
 await verifyQolAccess({db,as,denied,scalar,admin,member,other,blocked});
 await db.exec('reset role');await db.exec(await readFile(path+'migrations/'+(await readdir(path+'migrations')).find(n=>n.endsWith('_clan_collaboration_chat_update.sql')),'utf8'));
 const {verifyNextAccess}=await import('./next-access-cases.mjs');await verifyNextAccess({db,as,denied,scalar,admin,member,other,blocked});
+await db.exec('reset role');await db.exec(await readFile(path+'migrations/'+(await readdir(path+'migrations')).find(n=>n.endsWith('_clan_messages_planning_qol.sql')),'utf8'));
+await db.exec('reset role');await db.exec(await readFile(path+'migrations/'+(await readdir(path+'migrations')).find(n=>n.endsWith('_clan_update_index_review.sql')),'utf8'));
+const {verifyFutureAccess}=await import('./future-access-cases.mjs');await verifyFutureAccess({db,as,denied,scalar,admin,member,other,blocked});
 await db.close();

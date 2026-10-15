@@ -22,6 +22,7 @@
     const live=()=>!state.disposed&&!ctx.disposed&&ctx.epoch===epoch&&wrap.isConnected;
     const authorize=async()=>{if(!ctx.public)await ctx.authorize();if(!live())throw new Error('spotify_disposed');};
     const play=()=>{
+      window.RabenSpotifyConnect?.disconnect?.();
       if(!live()||!state.controller)return;
       for(const other of players)if(other!==state)other.controller?.pause?.();
       try{const result=state.controller.play();if(result?.catch)result.catch(()=>{if(live())status.textContent='Bitte starte die Musik mit ▶ im Spotify-Player.';});status.textContent='Start angefordert. Falls die Musik nicht startet, drücke ▶ im Spotify-Player.';}catch(_){status.textContent='Bitte starte die Musik mit ▶ im Spotify-Player.';}
@@ -47,17 +48,17 @@
     // A separate switch retains a usable opt-out after the player has loaded.
     const remember=el('label','spotify-consent'),checkbox=el('input','');checkbox.type='checkbox';checkbox.checked=preference();remember.append(checkbox,document.createTextNode('Spotify künftig auf diesem Gerät automatisch laden und starten'));
     checkbox.addEventListener('change',()=>{setAutoplay(checkbox.checked);if(checkbox.checked){if(state.controller)play();else load(false);}else status.textContent='Autostart ausgeschaltet. Du kannst die Musik manuell starten.';});
-    actions.append(start,pause);wrap.append(embed,actions,status,remember,el('p','field-note','Die Wiedergabe richtet sich nach Spotify und deinem Browser. Autostart kann einen ersten Klick benötigen.'));
+    actions.append(start,pause);if(window.RabenSpotifyConnect)wrap.append(RabenSpotifyConnect.create(ctx,source));wrap.append(embed,actions,status,remember,el('p','field-note','Die Wiedergabe richtet sich nach Spotify und deinem Browser. Autostart kann einen ersten Klick benötigen.'));
     state.dispose=()=>{if(state.disposed)return;state.disposed=true;try{state.controller?.destroy?.();}catch(_){}finally{if(state.frame){ctx.players.delete(state.frame);state.frame.remove();}ctx.spotifyPlayers.delete(state);players.delete(state);}};
     if(source.autoplay!==false&&preference()&&!ctx.spotifyAutoClaim){ctx.spotifyAutoClaim=true;Promise.resolve().then(()=>load(true));}
     return wrap;
   };
-  const release=ctx=>{for(const player of [...ctx.spotifyPlayers||[]])player.dispose();delete ctx.spotifyAutoClaim;};
+  const release=ctx=>{window.RabenSpotifyConnect?.release(ctx);for(const player of [...ctx.spotifyPlayers||[]])player.dispose();delete ctx.spotifyAutoClaim;};
   const home=(ctx,source)=>{
     document.getElementById('home-spotify-player')?.remove();if(!source?.enabled||!allowed(source))return;
     const dock=el('aside','site-music'),head=el('div','site-music-heading'),panel=create(ctx,{...source,compact:true});dock.id='home-spotify-player';dock.setAttribute('aria-label','Spotify-Begleitmusik');head.append(el('h2','',source.title||'Begleitmusik'));
     const minimize=button('Einklappen',()=>{panel.hidden=!panel.hidden;minimize.textContent=panel.hidden?'Musikplayer öffnen':'Einklappen';minimize.setAttribute('aria-expanded',String(!panel.hidden));});minimize.setAttribute('aria-expanded','true');head.append(minimize);dock.append(head,panel);document.body.append(dock);
   };
-  window.RabenSpotify={create,home,release,preference,setAutoplay};
+  window.RabenSpotify={create,home,release,preference,setAutoplay,pauseEmbeds:()=>{for(const p of players)p.controller?.pause?.();}};
   window.addEventListener('raben-lock',()=>{for(const player of [...players])if(!player.ctx.public)player.dispose();});
 })();
